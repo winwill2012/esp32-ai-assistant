@@ -1,6 +1,7 @@
 # Prerequisites
 *.d
-
+.idea
+.pio
 # Compiled Object files
 *.slo
 *.lo

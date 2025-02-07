@@ -1,0 +1,8 @@
+#ifndef AI_ROBOT_UTILS_H
+#define AI_ROBOT_UTILS_H
+
+#include "Arduino.h"
+
+String generateUUID();
+
+#endif
