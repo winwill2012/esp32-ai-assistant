@@ -3,6 +3,6 @@
 
 #include "Arduino.h"
 
-String generateUUID();
+String generateTaskId();
 
 #endif

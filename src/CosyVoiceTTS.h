@@ -11,7 +11,7 @@ public:
 
     void setupMax98357();
 
-    void eventCallback(WStype_t type, uint8_t *payload, size_t length);
+    void eventCallback(WStype_t type, uint8_t *payload, size_t length) const;
 
     void begin(const String &sk, const String &host, int port,
                const String &url, int i2sDout, int i2sBclk, int i2sLrc);
@@ -31,9 +31,9 @@ private:
     int i2sDout;
     int i2sBclk;
     int i2sLrc;
-    SemaphoreHandle_t webSocketConnected;
-    SemaphoreHandle_t ttsTaskStartedSemaphore;
-
+    SemaphoreHandle_t connected;
+    SemaphoreHandle_t taskStarted;
+    SemaphoreHandle_t taskRunning;
 };
 
 #endif
