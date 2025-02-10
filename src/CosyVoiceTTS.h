@@ -7,33 +7,37 @@
 
 class CosyVoiceTTS : public WebSocketsClient {
 public:
-    CosyVoiceTTS(i2s_port_t i2SPort, uint32_t sampleRate, String voice);
+    CosyVoiceTTS(i2s_port_t i2SPort, uint32_t sampleRate, String voice,
+                 const String &appId, const String &token,
+                 const String &host, int port,
+                 const String &url, int i2sDout, int i2sBclk, int i2sLrc);
 
     void setupMax98357();
 
-    void eventCallback(WStype_t type, uint8_t *payload, size_t length) const;
+    void eventCallback(WStype_t type, uint8_t *payload, size_t length);
 
-    void begin(const String &sk, const String &host, int port,
-               const String &url, int i2sDout, int i2sBclk, int i2sLrc);
+    void begin();
 
-    String buildRunTask();
+    String buildFullClientRequest(const String &text);
 
-    static String buildContinueTask(const String &text);
+    bool parseResponse(uint8_t *response);
 
-    static String buildFinishTask();
-
-    void tts(const String &text);
+    void synth(const String &text);
 
 private:
-    String voice;
-    uint32_t sampleRate;
-    i2s_port_t i2sNumber;
-    int i2sDout;
-    int i2sBclk;
-    int i2sLrc;
-    SemaphoreHandle_t connected;
-    SemaphoreHandle_t taskStarted;
-    SemaphoreHandle_t taskRunning;
+    String _appId;
+    String _token;
+    String _host;
+    uint16_t _port;
+    String _url;
+    String _voiceType;
+    String _emotion;
+    uint32_t _sampleRate;
+    i2s_port_t _i2sNumber;
+    int _i2sDout;
+    int _i2sBclk;
+    int _i2sLrc;
+    SemaphoreHandle_t _available;
 };
 
 #endif
