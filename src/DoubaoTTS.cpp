@@ -1,4 +1,4 @@
-#include "CosyVoiceTTS.h"
+#include "DoubaoTTS.h"
 
 #include <utility>
 
@@ -8,7 +8,6 @@
 #include "freertos/task.h"
 #include "Arduino.h"
 #include "ArduinoJson.h"
-#include "esp_system.h"
 #include <vector>
 
 JsonDocument params;
@@ -21,10 +20,10 @@ JsonDocument params;
 const uint8_t defaultHeader[] = {0x11, 0x10, 0x10, 0x00};
 TaskHandle_t eventHandler;
 
-CosyVoiceTTS::CosyVoiceTTS(i2s_port_t i2sNumber, uint32_t sampleRate, String voiceType,
-                           const String &appId,
-                           const String &token, const String &host, int port,
-                           const String &url, int i2sDout, int i2sBclk, int i2sLrc) {
+DoubaoTTS::DoubaoTTS(i2s_port_t i2sNumber, uint32_t sampleRate, String voiceType,
+                     const String &appId,
+                     const String &token, const String &host, int port,
+                     const String &url, int i2sDout, int i2sBclk, int i2sLrc) {
     _i2sNumber = i2sNumber;
     _voiceType = std::move(voiceType);
     _appId = appId;
@@ -41,7 +40,7 @@ CosyVoiceTTS::CosyVoiceTTS(i2s_port_t i2sNumber, uint32_t sampleRate, String voi
     setupMax98357();
 }
 
-void CosyVoiceTTS::eventCallback(WStype_t type, uint8_t *payload, size_t length) {
+void DoubaoTTS::eventCallback(WStype_t type, uint8_t *payload, size_t length) {
     switch (type) {
         case WStype_PING:
             break;
@@ -80,7 +79,7 @@ void CosyVoiceTTS::eventCallback(WStype_t type, uint8_t *payload, size_t length)
     }
 }
 
-String CosyVoiceTTS::buildFullClientRequest(const String &text) const {
+String DoubaoTTS::buildFullClientRequest(const String &text) const {
     const JsonObject app = params["app"].to<JsonObject>();
     app["appid"] = _appId;
     app["token"] = _token;
@@ -110,7 +109,7 @@ String CosyVoiceTTS::buildFullClientRequest(const String &text) const {
     return resStr;
 }
 
-void CosyVoiceTTS::synth(const String &text) {
+void DoubaoTTS::synth(const String &text) {
     if (xSemaphoreTake(_available, 0) == pdFALSE) {
         Serial.println("tts is busy");
         return;
@@ -144,7 +143,7 @@ void CosyVoiceTTS::synth(const String &text) {
     sendBIN(clientRequest.data(), clientRequest.size());
 }
 
-void CosyVoiceTTS::setupMax98357() const {
+void DoubaoTTS::setupMax98357() const {
     const i2s_config_t max98357_i2s_config = {
         .mode = i2s_mode_t(I2S_MODE_MASTER | I2S_MODE_TX),
         .sample_rate = _sampleRate,
@@ -170,14 +169,14 @@ void CosyVoiceTTS::setupMax98357() const {
 }
 
 [[noreturn]] void webSocketLoop(void *ptr) {
-    auto *client = static_cast<CosyVoiceTTS *>(ptr);
+    auto *client = static_cast<DoubaoTTS *>(ptr);
     while (true) {
         client->loop();
         vTaskDelay(1);
     }
 }
 
-void CosyVoiceTTS::begin() {
+void DoubaoTTS::begin() {
     if (isConnected()) {
         return;
     }
@@ -193,7 +192,7 @@ int32_t bigEndianToInt32(const uint8_t *bytes) {
     return (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
 }
 
-bool CosyVoiceTTS::parseResponse(const uint8_t *response) const {
+bool DoubaoTTS::parseResponse(const uint8_t *response) const {
     const uint8_t messageType = response[1] >> 4;
     const uint8_t messageTypeSpecificFlags = response[1] & 0x0f;
     const uint8_t *payload = response + 4;

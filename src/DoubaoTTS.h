@@ -1,16 +1,16 @@
-#ifndef COSY_VOICE_TTS_H
-#define COSY_VOICE_TTS_H
+#ifndef DOUBAO_TTS_H
+#define DOUBAO_TTS_H
 
 #include <Arduino.h>
 #include <WebSocketsClient.h>
 #include "driver/i2s.h"
 
-class CosyVoiceTTS : public WebSocketsClient {
+class DoubaoTTS : public WebSocketsClient {
 public:
-    CosyVoiceTTS(i2s_port_t i2SPort, uint32_t sampleRate, String voice,
-                 const String &appId, const String &token,
-                 const String &host, int port,
-                 const String &url, int i2sDout, int i2sBclk, int i2sLrc);
+    DoubaoTTS(i2s_port_t i2SPort, uint32_t sampleRate, String voice,
+              const String &appId, const String &token,
+              const String &host, int port,
+              const String &url, int i2sDout, int i2sBclk, int i2sLrc);
 
     void setupMax98357() const;
 
