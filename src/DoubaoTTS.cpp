@@ -18,7 +18,6 @@ JsonDocument params;
  * 第3个字节：0b0000, 0b0000   (保留字节)
  */
 const uint8_t defaultHeader[] = {0x11, 0x10, 0x10, 0x00};
-TaskHandle_t eventHandler;
 
 DoubaoTTS::DoubaoTTS(i2s_port_t i2sNumber, uint32_t sampleRate, String voiceType,
                      const String &appId,
@@ -36,7 +35,6 @@ DoubaoTTS::DoubaoTTS(i2s_port_t i2sNumber, uint32_t sampleRate, String voiceType
     _i2sBclk = i2sBclk;
     _i2sLrc = i2sLrc;
     _available = xSemaphoreCreateBinary();
-    xSemaphoreGive(_available);
     setupMax98357();
 }
 
@@ -95,7 +93,31 @@ String DoubaoTTS::buildFullClientRequest(const String &text) const {
     audio["speed_ratio"] = 1.0;
     audio["volume_ratio"] = 1.0;
     audio["pitch_ratio"] = 1.0;
-    audio["emotion"] = "happy";
+    /**
+     * pleased - 愉悦
+sorry - 抱歉
+annoyed - 嗔怪
+happy - 开心
+angry - 愤怒
+surprise - 惊讶
+hate - 厌恶
+sad - 悲伤
+scare - 害怕
+tear - 哭腔
+customer_service - 客服
+professional - 专业
+serious - 严肃
+tsundere - 傲娇
+comfort - 安慰鼓励
+conniving - 绿茶
+charming - 娇媚
+radio - 情感电台
+lovey-dovey - 撒娇
+yoga - 瑜伽
+storytelling - 讲故事
+分享
+     */
+    audio["emotion"] = "customer_service";
     audio["language"] = "cn";
 
     const JsonObject request = params["request"].to<JsonObject>();
@@ -110,13 +132,8 @@ String DoubaoTTS::buildFullClientRequest(const String &text) const {
 }
 
 void DoubaoTTS::synth(const String &text) {
-    if (xSemaphoreTake(_available, 0) == pdFALSE) {
+    if (xSemaphoreTake(_available, 3000) == pdFALSE) {
         Serial.println("tts is busy");
-        return;
-    }
-    // begin(); // 建立连接
-    if (!isConnected()) {
-        Serial.println("websocket is disConnected");
         return;
     }
     const String payloadStr = buildFullClientRequest(text);
@@ -126,16 +143,12 @@ void DoubaoTTS::synth(const String &text) {
     }
     payload[payloadStr.length()] = '\0';
     const size_t payloadSize = payloadStr.length();
-    uint8_t payloadLength[4];
-    payloadLength[0] = (payloadSize >> 24) & 0xFF;
-    payloadLength[1] = (payloadSize >> 16) & 0xFF;
-    payloadLength[2] = (payloadSize >> 8) & 0xFF;
-    payloadLength[3] = payloadSize & 0xFF;
+    uint8_t *payloadLength = int2Array(payloadSize);
 
     // 先写入报头（四字节）
     std::vector<uint8_t> clientRequest(defaultHeader, defaultHeader + sizeof(defaultHeader));
     // 写入payload长度（四字节）
-    clientRequest.insert(clientRequest.end(), payloadLength, payloadLength + sizeof(payloadLength));
+    clientRequest.insert(clientRequest.end(), payloadLength, payloadLength + 4);
     // 写入payload内容
     clientRequest.insert(clientRequest.end(), payload, payload + sizeof(payload));
     Serial.print("send bin: ");
@@ -145,22 +158,22 @@ void DoubaoTTS::synth(const String &text) {
 
 void DoubaoTTS::setupMax98357() const {
     const i2s_config_t max98357_i2s_config = {
-        .mode = i2s_mode_t(I2S_MODE_MASTER | I2S_MODE_TX),
-        .sample_rate = _sampleRate,
-        .bits_per_sample = i2s_bits_per_sample_t(16),
-        .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
-        .communication_format = i2s_comm_format_t(I2S_COMM_FORMAT_STAND_MSB),
-        .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1,
-        .dma_buf_count = 8,
-        .dma_buf_len = 1024,
-        .tx_desc_auto_clear = true
+            .mode = i2s_mode_t(I2S_MODE_MASTER | I2S_MODE_TX),
+            .sample_rate = _sampleRate,
+            .bits_per_sample = i2s_bits_per_sample_t(16),
+            .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
+            .communication_format = i2s_comm_format_t(I2S_COMM_FORMAT_STAND_MSB),
+            .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1,
+            .dma_buf_count = 8,
+            .dma_buf_len = 1024,
+            .tx_desc_auto_clear = true
     };
 
     const i2s_pin_config_t max98357_gpio_config = {
-        .bck_io_num = _i2sBclk,
-        .ws_io_num = _i2sLrc,
-        .data_out_num = _i2sDout,
-        .data_in_num = -1
+            .bck_io_num = _i2sBclk,
+            .ws_io_num = _i2sLrc,
+            .data_out_num = _i2sDout,
+            .data_in_num = -1
     };
 
     i2s_driver_install(_i2sNumber, &max98357_i2s_config, 0, nullptr);
@@ -168,7 +181,7 @@ void DoubaoTTS::setupMax98357() const {
     i2s_zero_dma_buffer(_i2sNumber);
 }
 
-[[noreturn]] void webSocketLoop(void *ptr) {
+[[noreturn]] void ttsWebSocketLoop(void *ptr) {
     auto *client = static_cast<DoubaoTTS *>(ptr);
     while (true) {
         client->loop();
@@ -185,7 +198,7 @@ void DoubaoTTS::begin() {
     onEvent([this](WStype_t type, uint8_t *payload, size_t length) {
         this->eventCallback(type, payload, length);
     });
-    xTaskCreate(webSocketLoop, "webSocketLoop", 4096, this, 1, &eventHandler);
+    xTaskCreate(ttsWebSocketLoop, "ttsWebSocketLoop", 4096, this, 1, nullptr);
 }
 
 int32_t bigEndianToInt32(const uint8_t *bytes) {

@@ -19,3 +19,12 @@ std::string getChipId(const char *prefix) {
             buffer[2], buffer[3], buffer[4], buffer[5]);
     return content;
 }
+
+uint8_t *int2Array(uint16_t size) {
+    auto *result = new uint8_t[4];
+    result[0] = (size >> 24) & 0xFF;
+    result[1] = (size >> 16) & 0xFF;
+    result[2] = (size >> 8) & 0xFF;
+    result[3] = size & 0xFF;
+    return result;
+}

@@ -6,4 +6,7 @@
 String generateTaskId();
 
 std::string getChipId(const char *prefix);
+
+uint8_t *int2Array(uint16_t size);
+
 #endif
