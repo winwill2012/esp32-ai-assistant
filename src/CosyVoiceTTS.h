@@ -12,15 +12,15 @@ public:
                  const String &host, int port,
                  const String &url, int i2sDout, int i2sBclk, int i2sLrc);
 
-    void setupMax98357();
+    void setupMax98357() const;
 
     void eventCallback(WStype_t type, uint8_t *payload, size_t length);
 
     void begin();
 
-    String buildFullClientRequest(const String &text);
+    String buildFullClientRequest(const String &text) const;
 
-    bool parseResponse(uint8_t *response);
+    bool parseResponse(const uint8_t *response) const;
 
     void synth(const String &text);
 

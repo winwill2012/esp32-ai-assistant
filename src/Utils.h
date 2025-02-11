@@ -5,4 +5,5 @@
 
 String generateTaskId();
 
+std::string getChipId(const char *prefix);
 #endif

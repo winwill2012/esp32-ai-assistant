@@ -42,8 +42,6 @@ CosyVoiceTTS::CosyVoiceTTS(i2s_port_t i2sNumber, uint32_t sampleRate, String voi
 }
 
 void CosyVoiceTTS::eventCallback(WStype_t type, uint8_t *payload, size_t length) {
-    Serial.print("received message: ");
-    Serial.println(type);
     switch (type) {
         case WStype_PING:
             break;
@@ -73,30 +71,25 @@ void CosyVoiceTTS::eventCallback(WStype_t type, uint8_t *payload, size_t length)
         case WStype_BIN:
             Serial.print("Received bin: ");
             Serial.println(length);
-//            if (parseResponse(payload)) {
-//                Serial.println("close the connection");
-////                disconnect();
-//                xSemaphoreGive(_available);
-////                vTaskDelete(eventHandler);
-//            }
+            if (parseResponse(payload)) {
+                xSemaphoreGive(_available);
+            }
             break;
         default:
             break;
     }
 }
 
-String CosyVoiceTTS::buildFullClientRequest(const String &text) {
-    JsonObject app = params["app"].to<JsonObject>();
+String CosyVoiceTTS::buildFullClientRequest(const String &text) const {
+    const JsonObject app = params["app"].to<JsonObject>();
     app["appid"] = _appId;
     app["token"] = _token;
     app["cluster"] = "volcano_tts";
 
-    JsonObject user = params["user"].to<JsonObject>();
-    uint8_t mac[6];
-    esp_read_mac(mac, ESP_MAC_WIFI_STA);
-    user["uid"] = String(mac, 6);
+    const JsonObject user = params["user"].to<JsonObject>();
+    user["uid"] = getChipId(nullptr);
 
-    JsonObject audio = params["audio"].to<JsonObject>();
+    const JsonObject audio = params["audio"].to<JsonObject>();
     audio["voice_type"] = _voiceType;
     audio["encoding"] = "pcm";
     audio["rate"] = _sampleRate;
@@ -106,8 +99,9 @@ String CosyVoiceTTS::buildFullClientRequest(const String &text) {
     audio["emotion"] = "happy";
     audio["language"] = "cn";
 
-    JsonObject request = params["request"].to<JsonObject>();
+    const JsonObject request = params["request"].to<JsonObject>();
     request["reqid"] = generateTaskId();
+    request["with_timestamp"] = 0;
     request["text"] = text;
     request["text_type"] = "plain";
     request["operation"] = "submit";
@@ -116,61 +110,58 @@ String CosyVoiceTTS::buildFullClientRequest(const String &text) {
     return resStr;
 }
 
-// 语音合成
 void CosyVoiceTTS::synth(const String &text) {
-    if (xSemaphoreTake(_available, 1) == pdFALSE) {
+    if (xSemaphoreTake(_available, 0) == pdFALSE) {
         Serial.println("tts is busy");
         return;
     }
-    begin(); // 建立连接
+    // begin(); // 建立连接
     if (!isConnected()) {
         Serial.println("websocket is disConnected");
         return;
     }
-    String payloadStr = buildFullClientRequest(text);
+    const String payloadStr = buildFullClientRequest(text);
     uint8_t payload[payloadStr.length()];
     for (int i = 0; i < payloadStr.length(); i++) {
         payload[i] = static_cast<uint8_t>(payloadStr.charAt(i));
     }
     payload[payloadStr.length()] = '\0';
-    size_t payloadSize = payloadStr.length();
-    uint8_t payloadArr[4];
-    payloadArr[0] = (payloadSize >> 24) & 0xFF;
-    payloadArr[1] = (payloadSize >> 16) & 0xFF;
-    payloadArr[2] = (payloadSize >> 8) & 0xFF;
-    payloadArr[3] = payloadSize & 0xFF;
+    const size_t payloadSize = payloadStr.length();
+    uint8_t payloadLength[4];
+    payloadLength[0] = (payloadSize >> 24) & 0xFF;
+    payloadLength[1] = (payloadSize >> 16) & 0xFF;
+    payloadLength[2] = (payloadSize >> 8) & 0xFF;
+    payloadLength[3] = payloadSize & 0xFF;
 
     // 先写入报头（四字节）
     std::vector<uint8_t> clientRequest(defaultHeader, defaultHeader + sizeof(defaultHeader));
     // 写入payload长度（四字节）
-    clientRequest.insert(clientRequest.end(), payloadArr, payloadArr + sizeof(payloadArr));
+    clientRequest.insert(clientRequest.end(), payloadLength, payloadLength + sizeof(payloadLength));
     // 写入payload内容
     clientRequest.insert(clientRequest.end(), payload, payload + sizeof(payload));
     Serial.print("send bin: ");
     Serial.println(payloadStr);
-    String base64Str = base64_encode(clientRequest.data(), clientRequest.size());
-    Serial.println(base64Str);
     sendBIN(clientRequest.data(), clientRequest.size());
 }
 
-void CosyVoiceTTS::setupMax98357() {
-    i2s_config_t max98357_i2s_config = {
-            .mode = i2s_mode_t(I2S_MODE_MASTER | I2S_MODE_TX),
-            .sample_rate = _sampleRate,
-            .bits_per_sample = i2s_bits_per_sample_t(16),
-            .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
-            .communication_format = i2s_comm_format_t(I2S_COMM_FORMAT_STAND_MSB),
-            .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1,
-            .dma_buf_count = 8,
-            .dma_buf_len = 1024,
-            .tx_desc_auto_clear = true
+void CosyVoiceTTS::setupMax98357() const {
+    const i2s_config_t max98357_i2s_config = {
+        .mode = i2s_mode_t(I2S_MODE_MASTER | I2S_MODE_TX),
+        .sample_rate = _sampleRate,
+        .bits_per_sample = i2s_bits_per_sample_t(16),
+        .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
+        .communication_format = i2s_comm_format_t(I2S_COMM_FORMAT_STAND_MSB),
+        .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1,
+        .dma_buf_count = 8,
+        .dma_buf_len = 1024,
+        .tx_desc_auto_clear = true
     };
 
     const i2s_pin_config_t max98357_gpio_config = {
-            .bck_io_num = _i2sBclk,
-            .ws_io_num = _i2sLrc,
-            .data_out_num = _i2sDout,
-            .data_in_num = -1
+        .bck_io_num = _i2sBclk,
+        .ws_io_num = _i2sLrc,
+        .data_out_num = _i2sDout,
+        .data_in_num = -1
     };
 
     i2s_driver_install(_i2sNumber, &max98357_i2s_config, 0, nullptr);
@@ -179,7 +170,7 @@ void CosyVoiceTTS::setupMax98357() {
 }
 
 [[noreturn]] void webSocketLoop(void *ptr) {
-    auto *client = (CosyVoiceTTS *) ptr;
+    auto *client = static_cast<CosyVoiceTTS *>(ptr);
     while (true) {
         client->loop();
         vTaskDelay(1);
@@ -195,7 +186,6 @@ void CosyVoiceTTS::begin() {
     onEvent([this](WStype_t type, uint8_t *payload, size_t length) {
         this->eventCallback(type, payload, length);
     });
-    setReconnectInterval(1000);
     xTaskCreate(webSocketLoop, "webSocketLoop", 4096, this, 1, &eventHandler);
 }
 
@@ -203,17 +193,18 @@ int32_t bigEndianToInt32(const uint8_t *bytes) {
     return (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
 }
 
-bool CosyVoiceTTS::parseResponse(uint8_t *res) {
-    uint8_t messageType = res[1] >> 4;
-    uint8_t messageTypeSpecificFlags = res[1] & 0x0f;
-    uint8_t *payload = res + 4;
+bool CosyVoiceTTS::parseResponse(const uint8_t *response) const {
+    const uint8_t messageType = response[1] >> 4;
+    const uint8_t messageTypeSpecificFlags = response[1] & 0x0f;
+    const uint8_t *payload = response + 4;
 
     Serial.printf("message type: %d\n", messageType);
     Serial.printf("messageTypeSpecificFlags: %d\n", messageTypeSpecificFlags);
-    if (messageType == 0xb) {  // 0b1011 - Audio-only server response (ACK).
+    if (messageType == 0b1011) {
+        // 0b1011 - Audio-only server response (ACK).
         if (messageTypeSpecificFlags > 0) {
-            auto sequenceNumber = static_cast<int32_t>(bigEndianToInt32(payload));
-            auto payloadSize = static_cast<uint32_t>(bigEndianToInt32(payload + 4));
+            const auto sequenceNumber = bigEndianToInt32(payload);
+            const auto payloadSize = bigEndianToInt32(payload + 4);
             Serial.printf("sequenceNumber: %d, payloadSize: %d, bin size: %d\n", sequenceNumber, payloadSize,
                           payloadSize);
             payload += 8;
@@ -224,8 +215,11 @@ bool CosyVoiceTTS::parseResponse(uint8_t *res) {
                 return true;
             }
         }
-    } else if (messageType == 0xf) {
-        Serial.println("synth error");
+    } else if (messageType == 0b1111) {
+        const uint8_t errorCode = bigEndianToInt32(payload);
+        const uint8_t messageSize = bigEndianToInt32(payload + 4);
+        const unsigned char *errMessage = payload + 8;
+        Serial.printf("synth error: %d\nReason: %s\n", errorCode, String(errMessage, messageSize).c_str());
         xSemaphoreGive(_available);
     }
     return false;
