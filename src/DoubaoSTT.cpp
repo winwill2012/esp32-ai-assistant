@@ -3,7 +3,7 @@
 #include "Utils.h"
 #include <vector>
 
-#define AUDIO_SAMPLE_RATE 44100
+#define AUDIO_SAMPLE_RATE 48000
 
 DoubaoSTT::DoubaoSTT(i2s_port_t i2sNumber, const String &appId, const String &token,
                      const String &host, int port, const String &url, int i2sDout, int i2sBclk, int i2sLrc) {
@@ -41,6 +41,7 @@ void DoubaoSTT::eventCallback(WStype_t type, uint8_t *payload, size_t length) {
             xSemaphoreTake(_available, portMAX_DELAY);
             break;
         case WStype_TEXT: {
+            Serial.println("收到TEXT回复: ");
             for (int i = 0; i < length; i++) {
                 Serial.print(static_cast<char>(payload[i]));
             }
@@ -48,7 +49,7 @@ void DoubaoSTT::eventCallback(WStype_t type, uint8_t *payload, size_t length) {
             break;
         }
         case WStype_BIN:
-            Serial.println("收到回复");
+            Serial.println("收到BIN回复: ");
             for (int i = 0; i < length; i++) {
                 Serial.print(static_cast<char>(payload[i]));
             }
@@ -121,8 +122,9 @@ std::vector<uint8_t> DoubaoSTT::buildFullClientRequest() {
     request["result_type"] = "full";
     request["sequence"] = 1;
     JsonObject audio = doc["audio"].to<JsonObject>();
-    audio["format"] = "raw";
-    audio["codec"] = "raw";
+    audio["format"] = "mp3";
+    audio["codec"] = "opus";
+    audio["channel"] = 2;
     audio["rate"] = AUDIO_SAMPLE_RATE;
     String payloadStr;
     serializeJson(doc, payloadStr);
@@ -144,12 +146,20 @@ std::vector<uint8_t> DoubaoSTT::buildFullClientRequest() {
     return clientRequest;
 }
 
-std::vector<uint8_t> DoubaoSTT::buildAudioOnlyRequest(uint8_t *audio, size_t size) {
+std::vector<uint8_t> DoubaoSTT::buildAudioOnlyRequest(uint8_t *audio, size_t size, bool lastPacket) {
     uint8_t *payloadLength = int2Array(size);
 
-    // 先写入报头（四字节）
-    std::vector<uint8_t> clientRequest(DefaultAudioOnlyWsHeader,
-                                       DefaultAudioOnlyWsHeader + sizeof(DefaultAudioOnlyWsHeader));
+    std::vector<uint8_t> clientRequest;
+    if (lastPacket) {
+        // 先写入报头（四字节）
+        clientRequest.insert(clientRequest.end(), DefaultLastAudioWsHeader,
+                             DefaultLastAudioWsHeader + sizeof(DefaultLastAudioWsHeader));
+    } else {
+        // 先写入报头（四字节）
+        clientRequest.insert(clientRequest.end(), DefaultAudioOnlyWsHeader,
+                             DefaultAudioOnlyWsHeader + sizeof(DefaultAudioOnlyWsHeader));
+    }
+
     // 写入payload长度（四字节）
     clientRequest.insert(clientRequest.end(), payloadLength, payloadLength + 4);
     // 写入payload内容
@@ -157,7 +167,7 @@ std::vector<uint8_t> DoubaoSTT::buildAudioOnlyRequest(uint8_t *audio, size_t siz
     return clientRequest;
 }
 
-void DoubaoSTT::stt(uint8_t *audio, size_t size) {
+void DoubaoSTT::stt(uint8_t *audio, size_t size, bool lastPacket) {
 //    if (xSemaphoreTake(_available, 5000) == pdFALSE) {
 //        Serial.println("stt is busy");
 //        return;
@@ -167,6 +177,6 @@ void DoubaoSTT::stt(uint8_t *audio, size_t size) {
 //    String base64 = base64_encode(payloadFullClientRequest.data(), payloadFullClientRequest.size());
 //    Serial.println(base64);
 //    sendBIN(payloadFullClientRequest.data(), payloadFullClientRequest.size());
-    std::vector<uint8_t> audioOnlyClientRequest = buildAudioOnlyRequest(audio, size);
+    std::vector<uint8_t> audioOnlyClientRequest = buildAudioOnlyRequest(audio, size, lastPacket);
     sendBIN(audioOnlyClientRequest.data(), audioOnlyClientRequest.size());
 }

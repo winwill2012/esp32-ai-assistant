@@ -57,9 +57,9 @@ public:
 
     std::vector<uint8_t> buildFullClientRequest();
 
-    static std::vector<uint8_t> buildAudioOnlyRequest(uint8_t *audio, size_t size);
+    static std::vector<uint8_t> buildAudioOnlyRequest(uint8_t *audio, size_t size, bool lastPacket);
 
-    void stt(uint8_t *audio, size_t size);
+    void stt(uint8_t *audio, size_t size, bool lastPacket);
 
 private:
     String _appId;
