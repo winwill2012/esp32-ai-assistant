@@ -12,10 +12,10 @@
 
 JsonDocument params;
 /**
- * µÚ0¸ö×Ö½Ú£º0b0001, 0b0001   (Ð­Òé°æ±¾£¬±¨Í·´óÐ¡)
- * µÚ1¸ö×Ö½Ú£º0b0001, 0b0000   (ÏûÏ¢ÀàÐÍ£¬Message type specific flags)
- * µÚ2¸ö×Ö½Ú£º0b0001, 0b0000   (ÐòÁÐ»¯·½Ê½£¬Ñ¹Ëõ·½·¨)
- * µÚ3¸ö×Ö½Ú£º0b0000, 0b0000   (±£Áô×Ö½Ú)
+ * ï¿½ï¿½0ï¿½ï¿½ï¿½Ö½Ú£ï¿½0b0001, 0b0001   (Ð­ï¿½ï¿½æ±¾ï¿½ï¿½ï¿½ï¿½Í·ï¿½ï¿½Ð¡)
+ * ï¿½ï¿½1ï¿½ï¿½ï¿½Ö½Ú£ï¿½0b0001, 0b0000   (ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½Í£ï¿½Message type specific flags)
+ * ï¿½ï¿½2ï¿½ï¿½ï¿½Ö½Ú£ï¿½0b0001, 0b0000   (ï¿½ï¿½ï¿½Ð»ï¿½ï¿½ï¿½Ê½ï¿½ï¿½Ñ¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
+ * ï¿½ï¿½3ï¿½ï¿½ï¿½Ö½Ú£ï¿½0b0000, 0b0000   (ï¿½ï¿½ï¿½ï¿½ï¿½Ö½ï¿½)
  */
 const uint8_t defaultHeader[] = {0x11, 0x10, 0x10, 0x00};
 
@@ -67,10 +67,7 @@ void DoubaoTTS::eventCallback(WStype_t type, uint8_t *payload, size_t length) {
         }
         case WStype_BIN:
             Serial.print("Received bin: ");
-            Serial.println(length);
-            if (parseResponse(payload)) {
-                xSemaphoreGive(_available);
-            }
+            parseResponse(payload);
             break;
         default:
             break;
@@ -93,29 +90,29 @@ String DoubaoTTS::buildFullClientRequest(const String &text) const {
     audio["speed_ratio"] = 1.0;
     audio["volume_ratio"] = 1.0;
     audio["pitch_ratio"] = 1.0;
-    /**
-     * pleased - ÓäÔÃ
-sorry - ±§Ç¸
-annoyed - àÁ¹Ö
-happy - ¿ªÐÄ
-angry - ·ßÅ­
-surprise - ¾ªÑÈ
-hate - Ñá¶ñ
-sad - ±¯ÉË
-scare - º¦ÅÂ
-tear - ¿ÞÇ»
-customer_service - ¿Í·þ
-professional - ×¨Òµ
-serious - ÑÏËà
-tsundere - °Á½¿
-comfort - °²Î¿¹ÄÀø
-conniving - ÂÌ²è
-charming - ½¿ÃÄ
-radio - Çé¸ÐµçÌ¨
-lovey-dovey - Èö½¿
-yoga - è¤Ù¤
-storytelling - ½²¹ÊÊÂ
-·ÖÏí
+        /**
+         * pleased - ï¿½ï¿½ï¿½ï¿½
+    sorry - ï¿½ï¿½Ç¸
+    annoyed - ï¿½ï¿½ï¿½ï¿½
+    happy - ï¿½ï¿½ï¿½ï¿½
+    angry - ï¿½ï¿½Å­
+    surprise - ï¿½ï¿½ï¿½ï¿½
+    hate - ï¿½ï¿½ï¿½
+    sad - ï¿½ï¿½ï¿½ï¿½
+    scare - ï¿½ï¿½ï¿½ï¿½
+    tear - ï¿½ï¿½Ç»
+    customer_service - ï¿½Í·ï¿½
+    professional - ×¨Òµ
+    serious - ï¿½ï¿½ï¿½ï¿½
+    tsundere - ï¿½ï¿½ï¿½ï¿½
+    comfort - ï¿½ï¿½Î¿ï¿½ï¿½ï¿½ï¿½
+    conniving - ï¿½Ì²ï¿½
+    charming - ï¿½ï¿½ï¿½ï¿½
+    radio - ï¿½ï¿½Ðµï¿½Ì¨
+    lovey-dovey - ï¿½ï¿½ï¿½ï¿½
+    yoga - ï¿½Ù¤
+    storytelling - ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    ï¿½ï¿½ï¿½ï¿½
      */
     audio["emotion"] = "customer_service";
     audio["language"] = "cn";
@@ -145,11 +142,11 @@ void DoubaoTTS::synth(const String &text) {
     const size_t payloadSize = payloadStr.length();
     uint8_t *payloadLength = int2Array(payloadSize);
 
-    // ÏÈÐ´Èë±¨Í·£¨ËÄ×Ö½Ú£©
+    // ï¿½ï¿½Ð´ï¿½ë±¨Í·ï¿½ï¿½ï¿½ï¿½ï¿½Ö½Ú£ï¿½
     std::vector<uint8_t> clientRequest(defaultHeader, defaultHeader + sizeof(defaultHeader));
-    // Ð´Èëpayload³¤¶È£¨ËÄ×Ö½Ú£©
+    // Ð´ï¿½ï¿½payloadï¿½ï¿½ï¿½È£ï¿½ï¿½ï¿½ï¿½Ö½Ú£ï¿½
     clientRequest.insert(clientRequest.end(), payloadLength, payloadLength + 4);
-    // Ð´ÈëpayloadÄÚÈÝ
+    // Ð´ï¿½ï¿½payloadï¿½ï¿½ï¿½ï¿½
     clientRequest.insert(clientRequest.end(), payload, payload + sizeof(payload));
     Serial.print("send bin: ");
     Serial.println(payloadStr);
@@ -158,22 +155,22 @@ void DoubaoTTS::synth(const String &text) {
 
 void DoubaoTTS::setupMax98357() const {
     const i2s_config_t max98357_i2s_config = {
-            .mode = i2s_mode_t(I2S_MODE_MASTER | I2S_MODE_TX),
-            .sample_rate = _sampleRate,
-            .bits_per_sample = i2s_bits_per_sample_t(16),
-            .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
-            .communication_format = i2s_comm_format_t(I2S_COMM_FORMAT_STAND_MSB),
-            .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1,
-            .dma_buf_count = 8,
-            .dma_buf_len = 1024,
-            .tx_desc_auto_clear = true
+        .mode = i2s_mode_t(I2S_MODE_MASTER | I2S_MODE_TX),
+        .sample_rate = _sampleRate,
+        .bits_per_sample = i2s_bits_per_sample_t(16),
+        .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
+        .communication_format = i2s_comm_format_t(I2S_COMM_FORMAT_STAND_MSB),
+        .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1,
+        .dma_buf_count = 8,
+        .dma_buf_len = 1024,
+        .tx_desc_auto_clear = true
     };
 
     const i2s_pin_config_t max98357_gpio_config = {
-            .bck_io_num = _i2sBclk,
-            .ws_io_num = _i2sLrc,
-            .data_out_num = _i2sDout,
-            .data_in_num = -1
+        .bck_io_num = _i2sBclk,
+        .ws_io_num = _i2sLrc,
+        .data_out_num = _i2sDout,
+        .data_in_num = -1
     };
 
     i2s_driver_install(_i2sNumber, &max98357_i2s_config, 0, nullptr);
@@ -201,38 +198,43 @@ void DoubaoTTS::begin() {
     xTaskCreate(ttsWebSocketLoop, "ttsWebSocketLoop", 4096, this, 1, nullptr);
 }
 
-int32_t bigEndianToInt32(const uint8_t *bytes) {
-    return (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
-}
-
-bool DoubaoTTS::parseResponse(const uint8_t *response) const {
+void DoubaoTTS::parseResponse(const uint8_t *response) const {
     const uint8_t messageType = response[1] >> 4;
     const uint8_t messageTypeSpecificFlags = response[1] & 0x0f;
     const uint8_t *payload = response + 4;
 
     Serial.printf("message type: %d\n", messageType);
     Serial.printf("messageTypeSpecificFlags: %d\n", messageTypeSpecificFlags);
-    if (messageType == 0b1011) {
-        // 0b1011 - Audio-only server response (ACK).
-        if (messageTypeSpecificFlags > 0) {
-            const auto sequenceNumber = bigEndianToInt32(payload);
-            const auto payloadSize = bigEndianToInt32(payload + 4);
-            Serial.printf("sequenceNumber: %d, payloadSize: %d, bin size: %d\n", sequenceNumber, payloadSize,
-                          payloadSize);
-            payload += 8;
-            size_t written_size;
-            i2s_write(_i2sNumber, payload, payloadSize, &written_size, portMAX_DELAY);
-            if (sequenceNumber < 0) {
-                Serial.println("tts synth completed");
-                return true;
+    switch (messageType) {
+        case 0b1011: {
+            // 0b1011 - Audio-only server response (ACK).
+            if (messageTypeSpecificFlags > 0) {
+                const auto sequenceNumber = parseInt32(payload);
+                const auto payloadSize = parseInt32(payload + 4);
+                Serial.printf("sequenceNumber: %d, payloadSize: %d, bin size: %d\n", sequenceNumber, payloadSize,
+                              payloadSize);
+                payload += 8;
+                size_t written_size;
+                i2s_write(_i2sNumber, payload, payloadSize, &written_size, portMAX_DELAY);
+                if (sequenceNumber < 0) {
+                    Serial.println("tts synth completed");
+                    xSemaphoreGive(_available);
+                    return true;
+                }
             }
+            break;
         }
-    } else if (messageType == 0b1111) {
-        const uint8_t errorCode = bigEndianToInt32(payload);
-        const uint8_t messageSize = bigEndianToInt32(payload + 4);
-        const unsigned char *errMessage = payload + 8;
-        Serial.printf("synth error: %d\nReason: %s\n", errorCode, String(errMessage, messageSize).c_str());
-        xSemaphoreGive(_available);
+        case 0b1111: {
+            // Error message from server (ä¾‹å¦‚é”™è¯¯çš„æ¶ˆæ¯ç±»åž‹ï¼Œä¸æ”¯æŒçš„åºåˆ—åŒ–æ–¹æ³•ç­‰ç­‰)
+            const uint8_t errorCode = parseInt32(payload);
+            const uint8_t messageSize = parseInt32(payload + 4);
+            const unsigned char *errMessage = payload + 8;
+            Serial.printf("synth error: %d\nReason: %s\n", errorCode, String(errMessage, messageSize).c_str());
+            xSemaphoreGive(_available);
+            break;
+        }
+        default:
+            break;
     }
     return false;
 }

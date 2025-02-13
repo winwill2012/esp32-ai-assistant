@@ -9,6 +9,14 @@ String generateTaskId() {
     return uuid;
 }
 
+int32_t parseInt32(const uint8_t *bytes) {
+    return (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
+}
+
+const char *parseString(const uint8_t *bytes, const uint32_t length) {
+    return String(bytes, length).c_str();
+}
+
 std::string getChipId(const char *prefix) {
     std::string content{prefix ? prefix : ""};
     std::size_t size = content.length();

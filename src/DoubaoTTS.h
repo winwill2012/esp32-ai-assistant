@@ -20,7 +20,7 @@ public:
 
     String buildFullClientRequest(const String &text) const;
 
-    bool parseResponse(const uint8_t *response) const;
+    void parseResponse(const uint8_t *response) const;
 
     void synth(const String &text);
 

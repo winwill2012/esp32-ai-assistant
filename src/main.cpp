@@ -30,14 +30,14 @@ void setup() {
     Serial.print("\nConnect WiFi success\nIP address: ");
     Serial.println(WiFi.localIP());
     Serial.println("连接网络成功");
-//    ttsClient.begin();
+    //    ttsClient.begin();
     sttClient.begin();
     Serial.println(esp_get_free_heap_size());
     Serial.printf("DMA free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_DMA));
     Serial.printf("Default free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_DEFAULT));
     Serial.printf("PSRAM free size: %d\n", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
-//    ttsClient.synth(
-//            "今天是 2 月 11 日，昆明晴转多云，最低温度 8℃ ，最高温度 19℃，西南风 3-4 级转小于 3 级。空气质量优，湿度适宜，阳光正好，很适合外出游玩、晒太阳，尽情享受惬意时光。");
+    //    ttsClient.synth(
+    //            "今天是 2 月 11 日，昆明晴转多云，最低温度 8℃ ，最高温度 19℃，西南风 3-4 级转小于 3 级。空气质量优，湿度适宜，阳光正好，很适合外出游玩、晒太阳，尽情享受惬意时光。");
     SPIFFS.begin(true);
 }
 
@@ -49,15 +49,15 @@ size_t bytesRead;
 void loop() {
     if (Serial.available()) {
         Serial.readStringUntil('\n');
-//        while (true) {
-//            esp_err_t err = i2s_read(I2S_NUM_1, buffer, bufferSize, &bytesRead, portMAX_DELAY);
-//            if (err == ESP_OK) {
-//                Serial.printf("Read %d bytes of audio data\n", bytesRead);
-//                sttClient.stt(buffer, bytesRead, false);
-//            } else {
-//                Serial.printf("Failed reading audio data: %d\n", err);
-//            }
-//        }
+        //        while (true) {
+        //            esp_err_t err = i2s_read(I2S_NUM_1, buffer, bufferSize, &bytesRead, portMAX_DELAY);
+        //            if (err == ESP_OK) {
+        //                Serial.printf("Read %d bytes of audio data\n", bytesRead);
+        //                sttClient.stt(buffer, bytesRead, false);
+        //            } else {
+        //                Serial.printf("Failed reading audio data: %d\n", err);
+        //            }
+        //        }
         File file = SPIFFS.open("/test.MP3", FILE_READ);
         if (!file) {
             Serial.println("打开文件失败");
@@ -70,10 +70,10 @@ void loop() {
         size_t read;
         while (file.available() > 0) {
             read = file.read(buff, 1024);
-            sttClient.stt(buff, read, false);
+            sttClient.recognize(buff, read, false);
             total += read;
         }
         Serial.printf("一共成功读取%d字节数据\n", total);
-        sttClient.stt(buff, 0, true);
+        sttClient.recognize(buff, 0, true);
     }
 }
