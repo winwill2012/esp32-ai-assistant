@@ -193,7 +193,7 @@ void DoubaoSTT::parseResponse(const uint8_t *response) const {
             const char *recognizeResult = parseString(payload, payloadSize);
             JsonDocument jsonResult;
             const DeserializationError err = deserializeJson(jsonResult, recognizeResult);
-            if (!err) {
+            if (err) {
                 Serial.println("解析语音识别结果失败");
                 return;
             }
