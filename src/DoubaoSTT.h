@@ -61,7 +61,7 @@ public:
 
     static std::vector<uint8_t> buildAudioOnlyRequest(uint8_t *audio, size_t size, bool lastPacket);
 
-    void recognize(uint8_t *audio, size_t size, bool lastPacket);
+    void recognize(uint8_t *audio, size_t size, bool firstPacket, bool lastPacket);
 
 private:
     String _appId;

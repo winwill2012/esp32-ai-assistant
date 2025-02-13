@@ -3,7 +3,7 @@
 #include "Utils.h"
 #include <vector>
 
-#define AUDIO_SAMPLE_RATE 48000
+#define AUDIO_SAMPLE_RATE 441000
 
 DoubaoSTT::DoubaoSTT(i2s_port_t i2sNumber, const String &appId, const String &token,
                      const String &host, int port, const String &url, int i2sDout, int i2sBclk, int i2sLrc) {
@@ -75,29 +75,25 @@ void DoubaoSTT::begin() {
         this->eventCallback(type, payload, length);
     });
     xTaskCreate(sttWebSocketLoop, "sttWebSocketLoop", 4096, this, 1, nullptr);
-    std::vector<uint8_t> payloadFullClientRequest = buildFullClientRequest();
-    if (xSemaphoreTake(_available, portMAX_DELAY) == pdTRUE) {
-        sendBIN(payloadFullClientRequest.data(), payloadFullClientRequest.size());
-    }
 }
 
 void DoubaoSTT::setupINMP441() const {
     const i2s_config_t i2s_config = {
-        .mode = i2s_mode_t(I2S_MODE_MASTER | I2S_MODE_RX),
-        .sample_rate = AUDIO_SAMPLE_RATE,
-        .bits_per_sample = i2s_bits_per_sample_t(16),
-        .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
-        .communication_format = i2s_comm_format_t(I2S_COMM_FORMAT_STAND_I2S),
-        .intr_alloc_flags = 0,
-        .dma_buf_count = 8,
-        .dma_buf_len = 1024,
-        .use_apll = false
+            .mode = i2s_mode_t(I2S_MODE_MASTER | I2S_MODE_RX),
+            .sample_rate = AUDIO_SAMPLE_RATE,
+            .bits_per_sample = i2s_bits_per_sample_t(16),
+            .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
+            .communication_format = i2s_comm_format_t(I2S_COMM_FORMAT_STAND_I2S),
+            .intr_alloc_flags = 0,
+            .dma_buf_count = 8,
+            .dma_buf_len = 1024,
+            .use_apll = false
     };
     const i2s_pin_config_t pin_config = {
-        .bck_io_num = _i2sBclk,
-        .ws_io_num = _i2sLrc,
-        .data_out_num = -1,
-        .data_in_num = _i2sDout
+            .bck_io_num = _i2sBclk,
+            .ws_io_num = _i2sLrc,
+            .data_out_num = -1,
+            .data_in_num = _i2sDout
     };
 
     i2s_driver_install(_i2sNumber, &i2s_config, 0, NULL);
@@ -119,9 +115,9 @@ std::vector<uint8_t> DoubaoSTT::buildFullClientRequest() {
     request["result_type"] = "full";
     request["sequence"] = 1;
     JsonObject audio = doc["audio"].to<JsonObject>();
-    audio["format"] = "mp3";
-    audio["codec"] = "opus";
-    audio["channel"] = 2;
+    audio["format"] = "raw";
+    audio["codec"] = "raw";
+    audio["channel"] = 1;
     audio["rate"] = AUDIO_SAMPLE_RATE;
     String payloadStr;
     serializeJson(doc, payloadStr);
@@ -164,16 +160,17 @@ std::vector<uint8_t> DoubaoSTT::buildAudioOnlyRequest(uint8_t *audio, size_t siz
     return clientRequest;
 }
 
-void DoubaoSTT::recognize(uint8_t *audio, size_t size, bool lastPacket) {
-    //    if (xSemaphoreTake(_available, 5000) == pdFALSE) {
-    //        Serial.println("stt is busy");
-    //        return;
-    //    }
-    //    begin();
-    //    std::vector<uint8_t> payloadFullClientRequest = buildFullClientRequest();
-    //    String base64 = base64_encode(payloadFullClientRequest.data(), payloadFullClientRequest.size());
-    //    Serial.println(base64);
-    //    sendBIN(payloadFullClientRequest.data(), payloadFullClientRequest.size());
+void DoubaoSTT::recognize(uint8_t *audio, size_t size, bool firstPacket, bool lastPacket) {
+    if (firstPacket && xSemaphoreTake(_available, 5000) == pdFALSE) {
+        Serial.println("stt is busy");
+        return;
+    }
+    if (firstPacket) {
+        std::vector<uint8_t> payloadFullClientRequest = buildFullClientRequest();
+        String base64 = base64_encode(payloadFullClientRequest.data(), payloadFullClientRequest.size());
+        Serial.println(base64);
+        sendBIN(payloadFullClientRequest.data(), payloadFullClientRequest.size());
+    }
     std::vector<uint8_t> audioOnlyClientRequest = buildAudioOnlyRequest(audio, size, lastPacket);
     sendBIN(audioOnlyClientRequest.data(), audioOnlyClientRequest.size());
 }
@@ -183,14 +180,14 @@ void DoubaoSTT::parseResponse(const uint8_t *response) const {
     const uint8_t messageTypeSpecificFlags = response[1] & 0x0f;
     const uint8_t *payload = response + 4;
 
-    Serial.printf("message type: %d\n", messageType);
-    Serial.printf("messageTypeSpecificFlags: %d\n", messageTypeSpecificFlags);
+    Serial.printf("[语音识别] message type: %d\n", messageType);
+    Serial.printf("[语音识别] messageTypeSpecificFlags: %d\n", messageTypeSpecificFlags);
     switch (messageType) {
         case 0b1001: {
             // 服务端下发包含识别结果的 full server response
             const uint32_t payloadSize = parseInt32(payload);
             payload += 4;
-            const char *recognizeResult = parseString(payload, payloadSize);
+            String recognizeResult = parseString(payload, payloadSize);
             JsonDocument jsonResult;
             const DeserializationError err = deserializeJson(jsonResult, recognizeResult);
             if (err) {
@@ -200,15 +197,15 @@ void DoubaoSTT::parseResponse(const uint8_t *response) const {
             const int32_t code = jsonResult["code"];
             const String message = jsonResult["message"];
             const int32_t sequence = jsonResult["sequence"];
-            const JsonArray result = jsonResult["result"];
+            const JsonArray result = jsonResult["result"].to<JsonArray>();
+            Serial.println(result.size());
             if (!result) {
-                Serial.println("语音识别结果: ");
-                Serial.printf("    code = %d\n", code);
-                Serial.printf(" message = %s\n", message.c_str());
-                Serial.printf("sequence = %d\n", sequence);
+                Serial.printf("[语音识别]     code = %d\n", code);
+                Serial.printf("[语音识别]  message = %s\n", message.c_str());
+                Serial.printf("[语音识别] sequence = %d\n", sequence);
                 for (const auto &item: result) {
                     String text = item["text"];
-                    Serial.printf("识别到文字: %s\n", text.c_str());
+                    Serial.printf("[语音识别] 识别到文字: %s\n", text.c_str());
                 }
             }
             // sequence小于0表示这是最后返回的一个分片，本次识别结束
@@ -223,10 +220,10 @@ void DoubaoSTT::parseResponse(const uint8_t *response) const {
             payload += 4;
             const uint32_t messageLength = parseInt32(payload);
             payload += 4;
-            const char *errorMessage = parseString(payload, messageLength);
+            String errorMessage = parseString(payload, messageLength);
             Serial.println("语音合成失败: ");
             Serial.printf("   errorCode =  %u\n", errorCode);
-            Serial.printf("errorMessage =  %s\n", errorMessage);
+            Serial.printf("errorMessage =  %s\n", errorMessage.c_str());
             xSemaphoreGive(_available);
         }
         default: {

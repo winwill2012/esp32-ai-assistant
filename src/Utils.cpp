@@ -13,8 +13,12 @@ int32_t parseInt32(const uint8_t *bytes) {
     return (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
 }
 
-const char *parseString(const uint8_t *bytes, const uint32_t length) {
-    return String(bytes, length).c_str();
+String parseString(const uint8_t *bytes, const uint32_t length) {
+    String result = "";
+    for (int i = 0; i < length; i++) {
+        result += static_cast<char>(bytes[i]);
+    }
+    return result;
 }
 
 std::string getChipId(const char *prefix) {
