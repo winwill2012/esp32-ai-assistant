@@ -26,8 +26,8 @@ LLMAgent agent("https://api.coze.cn/v3/chat", "7468218438402818082",
 void setup() {
     Serial.begin(115200);
     WiFiClass::mode(WIFI_MODE_STA);
-    // WiFi.begin("Xiaomi_E15A", "19910226");
-    WiFi.begin("SmartHome", "9jismart");
+     WiFi.begin("Xiaomi_E15A", "19910226");
+//    WiFi.begin("SmartHome", "9jismart");
     while (!WiFi.isConnected()) {
         Serial.print(".");
         vTaskDelay(1000);
@@ -56,7 +56,7 @@ size_t bytesRead;
 void loop() {
     if (Serial.available()) {
         Serial.readStringUntil('\n');
-        AgentResponse *response = agent.chat("开灯");
+        AgentResponse *response = agent.chat("心情不是很好，帮我把灯光颜色调暗一些");
         if (response == nullptr) {
             Serial.println("调用LLM Agent失败");
         } else {
