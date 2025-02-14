@@ -7,6 +7,7 @@
 #include "DoubaoSTT.h"
 #include "SPIFFS.h"
 #include <ESPAsyncWebServer.h>
+#include <utils.h>
 
 AsyncWebServer server(80);
 
@@ -30,8 +31,8 @@ LLMAgent agent("https://api.coze.cn/v3/chat", "7468218438402818082",
 void setup() {
     Serial.begin(115200);
     WiFiClass::mode(WIFI_MODE_STA);
-    WiFi.begin("Xiaomi_E15A", "19910226");
-//    WiFi.begin("SmartHome", "9jismart");
+    // WiFi.begin("Xiaomi_E15A", "19910226");
+    WiFi.begin("SmartHome", "9jismart");
     while (!WiFi.isConnected()) {
         Serial.print(".");
         vTaskDelay(1000);
@@ -45,11 +46,12 @@ void setup() {
 
     Serial.printf("Default free size =  %d\n", heap_caps_get_free_size(MALLOC_CAP_DEFAULT));
     Serial.printf("  Psram free size =  %d\n", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
-//    ttsClient.synth(
-//            "今天是 2 月 11 日，昆明晴转多云，最低温度 8℃ ，最高温度 19℃，西南风 3-4 级转小于 3 级。空气质量优，湿度适宜，阳光正好，很适合外出游玩、晒太阳，尽情享受惬意时光。");
+    //    ttsClient.synth(
+    //            "今天是 2 月 11 日，昆明晴转多云，最低温度 8℃ ，最高温度 19℃，西南风 3-4 级转小于 3 级。空气质量优，湿度适宜，阳光正好，很适合外出游玩、晒太阳，尽情享受惬意时光。");
     SPIFFS.begin(true);
     // 处理文件请求
-    server.on("/recording.wav", HTTP_GET, [](AsyncWebServerRequest *request) {
+    server.on("/download", HTTP_GET, [](AsyncWebServerRequest *request) {
+        const String &name = request->getParam("file")->value();
         request->send(SPIFFS, "/recording.wav", "audio/wav");
     });
 
@@ -71,6 +73,11 @@ void loop() {
             File file = SPIFFS.open("/recording.wav", FILE_WRITE);
             esp_err_t err = i2s_read(I2S_NUM_1, buffer, bufferSize, &bytesRead, portMAX_DELAY);
             if (err == ESP_OK) {
+                if (!hasSound(buffer, bytesRead)) {
+                    Serial.println("未检测到录音声音");
+                    continue;
+                }
+                Serial.println("检测到有录音声音");
                 Serial.printf("Read %d bytes of audio data\n", bytesRead);
                 file.write(buffer, bytesRead);
                 for (int i = 0; i < 50; i++) {

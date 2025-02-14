@@ -13,4 +13,6 @@ String parseString(const uint8_t *bytes, uint32_t length);
 
 uint8_t *int2Array(uint16_t size);
 
+bool hasSound(uint8_t *buffer, const size_t bufferSize);
+
 #endif

@@ -40,3 +40,20 @@ uint8_t *int2Array(uint16_t size) {
     result[3] = size & 0xFF;
     return result;
 }
+
+// 检查是否有声音
+bool hasSound(uint8_t *buffer, const size_t bufferSize) {
+    constexpr float threshold = 100.0; // 预设阈值，可根据实际情况调整
+    float sumSquares = 0.0;
+    // 遍历音频缓冲区
+    for (size_t i = 0; i < bufferSize; i += 4) {
+        // 假设数据为32位
+        int32_t sample = *reinterpret_cast<int32_t *>(&buffer[i]);
+        sumSquares += static_cast<float>(sample * sample);
+    }
+    // 计算均方根（RMS）值
+    const float rms = sqrt(sumSquares / (bufferSize / 4));
+    // 判断RMS值是否超过阈值
+    Serial.printf("声音RMS值: %f\n", rms);
+    return rms > threshold;
+}
