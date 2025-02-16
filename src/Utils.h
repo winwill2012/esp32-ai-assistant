@@ -11,8 +11,8 @@ int32_t parseInt32(const uint8_t *bytes);
 
 String parseString(const uint8_t *bytes, uint32_t length);
 
-uint8_t *int2Array(uint16_t size);
+uint8_t *int2Array(uint32_t size);
 
-bool hasSound(uint8_t *buffer, const size_t bufferSize);
+bool hasSound(const uint8_t *buffer, size_t bufferSize, float threshold);
 
 #endif

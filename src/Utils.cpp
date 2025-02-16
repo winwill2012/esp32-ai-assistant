@@ -32,8 +32,12 @@ std::string getChipId(const char *prefix) {
     return content;
 }
 
-uint8_t *int2Array(uint16_t size) {
-    auto *result = new uint8_t[4];
+uint8_t *int2Array(uint32_t size) {
+    auto *result = (uint8_t *) malloc(4);
+    if (result == nullptr) {
+        Serial.println("========分配内存失败=======");
+        return nullptr;
+    }
     result[0] = (size >> 24) & 0xFF;
     result[1] = (size >> 16) & 0xFF;
     result[2] = (size >> 8) & 0xFF;
@@ -41,19 +45,12 @@ uint8_t *int2Array(uint16_t size) {
     return result;
 }
 
-// 检查是否有声音
-bool hasSound(uint8_t *buffer, const size_t bufferSize) {
-    constexpr float threshold = 100.0; // 预设阈值，可根据实际情况调整
+bool hasSound(const uint8_t *buffer, const size_t bufferSize, float threshold) {
     float sumSquares = 0.0;
-    // 遍历音频缓冲区
-    for (size_t i = 0; i < bufferSize; i += 4) {
-        // 假设数据为32位
-        int32_t sample = *reinterpret_cast<int32_t *>(&buffer[i]);
+    for (size_t i = 0; i + 1 < bufferSize; i += 2) {
+        int32_t sample = buffer[i] << 8 | buffer[i + 1];
         sumSquares += static_cast<float>(sample * sample);
     }
-    // 计算均方根（RMS）值
-    const float rms = sqrt(sumSquares / (bufferSize / 4));
-    // 判断RMS值是否超过阈值
-    Serial.printf("声音RMS值: %f\n", rms);
+    const float rms = sqrt(sumSquares / (bufferSize / 2));
     return rms > threshold;
 }
