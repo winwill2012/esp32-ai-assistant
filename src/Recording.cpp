@@ -6,7 +6,7 @@ RecordingManager::RecordingManager(DoubaoSTT &sstClient) : _sttClient(sstClient)
     _soundPowerThreshold = RECORDING_POWER_THRESHOLD;
     _maxIdleTimeInMs = RECORDING_MAX_IDLE_TIME;
     _recordingBufferSize = RECORDING_BUFFER_SIZE;
-    _recordingBuffer = new uint8_t[_recordingBufferSize];
+    _recordingBuffer = (uint8_t *) malloc(_recordingBufferSize);
 }
 
 RecordingManager::~RecordingManager() {
@@ -19,7 +19,7 @@ void RecordingManager::beginRecording() {
     bool hasSoundFlag = false;
     unsigned long idleBeginTime = 0;
     bool firstPacket = true;
-    File file = SPIFFS.open("/recording.pcm", FILE_WRITE);
+    i2s_start(_sttClient.getI2sNumber());
     while (true) {
         esp_err_t err = i2s_read(_sttClient.getI2sNumber(), _recordingBuffer,
                                  _recordingBufferSize, &bytesRead, portMAX_DELAY);
@@ -27,7 +27,6 @@ void RecordingManager::beginRecording() {
             // 如有有声音
             if (hasSound(_recordingBuffer, bytesRead, _soundPowerThreshold)) {
                 hasSoundFlag = true;
-                file.write(_recordingBuffer, bytesRead);
                 _sttClient.recognize(_recordingBuffer, bytesRead, firstPacket, false);
                 if (firstPacket) {
                     firstPacket = false;
@@ -38,7 +37,7 @@ void RecordingManager::beginRecording() {
                     idleBeginTime = millis();
                 } else if (millis() - idleBeginTime > _maxIdleTimeInMs) {
                     _sttClient.recognize(_recordingBuffer, bytesRead, firstPacket, true);
-                    file.close();
+                    i2s_stop(_sttClient.getI2sNumber());
                     Serial.println("本次录音结束");
                     break;
                 }

@@ -1,12 +1,15 @@
 #ifndef LLMAGENT_H
 #define LLMAGENT_H
+
 #include <Arduino.h>
 
 struct AgentResponse {
+    AgentResponse() {}
+
     AgentResponse(const String &cmd,
                   const String &response,
                   const String &content,
-                  const String &emotion): cmd(cmd), response(response), content(content), emotion(emotion) {
+                  const String &emotion) : cmd(cmd), response(response), content(content), emotion(emotion) {
     }
 
     String cmd;

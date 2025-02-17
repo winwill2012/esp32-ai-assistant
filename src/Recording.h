@@ -5,9 +5,9 @@
 #include "driver/i2s.h"
 #include "DoubaoSTT.h"
 
-#define RECORDING_BUFFER_SIZE 4096
-#define RECORDING_POWER_THRESHOLD 10000
-#define RECORDING_MAX_IDLE_TIME 3000
+#define RECORDING_BUFFER_SIZE 3200
+#define RECORDING_POWER_THRESHOLD 5000
+#define RECORDING_MAX_IDLE_TIME 2000
 
 class RecordingManager {
 public:

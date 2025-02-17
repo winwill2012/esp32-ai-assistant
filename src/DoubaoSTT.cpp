@@ -1,15 +1,17 @@
 #include "DoubaoSTT.h"
 #include "ArduinoJson.h"
 #include "Utils.h"
+#include "TaskWatcher.h"
 #include <Arduino.h>
 #include <vector>
 
-#define AUDIO_SAMPLE_RATE 48000
+#define AUDIO_SAMPLE_RATE 16000
 
 JsonDocument doc;
 
-DoubaoSTT::DoubaoSTT(i2s_port_t i2sNumber, const String &appId, const String &token,
-                     const String &host, int port, const String &url, int i2sDout, int i2sBclk, int i2sLrc) {
+DoubaoSTT::DoubaoSTT(TaskWatcher taskWatcher, i2s_port_t i2sNumber, const String &appId, const String &token,
+                     const String &host, int port, const String &url, int i2sDout, int i2sBclk, int i2sLrc)
+        : _taskWatcher(taskWatcher) {
     _i2sNumber = i2sNumber;
     _appId = appId;
     _token = token;
@@ -52,7 +54,6 @@ void DoubaoSTT::eventCallback(WStype_t type, uint8_t *payload, size_t length) {
             break;
         }
         case WStype_BIN:
-            Serial.println("STT收到Bin回复: ");
             parseResponse(payload);
             break;
         default:
@@ -73,21 +74,21 @@ void DoubaoSTT::begin() {
 
 void DoubaoSTT::setupINMP441() const {
     const i2s_config_t i2s_config = {
-        .mode = i2s_mode_t(I2S_MODE_MASTER | I2S_MODE_RX),
-        .sample_rate = AUDIO_SAMPLE_RATE,
-        .bits_per_sample = i2s_bits_per_sample_t(16),
-        .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
-        .communication_format = i2s_comm_format_t(I2S_COMM_FORMAT_STAND_I2S | I2S_COMM_FORMAT_STAND_MSB),
-        .intr_alloc_flags = 0,
-        .dma_buf_count = 8,
-        .dma_buf_len = 1024,
-        .use_apll = false
+            .mode = i2s_mode_t(I2S_MODE_MASTER | I2S_MODE_RX),
+            .sample_rate = AUDIO_SAMPLE_RATE,
+            .bits_per_sample = i2s_bits_per_sample_t(16),
+            .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
+            .communication_format = i2s_comm_format_t(I2S_COMM_FORMAT_STAND_I2S),
+            .intr_alloc_flags = 0,
+            .dma_buf_count = 8,
+            .dma_buf_len = 1024,
+            .use_apll = false
     };
     const i2s_pin_config_t pin_config = {
-        .bck_io_num = _i2sBclk,
-        .ws_io_num = _i2sLrc,
-        .data_out_num = -1,
-        .data_in_num = _i2sDout
+            .bck_io_num = _i2sBclk,
+            .ws_io_num = _i2sLrc,
+            .data_out_num = -1,
+            .data_in_num = _i2sDout
     };
 
     i2s_driver_install(_i2sNumber, &i2s_config, 0, NULL);
@@ -110,9 +111,9 @@ void DoubaoSTT::buildFullClientRequest() {
     request["sequence"] = 1;
     request["workflow"] = "audio_in,resample,partition,vad,fe,decode,nlu_punctuate";
     JsonObject audio = doc["audio"].to<JsonObject>();
-    audio["format"] = "wav";
+    audio["format"] = "raw";
     audio["codec"] = "raw";
-    audio["channel"] = 2;
+    audio["channel"] = 1;
     audio["rate"] = AUDIO_SAMPLE_RATE;
     String payloadStr;
     serializeJson(doc, payloadStr);
@@ -155,13 +156,11 @@ void DoubaoSTT::buildAudioOnlyRequest(uint8_t *audio, const size_t size, const b
 }
 
 void DoubaoSTT::recognize(uint8_t *audio, size_t size, bool firstPacket, bool lastPacket) {
-    Serial.printf("DoubaoSTT::recognize: %dB, %d, %d\n", size, firstPacket, lastPacket);
     if (firstPacket) {
         while (!isConnected()) {
             loop();
             vTaskDelay(1);
         }
-        Serial.println("连接成功，发送第一个数据包");
         buildFullClientRequest();
         sendBIN(_requestBuilder.data(), _requestBuilder.size());
         loop();
@@ -203,14 +202,16 @@ void DoubaoSTT::parseResponse(const uint8_t *response) {
             if (code != 1000) {
                 Serial.printf("[语音识别] 识别失败, code: %d, message: %s\n", code, message.c_str());
             }
-            if (result.size() > 0) {
-                for (const auto &item: result) {
-                    String text = item["text"];
-                    Serial.printf("[语音识别] 识别到文字: %s\n", text.c_str());
-                }
-            }
             // sequence小于0表示这是最后返回的一个分片，本次识别结束
             if (sequence < 0) {
+                if (result.size() > 0) {
+                    for (const auto &item: result) {
+                        String temp = item["text"];
+                        auto *text = new String(temp);
+                        Serial.printf("[语音识别] 识别到文字: %s\n", (*text).c_str());
+                        _taskWatcher.publishChatTask(text);
+                    }
+                }
                 xSemaphoreGive(_taskFinished);
             }
             break;
