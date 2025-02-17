@@ -21,7 +21,7 @@ void RecordingManager::beginRecording() {
     bool firstPacket = true;
     File file = SPIFFS.open("/recording.pcm", FILE_WRITE);
     while (true) {
-        esp_err_t err = i2s_read(_sttClient.getI2sNumer(), _recordingBuffer,
+        esp_err_t err = i2s_read(_sttClient.getI2sNumber(), _recordingBuffer,
                                  _recordingBufferSize, &bytesRead, portMAX_DELAY);
         if (err == ESP_OK) {
             // 如有有声音

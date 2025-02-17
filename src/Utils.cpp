@@ -1,3 +1,5 @@
+#include <vector>
+
 #include "utils.h"
 
 String generateTaskId() {
@@ -32,12 +34,8 @@ std::string getChipId(const char *prefix) {
     return content;
 }
 
-uint8_t *int2Array(uint32_t size) {
-    auto *result = (uint8_t *) malloc(4);
-    if (result == nullptr) {
-        Serial.println("========分配内存失败=======");
-        return nullptr;
-    }
+std::vector<uint8_t> int2Array(const uint32_t size) {
+    std::vector<uint8_t> result(4);
     result[0] = (size >> 24) & 0xFF;
     result[1] = (size >> 16) & 0xFF;
     result[2] = (size >> 8) & 0xFF;

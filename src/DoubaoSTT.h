@@ -1,5 +1,3 @@
-#ifndef IOT_AI_CONTROLLER_DOUBAOSTT_H
-#define IOT_AI_CONTROLLER_DOUBAOSTT_H
 #ifndef DOUBAO_STT_H
 #define DOUBAO_STT_H
 
@@ -32,7 +30,7 @@ public:
 
     void recognize(uint8_t *audio, size_t size, bool firstPacket, bool lastPacket);
 
-    i2s_port_t getI2sNumer();
+    i2s_port_t getI2sNumber();
 
 private:
     String _appId;
@@ -47,9 +45,7 @@ private:
     int _i2sBclk;
     int _i2sLrc;
     std::vector<uint8_t> _requestBuilder;
-    SemaphoreHandle_t _available;
+    SemaphoreHandle_t _taskFinished;
 };
-
-#endif
 
 #endif
