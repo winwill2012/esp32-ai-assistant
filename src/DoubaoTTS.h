@@ -37,7 +37,7 @@ private:
     int _i2sDout;
     int _i2sBclk;
     int _i2sLrc;
-    SemaphoreHandle_t _available;
+    SemaphoreHandle_t _taskFinished;
 };
 
 #endif
