@@ -9,9 +9,9 @@
 
 JsonDocument doc;
 
-DoubaoSTT::DoubaoSTT(TaskWatcher taskWatcher, i2s_port_t i2sNumber, const String &appId, const String &token,
+DoubaoSTT::DoubaoSTT(LLMAgent llmAgent, i2s_port_t i2sNumber, const String &appId, const String &token,
                      const String &host, int port, const String &url, int i2sDout, int i2sBclk, int i2sLrc)
-        : _taskWatcher(taskWatcher) {
+        : _llmAgent(llmAgent) {
     _i2sNumber = i2sNumber;
     _appId = appId;
     _token = token;
@@ -206,10 +206,9 @@ void DoubaoSTT::parseResponse(const uint8_t *response) {
             if (sequence < 0) {
                 if (result.size() > 0) {
                     for (const auto &item: result) {
-                        String temp = item["text"];
-                        auto *text = new String(temp);
-                        Serial.printf("[语音识别] 识别到文字: %s\n", (*text).c_str());
-                        _taskWatcher.publishChatTask(text);
+                        String text = item["text"];
+                        Serial.printf("[语音识别] 识别到文字: %s\n", text.c_str());
+                        _llmAgent.begin(text);
                     }
                 }
                 xSemaphoreGive(_taskFinished);

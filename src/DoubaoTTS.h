@@ -18,11 +18,11 @@ public:
 
     void begin();
 
-    String buildFullClientRequest(const String &text) const;
+    String buildFullClientRequest(const String emotion, const String &text) const;
 
     void parseResponse(const uint8_t *response) const;
 
-    void synth(const String &text);
+    void synth(const String emotion, const String text);
 
 private:
     String _appId;

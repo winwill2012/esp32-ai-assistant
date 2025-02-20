@@ -4,11 +4,13 @@
 #include <Arduino.h>
 #include <map>
 #include <ArduinoJson.h>
+#include "DoubaoTTS.h"
+
+#define DELIMITER "^"
 
 class LLMAgent {
 public:
     enum State {
-        Illegal,
         Init,
         Started,
         EmotionCompleted,
@@ -20,22 +22,22 @@ public:
     enum Event {
         Begin, // 开始调用接口
         NormalCharReceived, // 收到普通字符
-        SemicolonReceived, // 收到分号
+        DelimiterReceived, // 收到字段分隔符
     };
 
     std::map<std::pair<State, Event>, State> StateTransferRouter = {
-        {{Init, Begin}, Started},
-        {{Started, NormalCharReceived}, Started},
-        {{Started, SemicolonReceived}, EmotionCompleted},
-        {{EmotionCompleted, NormalCharReceived}, EmotionCompleted},
-        {{EmotionCompleted, SemicolonReceived}, ResponseCompleted},
-        {{ResponseCompleted, NormalCharReceived}, ResponseCompleted},
-        {{ResponseCompleted, SemicolonReceived}, CmdCompleted},
-        {{CmdCompleted, NormalCharReceived}, CmdCompleted},
-        {{CmdCompleted, SemicolonReceived}, ContentCompleted},
+            {{Init,              Begin},              Started},
+            {{Started,           NormalCharReceived}, Started},
+            {{Started,           DelimiterReceived},  EmotionCompleted},
+            {{EmotionCompleted,  NormalCharReceived}, EmotionCompleted},
+            {{EmotionCompleted,  DelimiterReceived},  ResponseCompleted},
+            {{ResponseCompleted, NormalCharReceived}, ResponseCompleted},
+            {{ResponseCompleted, DelimiterReceived},  CmdCompleted},
+            {{CmdCompleted,      NormalCharReceived}, CmdCompleted},
+            {{CmdCompleted,      DelimiterReceived},  ContentCompleted},
     };
 
-    LLMAgent(const String &url, String botId, const String &token);
+    LLMAgent(DoubaoTTS tts, const String &url, String botId, const String &token);
 
     ~LLMAgent();
 
@@ -43,16 +45,8 @@ public:
 
     void show() const;
 
-    String emotion() const {
-        return _emotion;
-    }
-
     String response() const {
         return _response;
-    }
-
-    String cmd() const {
-        return _cmd;
     }
 
     String content() const {
@@ -61,9 +55,12 @@ public:
 
     State ProcessStreamOutput(String data);
 
+    void ProcessContent(String &content);
+
     void reset();
 
 private :
+    DoubaoTTS _tts;
     String _url;
     String _botId;
     String _token;
@@ -72,6 +69,7 @@ private :
     String _response;
     String _cmd;
     String _content;
+    String _ttsTextBuffer;
 
     State _state = Init;
     JsonDocument _document;

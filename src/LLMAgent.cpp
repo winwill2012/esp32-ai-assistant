@@ -3,7 +3,7 @@
 #include <ArduinoJson.h>
 #include "Utils.h"
 
-LLMAgent::LLMAgent(const String &url, const String botId, const String &token) {
+LLMAgent::LLMAgent(DoubaoTTS tts, const String &url, const String botId, const String &token) : _tts(tts) {
     _url = url;
     _botId = botId;
     _token = token;
@@ -60,11 +60,14 @@ void LLMAgent::begin(const String &input) {
 }
 
 void LLMAgent::show() const {
-    Serial.println("LLMAgent调用结果: ");
-    Serial.printf("   state = %d\n", _state);
-    Serial.printf("response = %s\n", _response.c_str());
-    Serial.printf("     cmd = %s\n", _cmd.c_str());
-    Serial.printf(" content = %s\n", _content.c_str());
+    Serial.println("-----------LLMAgent调用结果--------------------");
+    Serial.printf("    state = %d\n", _state);
+    Serial.printf("  emotion = %s\n", _emotion.c_str());
+    Serial.printf(" response = %s\n", _response.c_str());
+    Serial.printf("ttsBuffer = %s\n", _ttsTextBuffer.c_str());
+    Serial.printf("      cmd = %s\n", _cmd.c_str());
+    Serial.printf("  content = %s\n", _content.c_str());
+    Serial.println("-----------------------------------------------");
 }
 
 LLMAgent::State LLMAgent::ProcessStreamOutput(String input) {
@@ -81,31 +84,10 @@ LLMAgent::State LLMAgent::ProcessStreamOutput(String input) {
         return _state;
     }
     String content = _document["content"];
-    Event event;
-    if (content.compareTo(";") == 0) {
-        event = SemicolonReceived;
-    } else {
-        event = NormalCharReceived;
-        switch (_state) {
-            case Started:
-                _emotion += content;
-                break;
-            case EmotionCompleted:
-                _response += content;
-                break;
-            case ResponseCompleted:
-                _cmd += content;
-                break;
-            case CmdCompleted:
-                _content += content;
-                break;
-            default: ;
-        }
+    while (!content.isEmpty()) {
+        ProcessContent(content);
     }
-    const auto it = StateTransferRouter.find(std::make_pair<>(_state, event));
-    if (it != StateTransferRouter.end()) {
-        _state = it->second;
-    }
+    show();
     return _state;
 }
 
@@ -113,6 +95,57 @@ void LLMAgent::reset() {
     _state = Init;
     _emotion = "";
     _response = "";
+    _ttsTextBuffer = "";
     _cmd = "";
     _content = "";
+}
+
+void LLMAgent::ProcessContent(String &content) {
+    content.trim();
+    if (content.isEmpty()) {
+        return;
+    }
+    // 内容不包含分隔符，状态不会发生变化
+    if (content.indexOf(DELIMITER) < 0) {
+        switch (_state) {
+            case Started:
+                _emotion += content;
+                break;
+            case EmotionCompleted:
+                _response += content;
+                _ttsTextBuffer += content;
+                if (_ttsTextBuffer.indexOf("，") > 0) {
+                    int index = _ttsTextBuffer.indexOf("，");
+                    _tts.synth(_emotion, _ttsTextBuffer.substring(0, index));
+                    _ttsTextBuffer = _ttsTextBuffer.substring(index + 3);
+                }
+                if (_ttsTextBuffer.indexOf("。") > 0) {
+                    int index = _ttsTextBuffer.indexOf("。");
+                    _tts.synth(_emotion, _ttsTextBuffer.substring(0, index));
+                    _ttsTextBuffer = _ttsTextBuffer.substring(index + 3);
+                }
+                break;
+            case ResponseCompleted:
+                _cmd += content;
+                break;
+            case CmdCompleted:
+                _content += content;
+                break;
+            default:
+                break;
+        }
+        content = "";
+        return;
+    }
+    int index = content.indexOf(DELIMITER);
+    String currentContent = content.substring(0, index);
+    ProcessContent(currentContent);
+    auto it = StateTransferRouter.find(std::make_pair(_state, DelimiterReceived));
+    if (it != StateTransferRouter.end()) {
+        _state = it->second;
+    }
+    if (_state == ResponseCompleted && !_ttsTextBuffer.isEmpty()) {
+        _tts.synth(_emotion, _ttsTextBuffer);
+    }
+    content = content.substring(index + 1);
 }
