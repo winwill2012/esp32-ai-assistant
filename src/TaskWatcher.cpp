@@ -3,26 +3,20 @@
 #include <utility>
 
 void checkChatTask(void *ptr) {
-    auto *watcher = (TaskWatcher *) ptr;
+    auto *watcher = static_cast<TaskWatcher *>(ptr);
     String *message;
     while (true) {
         if (xQueueReceive(watcher->getChatQueue(), &message, portMAX_DELAY) == pdTRUE) {
             Serial.printf("收到chat任务: %s\n", (*message).c_str());
-            AgentResponse *response = watcher->getLLMAgent().chat(*message);
+            watcher->getLLMAgent().begin(*message);
             free(message);
-            Serial.print("LLMAgent返回结果: ");
-            Serial.println(response->response);
-            if (response->response != "") {
-                auto *task = new String(response->response);
-                watcher->publishTTSTask(task);
-            }
             vTaskDelay(1);
         }
     }
 }
 
 void checkTTSTask(void *ptr) {
-    auto *watcher = (TaskWatcher *) ptr;
+    auto *watcher = static_cast<TaskWatcher *>(ptr);
     String *message;
     while (true) {
         if (xQueueReceive(watcher->getTTSQueue(), &message, portMAX_DELAY) == pdTRUE) {
@@ -38,7 +32,7 @@ TaskWatcher::TaskWatcher(const LLMAgent &llmAgent, DoubaoTTS tts) : _llmAgent(ll
     _chatQueue = xQueueCreate(3, sizeof(String *));
     _ttsQueue = xQueueCreate(3, sizeof(String *));
     xTaskCreate(checkChatTask, "checkChatTask", 4096, this, 1, nullptr);
-    xTaskCreate(checkTTSTask, "checkTTSTask", 4096, this, 1, nullptr);
+    xTaskCreate(checkTTSTask, "checkTTSTask", 8192, this, 1, nullptr);
 }
 
 TaskWatcher::~TaskWatcher() = default;

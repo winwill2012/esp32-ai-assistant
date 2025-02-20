@@ -35,8 +35,8 @@ RecordingManager recordingManager(sttClient);
 void setup() {
     Serial.begin(115200);
     WiFiClass::mode(WIFI_MODE_STA);
-    WiFi.begin("Xiaomi_E15A", "19910226");
-//    WiFi.begin("SmartHome", "9jismart");
+    // WiFi.begin("Xiaomi_E15A", "19910226");
+    WiFi.begin("SmartHome", "9jismart");
     while (!WiFi.isConnected()) {
         Serial.print(".");
         vTaskDelay(1000);
@@ -47,7 +47,9 @@ void setup() {
     Serial.printf("Default free size =  %d\n", heap_caps_get_free_size(MALLOC_CAP_DEFAULT));
     Serial.printf("  Psram free size =  %d\n", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
     SPIFFS.begin(true);
-    ttsClient.synth("今天天气不错啊");
+
+    llmAgent.begin("请帮我打开小灯");
+    llmAgent.show();
 }
 
 uint8_t buffer[48000];
