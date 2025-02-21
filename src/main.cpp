@@ -7,8 +7,6 @@
 #include "SPIFFS.h"
 #include <ESPAsyncWebServer.h>
 #include "Recording.h"
-#include "TaskWatcher.h"
-#include "GlobalState.h"
 
 AsyncWebServer server(80);
 
@@ -31,14 +29,11 @@ DoubaoSTT sttClient(llmAgent, I2S_NUM_1, APP_ID, ACCESS_TOKEN,
 
 RecordingManager recordingManager(sttClient);
 
-//TaskWatcher taskWatcher(llmAgent, ttsClient);
-
-
 void setup() {
     Serial.begin(115200);
     WiFiClass::mode(WIFI_MODE_STA);
-    WiFi.begin("Xiaomi_E15A", "19910226");
-//    WiFi.begin("SmartHome", "9jismart");
+    // WiFi.begin("Xiaomi_E15A", "19910226");
+    WiFi.begin("SmartHome", "9jismart");
     while (!WiFi.isConnected()) {
         Serial.print(".");
         vTaskDelay(1000);
@@ -50,7 +45,7 @@ void setup() {
     Serial.printf("  Psram free size =  %d\n", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
     SPIFFS.begin(true);
 
-    llmAgent.begin("请帮我打开小灯");
+    llmAgent.begin("今天心情很不好，给我讲个稍微长一点的故事吧");
     llmAgent.show();
 }
 

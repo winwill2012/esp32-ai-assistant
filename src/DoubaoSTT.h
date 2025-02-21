@@ -5,7 +5,6 @@
 #include <WebSocketsClient.h>
 #include "driver/i2s.h"
 #include "LLMAgent.h"
-#include "TaskWatcher.h"
 #include <vector>
 
 // 默认头部

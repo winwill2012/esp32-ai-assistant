@@ -12,7 +12,7 @@ int32_t parseInt32(const uint8_t *bytes);
 
 String parseString(const uint8_t *bytes, uint32_t length);
 
-std::vector<uint8_t> int2Array(const uint32_t size);
+std::vector<uint8_t> int2Array(uint32_t size);
 
 bool hasSound(const uint8_t *buffer, size_t bufferSize, float threshold);
 

@@ -1,7 +1,6 @@
 #include "DoubaoSTT.h"
 #include "ArduinoJson.h"
 #include "Utils.h"
-#include "TaskWatcher.h"
 #include <Arduino.h>
 #include <vector>
 
@@ -11,7 +10,7 @@ JsonDocument doc;
 
 DoubaoSTT::DoubaoSTT(LLMAgent llmAgent, i2s_port_t i2sNumber, const String &appId, const String &token,
                      const String &host, int port, const String &url, int i2sDout, int i2sBclk, int i2sLrc)
-        : _llmAgent(llmAgent) {
+    : _llmAgent(llmAgent) {
     _i2sNumber = i2sNumber;
     _appId = appId;
     _token = token;
@@ -74,21 +73,21 @@ void DoubaoSTT::begin() {
 
 void DoubaoSTT::setupINMP441() const {
     const i2s_config_t i2s_config = {
-            .mode = i2s_mode_t(I2S_MODE_MASTER | I2S_MODE_RX),
-            .sample_rate = AUDIO_SAMPLE_RATE,
-            .bits_per_sample = i2s_bits_per_sample_t(16),
-            .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
-            .communication_format = i2s_comm_format_t(I2S_COMM_FORMAT_STAND_I2S),
-            .intr_alloc_flags = 0,
-            .dma_buf_count = 8,
-            .dma_buf_len = 1024,
-            .use_apll = false
+        .mode = i2s_mode_t(I2S_MODE_MASTER | I2S_MODE_RX),
+        .sample_rate = AUDIO_SAMPLE_RATE,
+        .bits_per_sample = i2s_bits_per_sample_t(16),
+        .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
+        .communication_format = i2s_comm_format_t(I2S_COMM_FORMAT_STAND_I2S),
+        .intr_alloc_flags = 0,
+        .dma_buf_count = 8,
+        .dma_buf_len = 1024,
+        .use_apll = false
     };
     const i2s_pin_config_t pin_config = {
-            .bck_io_num = _i2sBclk,
-            .ws_io_num = _i2sLrc,
-            .data_out_num = -1,
-            .data_in_num = _i2sDout
+        .bck_io_num = _i2sBclk,
+        .ws_io_num = _i2sLrc,
+        .data_out_num = -1,
+        .data_in_num = _i2sDout
     };
 
     i2s_driver_install(_i2sNumber, &i2s_config, 0, NULL);

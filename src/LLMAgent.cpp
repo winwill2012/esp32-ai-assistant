@@ -118,10 +118,11 @@ void LLMAgent::ProcessContent(String &content) {
     // 内容不包含分隔符，状态不会发生变化
     if (content.indexOf(DELIMITER) < 0) {
         switch (_state) {
-            case Started:
+            case Started: {
                 _emotion += content;
                 break;
-            case EmotionCompleted:
+            }
+            case EmotionCompleted: {
                 _response += content;
                 _ttsTextBuffer += content;
                 const std::pair<int, size_t> delimiterIndex = findMinIndexOfDelimiter(_ttsTextBuffer);
@@ -130,12 +131,15 @@ void LLMAgent::ProcessContent(String &content) {
                     _ttsTextBuffer = _ttsTextBuffer.substring(delimiterIndex.first + delimiterIndex.second);
                 }
                 break;
-            case ResponseCompleted:
+            }
+            case ResponseCompleted: {
                 _cmd += content;
                 break;
-            case CmdCompleted:
+            }
+            case CmdCompleted: {
                 _content += content;
                 break;
+            }
             default:
                 break;
         }

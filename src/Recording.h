@@ -1,7 +1,6 @@
 #ifndef IOT_AI_CONTROLLER_RECORDING_H
 #define IOT_AI_CONTROLLER_RECORDING_H
 
-#include <Arduino.h>
 #include "driver/i2s.h"
 #include "DoubaoSTT.h"
 

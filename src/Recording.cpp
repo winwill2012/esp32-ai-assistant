@@ -7,7 +7,7 @@ RecordingManager::RecordingManager(DoubaoSTT &sstClient) : _sttClient(sstClient)
     _soundPowerThreshold = RECORDING_POWER_THRESHOLD;
     _maxIdleTimeInMs = RECORDING_MAX_IDLE_TIME;
     _recordingBufferSize = RECORDING_BUFFER_SIZE;
-    _recordingBuffer = (uint8_t *) malloc(_recordingBufferSize);
+    _recordingBuffer = static_cast<uint8_t *>(malloc(_recordingBufferSize));
 }
 
 RecordingManager::~RecordingManager() {
@@ -37,7 +37,8 @@ void RecordingManager::beginRecording() {
                         firstPacket = false;
                     }
                     idleBeginTime = 0;
-                } else if (hasSoundFlag) { // 如果之前有声音，本次没有声音
+                } else if (hasSoundFlag) {
+                    // 如果之前有声音，本次没有声音
                     if (idleBeginTime == 0) {
                         idleBeginTime = millis();
                     } else if (millis() - idleBeginTime > _maxIdleTimeInMs) {
