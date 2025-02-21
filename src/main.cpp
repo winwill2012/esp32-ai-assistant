@@ -43,7 +43,6 @@ void setup() {
     Serial.println("连接网络成功");
     Serial.printf("Default free size =  %d\n", heap_caps_get_free_size(MALLOC_CAP_DEFAULT));
     Serial.printf("  Psram free size =  %d\n", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
-    SPIFFS.begin(true);
 
     llmAgent.begin("今天心情很不好，给我讲个稍微长一点的故事吧");
     llmAgent.show();

@@ -1,4 +1,6 @@
 #include "StorageManager.h"
+
+#include <SPI.h>
 #include <SPIFFS.h>
 
 StorageManager::StorageManager(const String &fileName) {

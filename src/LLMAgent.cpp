@@ -2,7 +2,6 @@
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 #include <StorageManager.h>
-
 #include "Utils.h"
 
 LLMAgent::LLMAgent(DoubaoTTS tts, const String &url, const String botId, const String &token) : _tts(tts),
@@ -21,9 +20,10 @@ void LLMAgent::begin(const String &input) {
     reset();
     HTTPClient http;
     const String conversationId = _conversationIdManager.read();
-    if (!conversationId.isEmpty()) {
-        _url += conversationId;
-    }
+    // if (!conversationId.isEmpty()) {
+    //     _url += conversationId;
+    // }
+    Serial.printf("url = %s\n", _url.c_str());
     http.begin(_url);
     http.addHeader("Authorization", "Bearer " + _token);
     http.addHeader("Content-Type", "application/json");
@@ -79,6 +79,7 @@ void LLMAgent::show() const {
 }
 
 LLMAgent::State LLMAgent::ProcessStreamOutput(String input) {
+    Serial.println(input);
     // 只处理data开头，并且是助手回答的数据类型
     if (!input.startsWith("data:") || input.indexOf("\"role\":\"assistant\",\"type\":\"answer\"") < 0) {
         return _state;
