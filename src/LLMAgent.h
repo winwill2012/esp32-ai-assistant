@@ -3,6 +3,8 @@
 
 #include <map>
 #include <ArduinoJson.h>
+#include <StorageManager.h>
+
 #include "DoubaoTTS.h"
 
 #define DELIMITER "^"
@@ -71,6 +73,7 @@ private :
     String _ttsTextBuffer;
 
     State _state = Init;
+    StorageManager _conversationIdManager;
     JsonDocument _document;
 };
 

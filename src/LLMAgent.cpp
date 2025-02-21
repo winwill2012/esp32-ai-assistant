@@ -5,11 +5,13 @@
 
 #include "Utils.h"
 
-LLMAgent::LLMAgent(DoubaoTTS tts, const String &url, const String botId, const String &token) : _tts(tts) {
+LLMAgent::LLMAgent(DoubaoTTS tts, const String &url, const String botId, const String &token) : _tts(tts),
+    _conversationIdManager(StorageManager("/conversationId.txt")) {
     _url = url;
     _botId = botId;
     _token = token;
     _state = Init;
+    _conversationIdManager.begin();
 }
 
 LLMAgent::~LLMAgent() {
@@ -18,7 +20,7 @@ LLMAgent::~LLMAgent() {
 void LLMAgent::begin(const String &input) {
     reset();
     HTTPClient http;
-    const String conversationId = StorageManager::readConversationId();
+    const String conversationId = _conversationIdManager.read();
     if (!conversationId.isEmpty()) {
         _url += conversationId;
     }
@@ -91,7 +93,7 @@ LLMAgent::State LLMAgent::ProcessStreamOutput(String input) {
     }
     String content = _document["content"];
     String conversationId = _document["conversation_id"];
-    StorageManager::updateConversationId(conversationId);
+    _conversationIdManager.update(conversationId);
     while (!content.isEmpty()) {
         ProcessContent(content);
     }

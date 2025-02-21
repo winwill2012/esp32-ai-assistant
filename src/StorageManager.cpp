@@ -1,21 +1,31 @@
 #include "StorageManager.h"
+#include <SPIFFS.h>
 
-StorageManager::StorageManager() {
+StorageManager::StorageManager(const String &fileName) {
+    _fileName = fileName;
 }
 
 bool StorageManager::begin() {
-    return SPIFFS.begin(true);
+    if (!SPIFFS.begin(true)) {
+        Serial.println("SPIFFS Mount Failed");
+        return false;
+    }
+    return true;
 }
 
-void StorageManager::updateConversationId(const String &conversationId) {
-    File file = SPIFFS.open(FILE_NAME, FILE_WRITE);
-    file.println(conversationId);
+void StorageManager::update(const String &content) const {
+    if (content.isEmpty()) { return; }
+    File file = SPIFFS.open(_fileName, FILE_WRITE);
+    file.println(content);
     file.close();
 }
 
-String StorageManager::readConversationId() {
-    File file = SPIFFS.open(FILE_NAME, FILE_READ);
-    String cid = file.readStringUntil('\n');
+String StorageManager::read() const {
+    if (!SPIFFS.exists(_fileName)) {
+        return "";
+    }
+    File file = SPIFFS.open(_fileName, FILE_READ);
+    String value = file.readStringUntil('\n');
     file.close();
-    return cid;
+    return value;
 }

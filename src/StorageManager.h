@@ -1,18 +1,18 @@
 #ifndef STORAGEMANAGER_H
 #define STORAGEMANAGER_H
 #include<Arduino.h>
-#include<SPIFFS.h>
 
-#define FILE_NAME "/cid.txt"
-
-class StorageManager : public fs::SPIFFSFS {
+class StorageManager {
 public:
-    StorageManager();
+    StorageManager(const String &fileName);
 
     static bool begin();
 
-    static void updateConversationId(const String &conversationId);
+    void update(const String &content) const;
 
-    static String readConversationId();
+    String read() const;
+
+private:
+    String _fileName;
 };
 #endif //STORAGEMANAGER_H
