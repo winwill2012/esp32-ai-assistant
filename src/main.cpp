@@ -23,7 +23,7 @@ AsyncWebServer server(80);
 DoubaoTTS ttsClient(I2S_NUM_0, 16000, "BV700_streaming", APP_ID, ACCESS_TOKEN,
                     HOST, 443, "/api/v1/tts/ws_binary", 16, 17, 18);
 
-LLMAgent llmAgent(ttsClient, "https://api.coze.cn/v3/chat", "7468218438402818082",
+LLMAgent llmAgent(ttsClient, "https://api.coze.cn/v3/chat?conversation_id=", "7468218438402818082",
                   "pat_vM6yCGCIl7FRLJoUbncQ8ZxFl3TKjviXMI50Sq45RSJzhahbB2AhlLRS1vVRiUEq");
 
 DoubaoSTT sttClient(llmAgent, I2S_NUM_1, APP_ID, ACCESS_TOKEN,

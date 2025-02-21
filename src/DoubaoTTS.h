@@ -22,7 +22,7 @@ public:
 
     void parseResponse(const uint8_t *response) const;
 
-    void synth(const String emotion, const String text);
+    void synth(const String &emotion, const String &text);
 
 private:
     String _appId;

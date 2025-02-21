@@ -1,7 +1,6 @@
 #ifndef LLMAGENT_H
 #define LLMAGENT_H
 
-#include <Arduino.h>
 #include <map>
 #include <ArduinoJson.h>
 #include "DoubaoTTS.h"
@@ -26,15 +25,15 @@ public:
     };
 
     std::map<std::pair<State, Event>, State> StateTransferRouter = {
-            {{Init,              Begin},              Started},
-            {{Started,           NormalCharReceived}, Started},
-            {{Started,           DelimiterReceived},  EmotionCompleted},
-            {{EmotionCompleted,  NormalCharReceived}, EmotionCompleted},
-            {{EmotionCompleted,  DelimiterReceived},  ResponseCompleted},
-            {{ResponseCompleted, NormalCharReceived}, ResponseCompleted},
-            {{ResponseCompleted, DelimiterReceived},  CmdCompleted},
-            {{CmdCompleted,      NormalCharReceived}, CmdCompleted},
-            {{CmdCompleted,      DelimiterReceived},  ContentCompleted},
+        {{Init, Begin}, Started},
+        {{Started, NormalCharReceived}, Started},
+        {{Started, DelimiterReceived}, EmotionCompleted},
+        {{EmotionCompleted, NormalCharReceived}, EmotionCompleted},
+        {{EmotionCompleted, DelimiterReceived}, ResponseCompleted},
+        {{ResponseCompleted, NormalCharReceived}, ResponseCompleted},
+        {{ResponseCompleted, DelimiterReceived}, CmdCompleted},
+        {{CmdCompleted, NormalCharReceived}, CmdCompleted},
+        {{CmdCompleted, DelimiterReceived}, ContentCompleted},
     };
 
     LLMAgent(DoubaoTTS tts, const String &url, String botId, const String &token);

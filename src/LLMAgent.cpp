@@ -1,6 +1,8 @@
 #include "LLMAgent.h"
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
+#include <StorageManager.h>
+
 #include "Utils.h"
 
 LLMAgent::LLMAgent(DoubaoTTS tts, const String &url, const String botId, const String &token) : _tts(tts) {
@@ -16,6 +18,10 @@ LLMAgent::~LLMAgent() {
 void LLMAgent::begin(const String &input) {
     reset();
     HTTPClient http;
+    const String conversationId = StorageManager::readConversationId();
+    if (!conversationId.isEmpty()) {
+        _url += conversationId;
+    }
     http.begin(_url);
     http.addHeader("Authorization", "Bearer " + _token);
     http.addHeader("Content-Type", "application/json");
@@ -84,6 +90,8 @@ LLMAgent::State LLMAgent::ProcessStreamOutput(String input) {
         return _state;
     }
     String content = _document["content"];
+    String conversationId = _document["conversation_id"];
+    StorageManager::updateConversationId(conversationId);
     while (!content.isEmpty()) {
         ProcessContent(content);
     }
@@ -114,15 +122,10 @@ void LLMAgent::ProcessContent(String &content) {
             case EmotionCompleted:
                 _response += content;
                 _ttsTextBuffer += content;
-                if (_ttsTextBuffer.indexOf("，") > 0) {
-                    int index = _ttsTextBuffer.indexOf("，");
-                    _tts.synth(_emotion, _ttsTextBuffer.substring(0, index));
-                    _ttsTextBuffer = _ttsTextBuffer.substring(index + 3);
-                }
-                if (_ttsTextBuffer.indexOf("。") > 0) {
-                    int index = _ttsTextBuffer.indexOf("。");
-                    _tts.synth(_emotion, _ttsTextBuffer.substring(0, index));
-                    _ttsTextBuffer = _ttsTextBuffer.substring(index + 3);
+                const std::pair<int, size_t> delimiterIndex = findMinIndexOfDelimiter(_ttsTextBuffer);
+                if (delimiterIndex.first >= 0) {
+                    _tts.synth(_emotion, _ttsTextBuffer.substring(0, delimiterIndex.first));
+                    _ttsTextBuffer = _ttsTextBuffer.substring(delimiterIndex.first + delimiterIndex.second);
                 }
                 break;
             case ResponseCompleted:
@@ -137,7 +140,7 @@ void LLMAgent::ProcessContent(String &content) {
         content = "";
         return;
     }
-    int index = content.indexOf(DELIMITER);
+    const int index = content.indexOf(DELIMITER);
     String currentContent = content.substring(0, index);
     ProcessContent(currentContent);
     auto it = StateTransferRouter.find(std::make_pair(_state, DelimiterReceived));

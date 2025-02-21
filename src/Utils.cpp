@@ -50,6 +50,22 @@ bool hasSound(const uint8_t *buffer, const size_t bufferSize, float threshold) {
         sumSquares += (sample * sample);
     }
     const double rms = sqrt(2 * sumSquares / bufferSize / 2);
-//    Serial.printf("sumSquares: %f  RMS值: %f\n", sumSquares, rms);
+    //    Serial.printf("sumSquares: %f  RMS值: %f\n", sumSquares, rms);
     return rms > threshold;
+}
+
+std::pair<int, size_t> findMinIndexOfDelimiter(const String &input) {
+    // 定义需要处理的中英文标点集合
+    std::vector<String> delimiters = {"，", "。", ".", ",", "！", "：", "；", "？"};
+
+    int minIndex = -1;
+    size_t minIndexDelimiterLength = 0;
+    for (const String &delimiter: delimiters) {
+        const int index = input.indexOf(delimiter);
+        if (index > 0 && (index < minIndex || minIndex == -1)) {
+            minIndex = index;
+            minIndexDelimiterLength = delimiter.length();
+        }
+    }
+    return std::make_pair(minIndex, minIndexDelimiterLength);
 }
