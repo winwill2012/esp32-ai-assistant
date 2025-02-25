@@ -1,4 +1,3 @@
-#include <SPIFFS.h>
 #include "Recording.h"
 #include "Utils.h"
 #include "GlobalState.h"
@@ -21,16 +20,14 @@ void RecordingManager::beginRecording() {
     bool hasSoundFlag = false;
     unsigned long idleBeginTime = 0;
     bool firstPacket = true;
-    i2s_start(_sttClient.getI2sNumber());
-    i2s_zero_dma_buffer(_sttClient.getI2sNumber());
     while (true) {
         if (globalState == Listening) {
-            Serial.println("开始录制声音====================");
             esp_err_t err = i2s_read(_sttClient.getI2sNumber(), _recordingBuffer,
                                      _recordingBufferSize, &bytesRead, portMAX_DELAY);
             if (err == ESP_OK) {
                 // 如有有声音
                 if (hasSound(_recordingBuffer, bytesRead, _soundPowerThreshold)) {
+                    Serial.println("识别到声音");
                     hasSoundFlag = true;
                     _sttClient.recognize(_recordingBuffer, bytesRead, firstPacket, false);
                     if (firstPacket) {
@@ -43,16 +40,11 @@ void RecordingManager::beginRecording() {
                         idleBeginTime = millis();
                     } else if (millis() - idleBeginTime > _maxIdleTimeInMs) {
                         _sttClient.recognize(_recordingBuffer, bytesRead, firstPacket, true);
-                        i2s_stop(_sttClient.getI2sNumber());
                         Serial.println("本次录音结束");
                         hasSoundFlag = false;
                         firstPacket = true;
-                        i2s_start(_sttClient.getI2sNumber());
-                        i2s_zero_dma_buffer(_sttClient.getI2sNumber());
                     }
                 }
-            } else {
-                Serial.printf("读取录音信息失败: %d\n", err);
             }
         }
     }

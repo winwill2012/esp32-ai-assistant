@@ -4,9 +4,7 @@
 #include <map>
 #include <ArduinoJson.h>
 #include <StorageManager.h>
-
 #include "DoubaoTTS.h"
-
 #define DELIMITER "^"
 
 class LLMAgent {

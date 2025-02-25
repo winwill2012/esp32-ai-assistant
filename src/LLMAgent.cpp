@@ -3,9 +3,12 @@
 #include <ArduinoJson.h>
 #include <StorageManager.h>
 #include "Utils.h"
+#include "GlobalState.h"
 
 LLMAgent::LLMAgent(DoubaoTTS tts, const String &url, const String botId, const String &token) : _tts(tts),
-    _conversationIdManager(StorageManager("/conversationId.txt")) {
+                                                                                                _conversationIdManager(
+                                                                                                        StorageManager(
+                                                                                                                "/conversationId.txt")) {
     _url = url;
     _botId = botId;
     _token = token;
@@ -13,18 +16,12 @@ LLMAgent::LLMAgent(DoubaoTTS tts, const String &url, const String botId, const S
     _conversationIdManager.begin();
 }
 
-LLMAgent::~LLMAgent() {
-}
+LLMAgent::~LLMAgent() = default;
 
 void LLMAgent::begin(const String &input) {
     reset();
     HTTPClient http;
-    const String conversationId = _conversationIdManager.read();
-    // if (!conversationId.isEmpty()) {
-    //     _url += conversationId;
-    // }
-    Serial.printf("url = %s\n", _url.c_str());
-    http.begin(_url);
+    http.begin(_url + cid);
     http.addHeader("Authorization", "Bearer " + _token);
     http.addHeader("Content-Type", "application/json");
     // 构建请求体
@@ -50,7 +47,7 @@ void LLMAgent::begin(const String &input) {
                 if (c == '\n') {
                     if (!line.isEmpty()) {
                         if (ProcessStreamOutput(line) == ContentCompleted) {
-                            Serial.println("LLMAgent::process completed");
+                            Serial.println("大模型调用结束");
                             break;
                         }
                     }
@@ -61,7 +58,7 @@ void LLMAgent::begin(const String &input) {
             }
         }
     } else {
-        Serial.print("Error on sending POST: ");
+        Serial.print("大模型调用失败: ");
         Serial.println(httpResponseCode);
     }
     http.end();
@@ -79,9 +76,8 @@ void LLMAgent::show() const {
 }
 
 LLMAgent::State LLMAgent::ProcessStreamOutput(String input) {
-    Serial.println(input);
     // 只处理data开头，并且是助手回答的数据类型
-    if (!input.startsWith("data:") || input.indexOf("\"role\":\"assistant\",\"type\":\"answer\"") < 0) {
+    if (!input.startsWith("data:") || input.indexOf(R"("role":"assistant","type":"answer")") < 0) {
         return _state;
     }
     input.replace("data:", "");
@@ -94,11 +90,10 @@ LLMAgent::State LLMAgent::ProcessStreamOutput(String input) {
     }
     String content = _document["content"];
     String conversationId = _document["conversation_id"];
-    _conversationIdManager.update(conversationId);
+    cid = conversationId;
     while (!content.isEmpty()) {
         ProcessContent(content);
     }
-    show();
     return _state;
 }
 

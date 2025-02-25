@@ -4,7 +4,6 @@
 #include "WiFi.h"
 #include "DoubaoTTS.h"
 #include "DoubaoSTT.h"
-#include "SPIFFS.h"
 #include <ESPAsyncWebServer.h>
 #include "Recording.h"
 
@@ -19,21 +18,21 @@ AsyncWebServer server(80);
  *  #define WEBSOCKETS_MAX_DATA_SIZE (64 * 1024)
  */
 DoubaoTTS ttsClient(I2S_NUM_0, 16000, "BV700_streaming", APP_ID, ACCESS_TOKEN,
-                    HOST, 443, "/api/v1/tts/ws_binary", 16, 17, 18);
+                    HOST, 443, "/api/v1/tts/ws_binary", 38, 39, 40);
 
 LLMAgent llmAgent(ttsClient, "https://api.coze.cn/v3/chat?conversation_id=", "7468218438402818082",
                   "pat_vM6yCGCIl7FRLJoUbncQ8ZxFl3TKjviXMI50Sq45RSJzhahbB2AhlLRS1vVRiUEq");
 
 DoubaoSTT sttClient(llmAgent, I2S_NUM_1, APP_ID, ACCESS_TOKEN,
-                    HOST, 443, "/api/v2/asr", 47, 48, 45);
+                    HOST, 443, "/api/v2/asr", 1, 42, 2);
 
 RecordingManager recordingManager(sttClient);
 
 void setup() {
     Serial.begin(115200);
     WiFiClass::mode(WIFI_MODE_STA);
-    // WiFi.begin("Xiaomi_E15A", "19910226");
-    WiFi.begin("SmartHome", "9jismart");
+    WiFi.begin("Xiaomi_E15A", "19910226");
+//    WiFi.begin("SmartHome", "9jismart");
     while (!WiFi.isConnected()) {
         Serial.print(".");
         vTaskDelay(1000);
@@ -44,16 +43,8 @@ void setup() {
     Serial.printf("Default free size =  %d\n", heap_caps_get_free_size(MALLOC_CAP_DEFAULT));
     Serial.printf("  Psram free size =  %d\n", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
 
-    llmAgent.begin("今天心情很不好，给我讲个稍微长一点的故事吧");
-    llmAgent.show();
+    recordingManager.beginRecording();
 }
 
-uint8_t buffer[48000];
-size_t size;
-
 void loop() {
-    if (Serial.available()) {
-        Serial.readStringUntil('\n');
-        recordingManager.beginRecording();
-    }
 }
