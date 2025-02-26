@@ -7,8 +7,6 @@
 #include <ESPAsyncWebServer.h>
 #include "Recording.h"
 
-AsyncWebServer server(80);
-
 #define HOST "openspeech.bytedance.com"
 #define APP_ID "8988564775"
 #define ACCESS_TOKEN "dsWgV1rCvxiinw_H2clmJuAI-O1D8P94"
@@ -31,8 +29,8 @@ RecordingManager recordingManager(sttClient);
 void setup() {
     Serial.begin(115200);
     WiFiClass::mode(WIFI_MODE_STA);
-    WiFi.begin("Xiaomi_E15A", "19910226");
-//    WiFi.begin("SmartHome", "9jismart");
+    // WiFi.begin("Xiaomi_E15A", "19910226");
+    WiFi.begin("SmartHome", "9jismart");
     while (!WiFi.isConnected()) {
         Serial.print(".");
         vTaskDelay(1000);
@@ -43,7 +41,8 @@ void setup() {
     Serial.printf("Default free size =  %d\n", heap_caps_get_free_size(MALLOC_CAP_DEFAULT));
     Serial.printf("  Psram free size =  %d\n", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
 
-    recordingManager.beginRecording();
+    // recordingManager.begin();
+    llmAgent.begin("你好啊，可以给我讲一个长一点的故事吗?");
 }
 
 void loop() {

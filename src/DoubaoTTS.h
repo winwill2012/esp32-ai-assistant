@@ -14,7 +14,7 @@ public:
 
     void setupMax98357() const;
 
-    void eventCallback(WStype_t type, uint8_t *payload, size_t length);
+    void eventCallback(WStype_t type, const uint8_t *payload, size_t length) const;
 
     void begin();
 
@@ -37,7 +37,6 @@ private:
     int _i2sDout;
     int _i2sBclk;
     int _i2sLrc;
-    SemaphoreHandle_t _taskFinished;
 };
 
 #endif

@@ -1,19 +1,14 @@
 #include "LLMAgent.h"
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
-#include <StorageManager.h>
 #include "Utils.h"
 #include "GlobalState.h"
 
-LLMAgent::LLMAgent(DoubaoTTS tts, const String &url, const String botId, const String &token) : _tts(tts),
-                                                                                                _conversationIdManager(
-                                                                                                        StorageManager(
-                                                                                                                "/conversationId.txt")) {
+LLMAgent::LLMAgent(DoubaoTTS tts, const String &url, const String botId, const String &token) : _tts(tts) {
     _url = url;
     _botId = botId;
     _token = token;
     _state = Init;
-    _conversationIdManager.begin();
 }
 
 LLMAgent::~LLMAgent() = default;
@@ -21,7 +16,7 @@ LLMAgent::~LLMAgent() = default;
 void LLMAgent::begin(const String &input) {
     reset();
     HTTPClient http;
-    http.begin(_url + cid);
+    http.begin(_url + GlobalState::getConversationId());
     http.addHeader("Authorization", "Bearer " + _token);
     http.addHeader("Content-Type", "application/json");
     // 构建请求体
@@ -43,11 +38,10 @@ void LLMAgent::begin(const String &input) {
         String line;
         while (stream->connected() || stream->available()) {
             if (stream->available()) {
-                const char c = stream->read();
+                const char c = static_cast<char>(stream->read());
                 if (c == '\n') {
                     if (!line.isEmpty()) {
                         if (ProcessStreamOutput(line) == ContentCompleted) {
-                            Serial.println("大模型调用结束");
                             break;
                         }
                     }
@@ -58,7 +52,7 @@ void LLMAgent::begin(const String &input) {
             }
         }
     } else {
-        Serial.print("大模型调用失败: ");
+        Serial.print("LLM调用失败: ");
         Serial.println(httpResponseCode);
     }
     http.end();
@@ -75,22 +69,22 @@ void LLMAgent::show() const {
     Serial.println("-----------------------------------------------");
 }
 
-LLMAgent::State LLMAgent::ProcessStreamOutput(String input) {
+LLMAgent::State LLMAgent::ProcessStreamOutput(String data) {
     // 只处理data开头，并且是助手回答的数据类型
-    if (!input.startsWith("data:") || input.indexOf(R"("role":"assistant","type":"answer")") < 0) {
+    if (!data.startsWith("data:") || data.indexOf(R"("role":"assistant","type":"answer")") < 0) {
         return _state;
     }
-    input.replace("data:", "");
+    data.replace("data:", "");
     _document.clear();
-    DeserializationError error = deserializeJson(_document, input);
+    const DeserializationError error = deserializeJson(_document, data);
     if (error != DeserializationError::Ok) {
-        Serial.printf("Failed to deserialize JSON: ");
-        Serial.println(input);
+        Serial.printf("反序列化大模型返回结果失败: ");
+        Serial.println(data);
         return _state;
     }
     String content = _document["content"];
     String conversationId = _document["conversation_id"];
-    cid = conversationId;
+    GlobalState::setConversationId(conversationId);
     while (!content.isEmpty()) {
         ProcessContent(content);
     }
@@ -107,6 +101,8 @@ void LLMAgent::reset() {
 }
 
 void LLMAgent::ProcessContent(String &content) {
+    Serial.printf("LLM reply: ");
+    Serial.println(content);
     content.trim();
     if (content.isEmpty()) {
         return;
@@ -121,6 +117,7 @@ void LLMAgent::ProcessContent(String &content) {
             case EmotionCompleted: {
                 _response += content;
                 _ttsTextBuffer += content;
+                // 回复的内容里面包含一些可以断句的标点符号时，直接发送给TTS进行语音合成，降低响应延迟
                 const std::pair<int, size_t> delimiterIndex = findMinIndexOfDelimiter(_ttsTextBuffer);
                 if (delimiterIndex.first >= 0) {
                     _tts.synth(_emotion, _ttsTextBuffer.substring(0, delimiterIndex.first));
@@ -142,15 +139,20 @@ void LLMAgent::ProcessContent(String &content) {
         content = "";
         return;
     }
+    // 如果包含分隔符^,前半部分和后半部分分开处理，递归调用本函数
     const int index = content.indexOf(DELIMITER);
-    String currentContent = content.substring(0, index);
-    ProcessContent(currentContent);
-    auto it = StateTransferRouter.find(std::make_pair(_state, DelimiterReceived));
+    String fistHalfContent = content.substring(0, index);
+    // 递归处理前半部分内容
+    ProcessContent(fistHalfContent);
+    // 执行状态转移相关逻辑
+    const auto it = StateTransferRouter.find(std::make_pair(_state, DelimiterReceived));
     if (it != StateTransferRouter.end()) {
         _state = it->second;
     }
     if (_state == ResponseCompleted && !_ttsTextBuffer.isEmpty()) {
         _tts.synth(_emotion, _ttsTextBuffer);
     }
-    content = content.substring(index + 1);
+    // 递归处理后半部分内容
+    String secondHalfContent = content.substring(index + 1);
+    ProcessContent(secondHalfContent);
 }
