@@ -11,7 +11,7 @@ JsonDocument doc;
 
 DoubaoSTT::DoubaoSTT(const LLMAgent &llmAgent, i2s_port_t i2sNumber, const String &appId, const String &token,
                      const String &host, int port, const String &url, int i2sDout, int i2sBclk, int i2sLrc)
-    : _llmAgent(llmAgent) {
+        : _llmAgent(llmAgent) {
     _i2sNumber = i2sNumber;
     _appId = appId;
     _token = token;
@@ -38,11 +38,9 @@ void DoubaoSTT::eventCallback(WStype_t type, uint8_t *payload, size_t length) {
             Serial.println();
             break;
         case WStype_CONNECTED: {
-            GlobalState::setEvents(EVENT_STT_WS_CONNECTED);
             break;
         }
         case WStype_DISCONNECTED:
-            GlobalState::unsetEvents(EVENT_STT_WS_CONNECTED);
             break;
         case WStype_TEXT: {
             Serial.println("DoubaoSTT收到Text回复: ");
@@ -73,21 +71,21 @@ void DoubaoSTT::begin() {
 
 void DoubaoSTT::setupINMP441() const {
     const i2s_config_t i2s_config = {
-        .mode = i2s_mode_t(I2S_MODE_MASTER | I2S_MODE_RX),
-        .sample_rate = AUDIO_SAMPLE_RATE,
-        .bits_per_sample = i2s_bits_per_sample_t(16),
-        .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
-        .communication_format = i2s_comm_format_t(I2S_COMM_FORMAT_STAND_I2S),
-        .intr_alloc_flags = 0,
-        .dma_buf_count = 8,
-        .dma_buf_len = 1024,
-        .use_apll = true
+            .mode = i2s_mode_t(I2S_MODE_MASTER | I2S_MODE_RX),
+            .sample_rate = AUDIO_SAMPLE_RATE,
+            .bits_per_sample = i2s_bits_per_sample_t(16),
+            .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
+            .communication_format = i2s_comm_format_t(I2S_COMM_FORMAT_STAND_I2S),
+            .intr_alloc_flags = 0,
+            .dma_buf_count = 8,
+            .dma_buf_len = 1024,
+            .use_apll = true
     };
     const i2s_pin_config_t pin_config = {
-        .bck_io_num = _i2sBclk,
-        .ws_io_num = _i2sLrc,
-        .data_out_num = -1,
-        .data_in_num = _i2sDout
+            .bck_io_num = _i2sBclk,
+            .ws_io_num = _i2sLrc,
+            .data_out_num = -1,
+            .data_in_num = _i2sDout
     };
 
     i2s_driver_install(_i2sNumber, &i2s_config, 0, nullptr);
@@ -156,8 +154,7 @@ void DoubaoSTT::buildAudioOnlyRequest(uint8_t *audio, const size_t size, const b
 
 void DoubaoSTT::recognize(uint8_t *audio, size_t size, bool firstPacket, bool lastPacket) {
     if (firstPacket) {
-        // 等待STT websocket连接成功
-        while (!GlobalState::waitAllEvents(EVENT_STT_WS_CONNECTED, 0)) {
+        while (!isConnected()) {
             loop();
             vTaskDelay(1);
         }
@@ -176,6 +173,7 @@ void DoubaoSTT::recognize(uint8_t *audio, size_t size, bool firstPacket, bool la
             loop();
             vTaskDelay(1);
         }
+        GlobalState::unsetEvents(EVENT_STT_WS_TASK_FINISHED);
         disconnect();
         Serial.println("语音识别任务完成");
     }

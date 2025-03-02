@@ -4,11 +4,12 @@
 #include <map>
 #include <ArduinoJson.h>
 #include "DoubaoTTS.h"
+
 #define DELIMITER "^"
 
 class LLMAgent {
 public:
-    enum State {
+    enum LLMState {
         Init,
         Started,
         EmotionCompleted,
@@ -17,22 +18,22 @@ public:
         ContentCompleted,
     };
 
-    enum Event {
+    enum LLMEvent {
         Begin, // 开始调用接口
         NormalCharReceived, // 收到普通字符
         DelimiterReceived, // 收到字段分隔符
     };
 
-    std::map<std::pair<State, Event>, State> StateTransferRouter = {
-        {{Init, Begin}, Started},
-        {{Started, NormalCharReceived}, Started},
-        {{Started, DelimiterReceived}, EmotionCompleted},
-        {{EmotionCompleted, NormalCharReceived}, EmotionCompleted},
-        {{EmotionCompleted, DelimiterReceived}, ResponseCompleted},
-        {{ResponseCompleted, NormalCharReceived}, ResponseCompleted},
-        {{ResponseCompleted, DelimiterReceived}, CmdCompleted},
-        {{CmdCompleted, NormalCharReceived}, CmdCompleted},
-        {{CmdCompleted, DelimiterReceived}, ContentCompleted},
+    std::map<std::pair<LLMState, LLMEvent>, LLMState> StateTransferRouter = {
+            {{Init,              Begin},              Started},
+            {{Started,           NormalCharReceived}, Started},
+            {{Started,           DelimiterReceived},  EmotionCompleted},
+            {{EmotionCompleted,  NormalCharReceived}, EmotionCompleted},
+            {{EmotionCompleted,  DelimiterReceived},  ResponseCompleted},
+            {{ResponseCompleted, NormalCharReceived}, ResponseCompleted},
+            {{ResponseCompleted, DelimiterReceived},  CmdCompleted},
+            {{CmdCompleted,      NormalCharReceived}, CmdCompleted},
+            {{CmdCompleted,      DelimiterReceived},  ContentCompleted},
     };
 
     LLMAgent(DoubaoTTS tts, const String &url, String botId, const String &token);
@@ -51,7 +52,7 @@ public:
         return _content;
     }
 
-    State ProcessStreamOutput(String data);
+    LLMState ProcessStreamOutput(String data);
 
     void ProcessContent(String &content);
 
@@ -69,7 +70,7 @@ private :
     String _content;
     String _ttsTextBuffer;
 
-    State _state = Init;
+    LLMState _state = Init;
     JsonDocument _document;
 };
 

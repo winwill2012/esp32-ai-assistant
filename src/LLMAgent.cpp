@@ -69,7 +69,7 @@ void LLMAgent::show() const {
     Serial.println("-----------------------------------------------");
 }
 
-LLMAgent::State LLMAgent::ProcessStreamOutput(String data) {
+LLMAgent::LLMState LLMAgent::ProcessStreamOutput(String data) {
     // 只处理data开头，并且是助手回答的数据类型
     if (!data.startsWith("data:") || data.indexOf(R"("role":"assistant","type":"answer")") < 0) {
         return _state;
@@ -101,8 +101,6 @@ void LLMAgent::reset() {
 }
 
 void LLMAgent::ProcessContent(String &content) {
-    Serial.printf("LLM reply: ");
-    Serial.println(content);
     content.trim();
     if (content.isEmpty()) {
         return;
@@ -152,7 +150,5 @@ void LLMAgent::ProcessContent(String &content) {
     if (_state == ResponseCompleted && !_ttsTextBuffer.isEmpty()) {
         _tts.synth(_emotion, _ttsTextBuffer);
     }
-    // 递归处理后半部分内容
-    String secondHalfContent = content.substring(index + 1);
-    ProcessContent(secondHalfContent);
+    content = content.substring(index + 1);
 }

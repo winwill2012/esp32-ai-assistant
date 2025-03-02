@@ -12,7 +12,7 @@ public:
 
     ~RecordingManager();
 
-    void begin();
+    [[noreturn]] void begin();
 
 private:
     DoubaoSTT _sttClient;

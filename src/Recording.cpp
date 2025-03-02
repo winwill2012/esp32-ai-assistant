@@ -15,13 +15,14 @@ RecordingManager::~RecordingManager() {
 }
 
 [[noreturn]] void RecordingManager::begin() {
-    GlobalState::setEvents(EVENT_LISTENING);
     size_t bytesRead;
     bool hasSoundFlag = false;
     unsigned long idleBeginTime = 0;
     bool firstPacket = true;
     while (true) {
-        GlobalState::waitAllEvents(EVENT_LISTENING, portMAX_DELAY); // 等待进入监听模式再录音
+        if (GlobalState::getState() != Listening) {
+            continue;
+        }
         const esp_err_t err = i2s_read(_sttClient.getI2sNumber(), _recordingBuffer, _recordingBufferSize, &bytesRead,
                                        portMAX_DELAY);
         if (err == ESP_OK) {
