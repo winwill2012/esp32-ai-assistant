@@ -5,6 +5,8 @@
 #include "DoubaoTTS.h"
 #include "DoubaoSTT.h"
 #include "Recording.h"
+#include "GlobalState.h"
+#include "Utils.h"
 //#include <lvgl.h>
 //#include "FT6336.h"
 //#include "gui/gui_guider.h"
@@ -60,7 +62,7 @@ RecordingManager recordingManager(sttClient);
 
 void setup() {
     Serial.begin(115200);
-
+    randomSeed(millis());
 //    lv_init();
 //    lv_tick_set_cb(my_tick);
 //    ts.begin();
@@ -90,9 +92,11 @@ void setup() {
     Serial.printf("  PSRAM free size =  %d\n", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
 
     recordingManager.begin();
+//    ttsClient.synth("happy", "测试一下语音合成的效果");
 }
 
 void loop() {
 //    lv_timer_handler(); /* let the GUI do its work */
 //    delay(5); /* let this time pass */
+//    Serial.println(generateTaskId());
 }

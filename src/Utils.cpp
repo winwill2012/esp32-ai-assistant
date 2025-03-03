@@ -2,6 +2,7 @@
 #include "utils.h"
 
 String generateTaskId() {
+    randomSeed(millis());
     String uuid = "";
     const char *charset = "0123456789abcdef";
     for (int i = 0; i < 32; i++) {
@@ -44,12 +45,11 @@ std::vector<uint8_t> int2Array(const uint32_t size) {
 
 bool hasSound(const uint8_t *buffer, const size_t bufferSize, float threshold) {
     double sumSquares = 0.0;
-    for (size_t i = 0; i < bufferSize; i += 2) {
-        int16_t sample = (static_cast<int16_t>(buffer[i]) << 8) | buffer[i + 1];
+    for (size_t i = 0; i < bufferSize; i++) {
+        int16_t sample = buffer[i] << 8 | buffer[i + 1];
         sumSquares += (sample * sample);
     }
-    const double rms = sqrt(2 * sumSquares / bufferSize / 2);
-    //    Serial.printf("sumSquares: %f  RMS值: %f\n", sumSquares, rms);
+    const double rms = sqrt(sumSquares / bufferSize);
     return rms > threshold;
 }
 
@@ -68,3 +68,9 @@ std::pair<int, size_t> findMinIndexOfDelimiter(const String &input) {
     }
     return std::make_pair(minIndex, minIndexDelimiterLength);
 }
+
+
+
+
+
+

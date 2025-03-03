@@ -5,8 +5,8 @@
 RecordingManager::RecordingManager(DoubaoSTT &sstClient) : _sttClient(sstClient) {
     _soundPowerThreshold = RECORDING_POWER_THRESHOLD;
     _maxIdleTimeInMs = RECORDING_MAX_IDLE_TIME;
-    _recordingBufferSize = 3200;
-    _recordingBuffer = static_cast<uint8_t *>(malloc(3200));
+    _recordingBufferSize = 800;  // 25ms的音频数据
+    _recordingBuffer = (uint8_t *) malloc(_recordingBufferSize);
 }
 
 RecordingManager::~RecordingManager() {
@@ -19,6 +19,7 @@ RecordingManager::~RecordingManager() {
     bool hasSoundFlag = false;
     unsigned long idleBeginTime = 0;
     bool firstPacket = true;
+    GlobalState::setState(Listening);
     while (true) {
         if (GlobalState::getState() != Listening) {
             continue;
@@ -28,6 +29,7 @@ RecordingManager::~RecordingManager() {
         if (err == ESP_OK) {
             // 如有有声音
             if (hasSound(_recordingBuffer, bytesRead, _soundPowerThreshold)) {
+                Serial.println("识别到声音");
                 hasSoundFlag = true;
                 _sttClient.recognize(_recordingBuffer, bytesRead, firstPacket, false);
                 if (firstPacket) {
@@ -39,8 +41,8 @@ RecordingManager::~RecordingManager() {
                 if (idleBeginTime == 0) {
                     idleBeginTime = millis();
                 } else if (millis() - idleBeginTime > _maxIdleTimeInMs) {
-                    _sttClient.recognize(_recordingBuffer, bytesRead, firstPacket, true);
                     Serial.println("本次录音结束");
+                    _sttClient.recognize(_recordingBuffer, bytesRead, firstPacket, true);
                     hasSoundFlag = false;
                     firstPacket = true;
                 }

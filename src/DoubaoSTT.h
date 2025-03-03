@@ -14,7 +14,8 @@ const byte DefaultLastAudioWsHeader[] = {0x11, 0x22, 0x10, 0x00};
 
 class DoubaoSTT : public WebSocketsClient {
 public:
-    DoubaoSTT(const LLMAgent& llmAgent, i2s_port_t i2SPort, const String &appId, const String &token, const String &host,
+    DoubaoSTT(const LLMAgent &llmAgent, i2s_port_t i2SPort, const String &appId, const String &token,
+              const String &host,
               int port, const String &url, int i2sDout, int i2sBclk, int i2sLrc);
 
     void setupINMP441() const;
@@ -46,6 +47,7 @@ private:
     int _i2sDout;
     int _i2sBclk;
     int _i2sLrc;
+    SemaphoreHandle_t _taskFinished;
     std::vector<uint8_t> _requestBuilder;
 };
 

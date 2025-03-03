@@ -55,6 +55,7 @@ void LLMAgent::begin(const String &input) {
         Serial.print("LLM调用失败: ");
         Serial.println(httpResponseCode);
     }
+    Serial.println("LLM调用结束");
     http.end();
 }
 

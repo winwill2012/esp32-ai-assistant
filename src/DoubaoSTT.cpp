@@ -2,7 +2,6 @@
 #include "ArduinoJson.h"
 #include "Utils.h"
 #include <Arduino.h>
-#include <GlobalState.h>
 #include <vector>
 
 #define AUDIO_SAMPLE_RATE 16000
@@ -22,6 +21,7 @@ DoubaoSTT::DoubaoSTT(const LLMAgent &llmAgent, i2s_port_t i2sNumber, const Strin
     _i2sBclk = i2sBclk;
     _i2sLrc = i2sLrc;
     _requestBuilder = std::vector<uint8_t>();
+    _taskFinished = xSemaphoreCreateBinary();
     setupINMP441();
     begin();
 }
@@ -29,27 +29,11 @@ DoubaoSTT::DoubaoSTT(const LLMAgent &llmAgent, i2s_port_t i2sNumber, const Strin
 void DoubaoSTT::eventCallback(WStype_t type, uint8_t *payload, size_t length) {
     switch (type) {
         case WStype_PING:
-            break;
         case WStype_ERROR:
-            Serial.println("DoubaoSTT连接错误: ");
-            for (size_t i = 0; i < length; i++) {
-                Serial.print(static_cast<char>(payload[i]));
-            }
-            Serial.println();
-            break;
-        case WStype_CONNECTED: {
-            break;
-        }
+        case WStype_CONNECTED:
         case WStype_DISCONNECTED:
+        case WStype_TEXT:
             break;
-        case WStype_TEXT: {
-            Serial.println("DoubaoSTT收到Text回复: ");
-            for (int i = 0; i < length; i++) {
-                Serial.print(static_cast<char>(payload[i]));
-            }
-            Serial.println();
-            break;
-        }
         case WStype_BIN:
             parseResponse(payload);
             break;
@@ -159,8 +143,6 @@ void DoubaoSTT::recognize(uint8_t *audio, size_t size, bool firstPacket, bool la
             vTaskDelay(1);
         }
         buildFullClientRequest();
-        // 清空合成完毕状态
-        GlobalState::unsetEvents(EVENT_STT_WS_TASK_FINISHED);
         sendBIN(_requestBuilder.data(), _requestBuilder.size());
         loop();
     }
@@ -169,20 +151,17 @@ void DoubaoSTT::recognize(uint8_t *audio, size_t size, bool firstPacket, bool la
     loop();
     if (lastPacket) {
         // 等待本次合成完毕
-        while (!GlobalState::waitAllEvents(EVENT_STT_WS_TASK_FINISHED, 0)) {
+        while (xSemaphoreTake(_taskFinished, 0) == pdFALSE) {
             loop();
             vTaskDelay(1);
         }
-        GlobalState::unsetEvents(EVENT_STT_WS_TASK_FINISHED);
         disconnect();
-        Serial.println("语音识别任务完成");
     }
 }
 
 void DoubaoSTT::parseResponse(const uint8_t *response) {
     const uint8_t messageType = response[1] >> 4;
     const uint8_t *payload = response + 4;
-
     switch (messageType) {
         case 0b1001: {
             // 服务端下发包含识别结果的 full server response
@@ -195,10 +174,14 @@ void DoubaoSTT::parseResponse(const uint8_t *response) {
                 Serial.println("解析语音识别结果失败");
                 return;
             }
+            const String reqId = jsonResult["reqid"];
             const int32_t code = jsonResult["code"];
             const String message = jsonResult["message"];
             const int32_t sequence = jsonResult["sequence"];
             const JsonArray result = jsonResult["result"];
+            if (sequence < 0) {
+                xSemaphoreGive(_taskFinished);
+            }
             if (code == 1000 && result.size() > 0) {
                 for (const auto &item: result) {
                     String text = item["text"];
@@ -209,9 +192,6 @@ void DoubaoSTT::parseResponse(const uint8_t *response) {
                 }
             } else {
                 Serial.printf("[语音识别错误]: code = %d, seq = %d, message = %s\n", code, sequence, message.c_str());
-            }
-            if (sequence < 0) {
-                GlobalState::setEvents(EVENT_STT_WS_TASK_FINISHED);
             }
             break;
         }
@@ -225,7 +205,7 @@ void DoubaoSTT::parseResponse(const uint8_t *response) {
             Serial.println("语音识别失败: ");
             Serial.printf("   errorCode =  %u\n", errorCode);
             Serial.printf("errorMessage =  %s\n", errorMessage.c_str());
-            GlobalState::setEvents(EVENT_STT_WS_TASK_FINISHED);
+            xSemaphoreGive(_taskFinished);
         }
         default: {
             break;
