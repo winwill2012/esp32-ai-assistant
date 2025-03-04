@@ -7,7 +7,7 @@
 
 class DoubaoTTS : public WebSocketsClient {
 public:
-    DoubaoTTS(i2s_port_t i2SPort, uint32_t sampleRate, String voice,
+    DoubaoTTS(i2s_port_t i2SPort, uint32_t sampleRate,
               const String &appId, const String &token,
               const String &host, int port,
               const String &url, int i2sDout, int i2sBclk, int i2sLrc);
@@ -30,8 +30,6 @@ private:
     String _host;
     uint16_t _port;
     String _url;
-    String _voiceType;
-    String _emotion;
     uint32_t _sampleRate;
     i2s_port_t _i2sNumber;
     int _i2sDout;

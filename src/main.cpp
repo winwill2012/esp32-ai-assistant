@@ -1,4 +1,5 @@
 #include <LLMAgent.h>
+#include <Settings.h>
 #include <driver/i2s.h>
 #include "Arduino.h"
 #include "WiFi.h"
@@ -32,7 +33,7 @@
  *  一定要记得修改WebSockets.h中的如下定义：
  *  #define WEBSOCKETS_MAX_DATA_SIZE (64 * 1024)
  */
-DoubaoTTS ttsClient(I2S_NUM_0, 16000, "BV700_streaming", APP_ID, ACCESS_TOKEN,
+DoubaoTTS ttsClient(I2S_NUM_0, 16000, APP_ID, ACCESS_TOKEN,
                     HOST, 443, "/api/v1/tts/ws_binary", 38, 39, 40);
 
 LLMAgent llmAgent(ttsClient, "https://api.coze.cn/v3/chat?conversation_id=", "7468218438402818082",
@@ -62,41 +63,44 @@ RecordingManager recordingManager(sttClient);
 
 void setup() {
     Serial.begin(115200);
-    randomSeed(millis());
-//    lv_init();
-//    lv_tick_set_cb(my_tick);
-//    ts.begin();
-//
-//    lv_display_t *disp = lv_tft_espi_create(TFT_HOR_RES, TFT_VER_RES, draw_buf, sizeof(draw_buf));
-//    lv_display_set_rotation(disp, TFT_ROTATION);
-//
-//    lv_indev_t *indev = lv_indev_create();
-//    lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER); /*Touchpad should have POINTER type*/
-//    lv_indev_set_read_cb(indev, my_touchpad_read);
+    Settings::begin();
+    //    lv_init();
+    //    lv_tick_set_cb(my_tick);
+    //    ts.begin();
+    //
+    //    lv_display_t *disp = lv_tft_espi_create(TFT_HOR_RES, TFT_VER_RES, draw_buf, sizeof(draw_buf));
+    //    lv_display_set_rotation(disp, TFT_ROTATION);
+    //
+    //    lv_indev_t *indev = lv_indev_create();
+    //    lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER); /*Touchpad should have POINTER type*/
+    //    lv_indev_set_read_cb(indev, my_touchpad_read);
 
-//    Serial.println("开始渲染LVGL界面");
-//    setup_ui(&guider_ui);
-//    events_init(&guider_ui);
+    //    Serial.println("开始渲染LVGL界面");
+    //    setup_ui(&guider_ui);
+    //    events_init(&guider_ui);
 
     Serial.println("开始连接wifi");
     WiFiClass::mode(WIFI_MODE_STA);
-    WiFi.begin("Xiaomi_E15A", "19910226");
+    // WiFi.begin("Xiaomi_E15A", "19910226");
+    WiFi.begin("SmartHome", "9jismart");
     while (!WiFi.isConnected()) {
         Serial.print(".");
         vTaskDelay(1000);
     }
-    Serial.print("\nConnect WiFi success\nIP address: ");
-    Serial.println(WiFi.localIP());
     Serial.println("连接网络成功");
     Serial.printf("Default free size =  %d\n", heap_caps_get_free_size(MALLOC_CAP_DEFAULT));
     Serial.printf("  PSRAM free size =  %d\n", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
 
-    recordingManager.begin();
-//    ttsClient.synth("happy", "测试一下语音合成的效果");
+    // recordingManager.begin();
 }
 
 void loop() {
-//    lv_timer_handler(); /* let the GUI do its work */
-//    delay(5); /* let this time pass */
-//    Serial.println(generateTaskId());
+    //    lv_timer_handler(); /* let the GUI do its work */
+    //    delay(5); /* let this time pass */
+    const std::vector<WifiInfo> list = Settings::getWifiList();
+    Serial.println("WiFi列表如下: ");
+    for (const auto &wifiInfo: list) {
+        Serial.printf("[%s] [%d] [%d]\n", wifiInfo._ssid.c_str(), wifiInfo._rssi, wifiInfo._encrypted);
+    }
+    Serial.println("WiFi扫描结束");
 }
