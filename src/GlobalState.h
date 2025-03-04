@@ -2,7 +2,6 @@
 #define IOT_AI_CONTROLLER_GLOBALSTATE_H
 
 #include <Arduino.h>
-#include <freertos/event_groups.h>
 #include <map>
 
 #define EVENT_TTS_WS_TASK_FINISHED (1<<2)
@@ -17,18 +16,18 @@ enum MachineState {
 };
 
 enum MachineEvent {
-    StartListen,      // 开始监听
-    StopListening,    // 停止监听
+    StartListen, // 开始监听
+    StopListening, // 停止监听
     InterruptPlaying, // 打断播放
 };
 
 class GlobalState {
 public:
     std::map<std::pair<MachineState, MachineEvent>, MachineState> machineStateTransferRouter = {
-            {{Sleep, StartListen}, Listening},
-            {{Listening, StopListening}, Sleep},
-            {{Playing, InterruptPlaying}, Listening},
-            {{Playing, StopListening}, Sleep}
+        {{Sleep, StartListen}, Listening},
+        {{Listening, StopListening}, Sleep},
+        {{Playing, InterruptPlaying}, Listening},
+        {{Playing, StopListening}, Sleep}
     };
 
     static void setConversationId(String conversationId);

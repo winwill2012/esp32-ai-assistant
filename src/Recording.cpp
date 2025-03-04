@@ -1,12 +1,16 @@
 #include "Recording.h"
+
+#include <Settings.h>
+
+#include <utility>
+
 #include "Utils.h"
 #include "GlobalState.h"
 
-RecordingManager::RecordingManager(DoubaoSTT &sstClient) : _sttClient(sstClient) {
+RecordingManager::RecordingManager(DoubaoSTT sttClient) : _sttClient(std::move(sttClient)) {
     _soundPowerThreshold = RECORDING_POWER_THRESHOLD;
-    _maxIdleTimeInMs = RECORDING_MAX_IDLE_TIME;
-    _recordingBufferSize = 800;  // 25ms的音频数据
-    _recordingBuffer = (uint8_t *) malloc(_recordingBufferSize);
+    _recordingBufferSize = 800; // 25ms的音频数据
+    _recordingBuffer = static_cast<uint8_t *>(malloc(_recordingBufferSize));
 }
 
 RecordingManager::~RecordingManager() {
@@ -28,7 +32,7 @@ RecordingManager::~RecordingManager() {
                                        portMAX_DELAY);
         if (err == ESP_OK) {
             // 如有有声音
-            if (hasSound(_recordingBuffer, bytesRead, _soundPowerThreshold)) {
+            if (calculateSoundRMS(_recordingBuffer, bytesRead) > Settings::getBackgroundNoiseRMS()) {
                 Serial.println("识别到声音");
                 hasSoundFlag = true;
                 _sttClient.recognize(_recordingBuffer, bytesRead, firstPacket, false);
@@ -40,7 +44,7 @@ RecordingManager::~RecordingManager() {
                 // 如果之前有声音，本次没有声音
                 if (idleBeginTime == 0) {
                     idleBeginTime = millis();
-                } else if (millis() - idleBeginTime > _maxIdleTimeInMs) {
+                } else if (millis() - idleBeginTime > Settings::getRecordingSilenceTime() * 60) {
                     Serial.println("本次录音结束");
                     _sttClient.recognize(_recordingBuffer, bytesRead, firstPacket, true);
                     hasSoundFlag = false;

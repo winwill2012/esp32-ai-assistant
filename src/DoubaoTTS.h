@@ -14,15 +14,15 @@ public:
 
     void setupMax98357() const;
 
-    void eventCallback(const WStype_t type, uint8_t *payload, const size_t length);
+    void eventCallback(WStype_t type, uint8_t *payload, size_t length);
 
     void begin();
 
-    String buildFullClientRequest(const String emotion, const String &text) const;
+    String buildFullClientRequest(const String &text) const;
 
-    void parseResponse(uint8_t *response);
+    void parseResponse(const uint8_t *response) const;
 
-    void synth(const String &emotion, const String &text);
+    void synth(const String &text);
 
 private:
     String _appId;

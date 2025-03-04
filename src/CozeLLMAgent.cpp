@@ -1,19 +1,22 @@
-#include "LLMAgent.h"
+#include "CozeLLMAgent.h"
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
+
+#include <utility>
 #include "Utils.h"
 #include "GlobalState.h"
 
-LLMAgent::LLMAgent(DoubaoTTS tts, const String &url, const String botId, const String &token) : _tts(tts) {
+CozeLLMAgent::CozeLLMAgent(DoubaoTTS tts, const String &url, const String &botId, const String &token) : _tts(
+    std::move(tts)) {
     _url = url;
     _botId = botId;
     _token = token;
     _state = Init;
 }
 
-LLMAgent::~LLMAgent() = default;
+CozeLLMAgent::~CozeLLMAgent() = default;
 
-void LLMAgent::begin(const String &input) {
+void CozeLLMAgent::begin(const String &input) {
     reset();
     HTTPClient http;
     http.begin(_url + GlobalState::getConversationId());
@@ -59,10 +62,9 @@ void LLMAgent::begin(const String &input) {
     http.end();
 }
 
-void LLMAgent::show() const {
+void CozeLLMAgent::show() const {
     Serial.println("-----------LLMAgent调用结果--------------------");
     Serial.printf("    state = %d\n", _state);
-    Serial.printf("  emotion = %s\n", _emotion.c_str());
     Serial.printf(" response = %s\n", _response.c_str());
     Serial.printf("ttsBuffer = %s\n", _ttsTextBuffer.c_str());
     Serial.printf("      cmd = %s\n", _cmd.c_str());
@@ -70,7 +72,7 @@ void LLMAgent::show() const {
     Serial.println("-----------------------------------------------");
 }
 
-LLMAgent::LLMState LLMAgent::ProcessStreamOutput(String data) {
+CozeLLMAgent::LLMState CozeLLMAgent::ProcessStreamOutput(String data) {
     // 只处理data开头，并且是助手回答的数据类型
     if (!data.startsWith("data:") || data.indexOf(R"("role":"assistant","type":"answer")") < 0) {
         return _state;
@@ -92,16 +94,15 @@ LLMAgent::LLMState LLMAgent::ProcessStreamOutput(String data) {
     return _state;
 }
 
-void LLMAgent::reset() {
+void CozeLLMAgent::reset() {
     _state = Init;
-    _emotion = "";
     _response = "";
     _ttsTextBuffer = "";
     _cmd = "";
     _content = "";
 }
 
-void LLMAgent::ProcessContent(String &content) {
+void CozeLLMAgent::ProcessContent(String &content) {
     content.trim();
     if (content.isEmpty()) {
         return;
@@ -110,16 +111,12 @@ void LLMAgent::ProcessContent(String &content) {
     if (content.indexOf(DELIMITER) < 0) {
         switch (_state) {
             case Started: {
-                _emotion += content;
-                break;
-            }
-            case EmotionCompleted: {
                 _response += content;
                 _ttsTextBuffer += content;
                 // 回复的内容里面包含一些可以断句的标点符号时，直接发送给TTS进行语音合成，降低响应延迟
                 const std::pair<int, size_t> delimiterIndex = findMinIndexOfDelimiter(_ttsTextBuffer);
                 if (delimiterIndex.first >= 0) {
-                    _tts.synth(_emotion, _ttsTextBuffer.substring(0, delimiterIndex.first));
+                    _tts.synth(_ttsTextBuffer.substring(0, delimiterIndex.first));
                     _ttsTextBuffer = _ttsTextBuffer.substring(delimiterIndex.first + delimiterIndex.second);
                 }
                 break;
@@ -149,7 +146,7 @@ void LLMAgent::ProcessContent(String &content) {
         _state = it->second;
     }
     if (_state == ResponseCompleted && !_ttsTextBuffer.isEmpty()) {
-        _tts.synth(_emotion, _ttsTextBuffer);
+        _tts.synth(_ttsTextBuffer);
     }
     content = content.substring(index + 1);
 }

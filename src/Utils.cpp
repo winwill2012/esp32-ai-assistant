@@ -43,14 +43,16 @@ std::vector<uint8_t> int2Array(const uint32_t size) {
     return result;
 }
 
-bool hasSound(const uint8_t *buffer, const size_t bufferSize, float threshold) {
+double calculateSoundRMS(const uint8_t *buffer, const size_t bufferSize) {
+    if (bufferSize % 2 != 0) {
+        return 0.0;
+    }
     double sumSquares = 0.0;
-    for (size_t i = 0; i < bufferSize; i++) {
-        int16_t sample = buffer[i] << 8 | buffer[i + 1];
+    for (size_t i = 0; i < bufferSize; i += 2) {
+        const auto sample = static_cast<int16_t>((buffer[i] << 8) | buffer[i + 1]);
         sumSquares += (sample * sample);
     }
-    const double rms = sqrt(sumSquares / bufferSize);
-    return rms > threshold;
+    return sqrt(sumSquares / bufferSize);
 }
 
 std::pair<int, size_t> findMinIndexOfDelimiter(const String &input) {
@@ -68,9 +70,3 @@ std::pair<int, size_t> findMinIndexOfDelimiter(const String &input) {
     }
     return std::make_pair(minIndex, minIndexDelimiterLength);
 }
-
-
-
-
-
-

@@ -2,15 +2,16 @@
 #include "ArduinoJson.h"
 #include "Utils.h"
 #include <Arduino.h>
+#include <CozeLLMAgent.h>
 #include <vector>
 
 #define AUDIO_SAMPLE_RATE 16000
 
 JsonDocument doc;
 
-DoubaoSTT::DoubaoSTT(const LLMAgent &llmAgent, i2s_port_t i2sNumber, const String &appId, const String &token,
+DoubaoSTT::DoubaoSTT(const CozeLLMAgent &llmAgent, i2s_port_t i2sNumber, const String &appId, const String &token,
                      const String &host, int port, const String &url, int i2sDout, int i2sBclk, int i2sLrc)
-        : _llmAgent(llmAgent) {
+    : _llmAgent(llmAgent) {
     _i2sNumber = i2sNumber;
     _appId = appId;
     _token = token;
@@ -54,22 +55,22 @@ void DoubaoSTT::begin() {
 }
 
 void DoubaoSTT::setupINMP441() const {
-    const i2s_config_t i2s_config = {
-            .mode = i2s_mode_t(I2S_MODE_MASTER | I2S_MODE_RX),
-            .sample_rate = AUDIO_SAMPLE_RATE,
-            .bits_per_sample = i2s_bits_per_sample_t(16),
-            .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
-            .communication_format = i2s_comm_format_t(I2S_COMM_FORMAT_STAND_I2S),
-            .intr_alloc_flags = 0,
-            .dma_buf_count = 8,
-            .dma_buf_len = 1024,
-            .use_apll = true
+    constexpr i2s_config_t i2s_config = {
+        .mode = static_cast<i2s_mode_t>(I2S_MODE_MASTER | I2S_MODE_RX),
+        .sample_rate = AUDIO_SAMPLE_RATE,
+        .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
+        .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
+        .communication_format = I2S_COMM_FORMAT_STAND_I2S,
+        .intr_alloc_flags = 0,
+        .dma_buf_count = 8,
+        .dma_buf_len = 1024,
+        .use_apll = true
     };
     const i2s_pin_config_t pin_config = {
-            .bck_io_num = _i2sBclk,
-            .ws_io_num = _i2sLrc,
-            .data_out_num = -1,
-            .data_in_num = _i2sDout
+        .bck_io_num = _i2sBclk,
+        .ws_io_num = _i2sLrc,
+        .data_out_num = -1,
+        .data_in_num = _i2sDout
     };
 
     i2s_driver_install(_i2sNumber, &i2s_config, 0, nullptr);
@@ -79,19 +80,19 @@ void DoubaoSTT::setupINMP441() const {
 
 void DoubaoSTT::buildFullClientRequest() {
     doc.clear();
-    JsonObject app = doc["app"].to<JsonObject>();
+    const JsonObject app = doc["app"].to<JsonObject>();
     app["appid"] = _appId;
     app["cluster"] = "volcengine_input_common";
     app["token"] = _token;
-    JsonObject user = doc["user"].to<JsonObject>();
+    const JsonObject user = doc["user"].to<JsonObject>();
     user["uid"] = getChipId(nullptr);
-    JsonObject request = doc["request"].to<JsonObject>();
+    const JsonObject request = doc["request"].to<JsonObject>();
     request["reqid"] = generateTaskId();
     request["nbest"] = 1;
     request["result_type"] = "full";
     request["sequence"] = 1;
     request["workflow"] = "audio_in,resample,partition,vad,fe,decode,nlu_punctuate";
-    JsonObject audio = doc["audio"].to<JsonObject>();
+    const JsonObject audio = doc["audio"].to<JsonObject>();
     audio["format"] = "raw";
     audio["codec"] = "raw";
     audio["channel"] = 1;
@@ -136,7 +137,7 @@ void DoubaoSTT::buildAudioOnlyRequest(uint8_t *audio, const size_t size, const b
     _requestBuilder.insert(_requestBuilder.end(), audio, audio + size);
 }
 
-void DoubaoSTT::recognize(uint8_t *audio, size_t size, bool firstPacket, bool lastPacket) {
+void DoubaoSTT::recognize(uint8_t *audio, const size_t size, const bool firstPacket, const bool lastPacket) {
     if (firstPacket) {
         while (!isConnected()) {
             loop();

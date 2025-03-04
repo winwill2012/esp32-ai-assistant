@@ -1,5 +1,5 @@
-#ifndef LLMAGENT_H
-#define LLMAGENT_H
+#ifndef COZE_LLMAGENT_H
+#define COZE_LLMAGENT_H
 
 #include <map>
 #include <ArduinoJson.h>
@@ -7,12 +7,11 @@
 
 #define DELIMITER "^"
 
-class LLMAgent {
+class CozeLLMAgent {
 public:
     enum LLMState {
         Init,
         Started,
-        EmotionCompleted,
         ResponseCompleted,
         CmdCompleted,
         ContentCompleted,
@@ -25,20 +24,18 @@ public:
     };
 
     std::map<std::pair<LLMState, LLMEvent>, LLMState> StateTransferRouter = {
-            {{Init,              Begin},              Started},
-            {{Started,           NormalCharReceived}, Started},
-            {{Started,           DelimiterReceived},  EmotionCompleted},
-            {{EmotionCompleted,  NormalCharReceived}, EmotionCompleted},
-            {{EmotionCompleted,  DelimiterReceived},  ResponseCompleted},
-            {{ResponseCompleted, NormalCharReceived}, ResponseCompleted},
-            {{ResponseCompleted, DelimiterReceived},  CmdCompleted},
-            {{CmdCompleted,      NormalCharReceived}, CmdCompleted},
-            {{CmdCompleted,      DelimiterReceived},  ContentCompleted},
+        {{Init, Begin}, Started},
+        {{Started, NormalCharReceived}, Started},
+        {{Started, DelimiterReceived}, ResponseCompleted},
+        {{ResponseCompleted, NormalCharReceived}, ResponseCompleted},
+        {{ResponseCompleted, DelimiterReceived}, CmdCompleted},
+        {{CmdCompleted, NormalCharReceived}, CmdCompleted},
+        {{CmdCompleted, DelimiterReceived}, ContentCompleted},
     };
 
-    LLMAgent(DoubaoTTS tts, const String &url, String botId, const String &token);
+    CozeLLMAgent(DoubaoTTS tts, const String &url, const String &botId, const String &token);
 
-    ~LLMAgent();
+    ~CozeLLMAgent();
 
     void begin(const String &input);
 
@@ -64,7 +61,6 @@ private :
     String _botId;
     String _token;
 
-    String _emotion;
     String _response;
     String _cmd;
     String _content;

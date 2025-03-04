@@ -4,11 +4,10 @@
 #include "DoubaoSTT.h"
 
 #define RECORDING_POWER_THRESHOLD 5000
-#define RECORDING_MAX_IDLE_TIME 1000
 
 class RecordingManager {
 public:
-    explicit RecordingManager(DoubaoSTT &sttClient);
+    explicit RecordingManager(DoubaoSTT sttClient);
 
     ~RecordingManager();
 
@@ -17,7 +16,6 @@ public:
 private:
     DoubaoSTT _sttClient;
     float _soundPowerThreshold;
-    uint32_t _maxIdleTimeInMs;
     size_t _recordingBufferSize;
     uint8_t *_recordingBuffer;
 };

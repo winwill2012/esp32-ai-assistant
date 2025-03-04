@@ -6,11 +6,13 @@
 #include <utility>
 #include <vector>
 
-#define SETTINGS_NAMESPACE   "settings"
-#define SETTING_VOLUME_RATIO "volumeRatio"
-#define SETTING_SPEED_RATIO  "speedRatio"
-#define SETTING_VOICE_TYPE   "voiceType"
-#define SETTING_EMOTION      "emotion"
+#define SETTINGS_NAMESPACE                  "settings"
+#define SETTING_VOLUME_RATIO                "volumeRatio"
+#define SETTING_SPEED_RATIO                 "speedRatio"
+#define SETTING_VOICE_TYPE                  "voiceType"
+#define SETTING_EMOTION                     "emotion"
+#define SETTING_RECORDING_SILENCE_TIME      "recordingSilenceTime"
+#define SETTING_BACKGROUND_NOISE_RMS        "backgroundNoiseRMS"
 
 struct WifiInfo {
     WifiInfo(String ssid, const int rssi, const bool encrypted): _ssid(std::move(ssid)),
@@ -43,6 +45,14 @@ public:
 
     static void setSpeedRatio(float speedRatio);
 
+    static void setRecordingSilenceTime(int recordingSilenceTime);
+
+    static int getRecordingSilenceTime();
+
+    static double getBackgroundNoiseRMS();
+
+    static void setBackgroundNoiseRMS(double backgroundNoiseRMS);
+
     static std::vector<WifiInfo> getWifiList();
 
 private:
@@ -54,6 +64,12 @@ private:
     static float _volumeRatio;
     // 说话语速
     static float _speedRatio;
+
+    // 每一次录音的静默时间，单位s，超过该时间则认为本次录音已完成
+    static int _recordingSilenceTime;
+
+    // 背景噪声RMS值
+    static double _backgroundNoiseRMS;
 
     static Preferences preferences;
 };

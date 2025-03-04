@@ -14,7 +14,7 @@ String parseString(const uint8_t *bytes, uint32_t length);
 
 std::vector<uint8_t> int2Array(uint32_t size);
 
-bool hasSound(const uint8_t *buffer, size_t bufferSize, float threshold);
+double calculateSoundRMS(const uint8_t *buffer, size_t bufferSize);
 
 std::pair<int, size_t> findMinIndexOfDelimiter(const String &input);
 
