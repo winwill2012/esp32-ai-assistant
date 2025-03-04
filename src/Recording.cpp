@@ -33,7 +33,6 @@ RecordingManager::~RecordingManager() {
         if (err == ESP_OK) {
             // 如有有声音
             if (calculateSoundRMS(_recordingBuffer, bytesRead) > Settings::getBackgroundNoiseRMS()) {
-                Serial.println("识别到声音");
                 hasSoundFlag = true;
                 _sttClient.recognize(_recordingBuffer, bytesRead, firstPacket, false);
                 if (firstPacket) {
@@ -45,7 +44,6 @@ RecordingManager::~RecordingManager() {
                 if (idleBeginTime == 0) {
                     idleBeginTime = millis();
                 } else if (millis() - idleBeginTime > Settings::getRecordingSilenceTime()) {
-                    Serial.println("本次录音结束");
                     _sttClient.recognize(_recordingBuffer, bytesRead, firstPacket, true);
                     hasSoundFlag = false;
                     firstPacket = true;

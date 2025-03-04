@@ -11,7 +11,7 @@ JsonDocument doc;
 
 DoubaoSTT::DoubaoSTT(const CozeLLMAgent &llmAgent, i2s_port_t i2sNumber, const String &appId, const String &token,
                      const String &host, int port, const String &url, int i2sDout, int i2sBclk, int i2sLrc)
-    : _llmAgent(llmAgent) {
+        : _llmAgent(llmAgent) {
     _i2sNumber = i2sNumber;
     _appId = appId;
     _token = token;
@@ -56,21 +56,21 @@ void DoubaoSTT::begin() {
 
 void DoubaoSTT::setupINMP441() const {
     constexpr i2s_config_t i2s_config = {
-        .mode = static_cast<i2s_mode_t>(I2S_MODE_MASTER | I2S_MODE_RX),
-        .sample_rate = AUDIO_SAMPLE_RATE,
-        .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
-        .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
-        .communication_format = I2S_COMM_FORMAT_STAND_I2S,
-        .intr_alloc_flags = 0,
-        .dma_buf_count = 8,
-        .dma_buf_len = 1024,
-        .use_apll = true
+            .mode = static_cast<i2s_mode_t>(I2S_MODE_MASTER | I2S_MODE_RX),
+            .sample_rate = AUDIO_SAMPLE_RATE,
+            .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
+            .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
+            .communication_format = I2S_COMM_FORMAT_STAND_I2S,
+            .intr_alloc_flags = 0,
+            .dma_buf_count = 8,
+            .dma_buf_len = 1024,
+            .use_apll = true
     };
     const i2s_pin_config_t pin_config = {
-        .bck_io_num = _i2sBclk,
-        .ws_io_num = _i2sLrc,
-        .data_out_num = -1,
-        .data_in_num = _i2sDout
+            .bck_io_num = _i2sBclk,
+            .ws_io_num = _i2sLrc,
+            .data_out_num = -1,
+            .data_in_num = _i2sDout
     };
 
     i2s_driver_install(_i2sNumber, &i2s_config, 0, nullptr);
@@ -138,6 +138,7 @@ void DoubaoSTT::buildAudioOnlyRequest(uint8_t *audio, const size_t size, const b
 }
 
 void DoubaoSTT::recognize(uint8_t *audio, const size_t size, const bool firstPacket, const bool lastPacket) {
+    Serial.printf("语音识别: %d, firstPacket: %d, lastPacket: %d\n", size, firstPacket, lastPacket);
     if (firstPacket) {
         while (!isConnected()) {
             loop();
@@ -192,7 +193,7 @@ void DoubaoSTT::parseResponse(const uint8_t *response) {
                     }
                 }
             } else {
-                Serial.printf("[语音识别错误]: code = %d, seq = %d, message = %s\n", code, sequence, message.c_str());
+                Serial.printf("未识别到文字: %d, %s\n", code, message.c_str());
             }
             break;
         }

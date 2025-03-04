@@ -23,25 +23,37 @@ __attribute__((unused)) void kb_event_cb (lv_event_t *e) {
 }
 
 __attribute__((unused)) void ta_event_cb (lv_event_t *e) {
-#if LV_USE_KEYBOARD
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * ta = lv_event_get_target(e);
-    lv_obj_t * kb = lv_event_get_user_data(e);
-
-    if(code == LV_EVENT_FOCUSED) {
-        if(lv_indev_get_type(lv_indev_active()) != LV_INDEV_TYPE_KEYPAD) {
-            lv_keyboard_set_textarea(kb, ta);
-            lv_obj_remove_flag(kb, LV_OBJ_FLAG_HIDDEN);
-        }
-    }
-    else if(code == LV_EVENT_READY) {
-        lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
-        lv_obj_remove_state(ta, LV_STATE_FOCUSED);
-        lv_indev_reset(NULL, ta);
-    }
+#if LV_USE_KEYBOARD || LV_USE_ZH_KEYBOARD
+    lv_obj_t *ta = lv_event_get_target(e);
 #endif
+    lv_obj_t *kb = lv_event_get_user_data(e);
+    if (code == LV_EVENT_FOCUSED || code == LV_EVENT_CLICKED)
+    {
+#if LV_USE_ZH_KEYBOARD != 0
+        lv_zh_keyboard_set_textarea(kb, ta);
+#endif
+#if LV_USE_KEYBOARD != 0
+        lv_keyboard_set_textarea(kb, ta);
+#endif
+        lv_obj_move_foreground(kb);
+        lv_obj_clear_flag(kb, LV_OBJ_FLAG_HIDDEN);
+    }
+    if (code == LV_EVENT_CANCEL || code == LV_EVENT_DEFOCUSED)
+    {
+
+#if LV_USE_ZH_KEYBOARD != 0
+        lv_zh_keyboard_set_textarea(kb, ta);
+#endif
+#if LV_USE_KEYBOARD != 0
+        lv_keyboard_set_textarea(kb, ta);
+#endif
+        lv_obj_move_background(kb);
+        lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
+    }
 }
 
+#if LV_USE_ANALOGCLOCK != 0
 void clock_count(int *hour, int *min, int *sec)
 {
     (*sec)++;
@@ -62,33 +74,16 @@ void clock_count(int *hour, int *min, int *sec)
         }
     }
 }
-
-void digital_clock_count(int * hour, int * minute, int * seconds, char * meridiem)
-{
-
-    (*seconds)++;
-    if(*seconds == 60) {
-        *seconds = 0;
-        (*minute)++;
-    }
-    if(*minute == 60) {
-        *minute = 0;
-        if(*hour < 12) {
-            (*hour)++;
-        }
-        else {
-            (*hour)++;
-            (*hour) = (*hour) % 12;
-        }
-    }
-    if(*hour == 12 && *seconds == 0 && *minute == 0) {
-        if((lv_strcmp(meridiem, "PM") == 0)) {
-            lv_strcpy(meridiem, "AM");
-        }
-        else {
-            lv_strcpy(meridiem, "PM");
-        }
-    }
-}
+#endif
 
 
+const lv_img_dsc_t * main_robot_imgs[8] = {
+    &main_robotrobot_1,
+    &main_robotrobot_2,
+    &main_robotrobot_3,
+    &main_robotrobot_4,
+    &main_robotrobot_5,
+    &main_robotrobot_6,
+    &main_robotrobot_7,
+    &main_robotrobot_8,
+};

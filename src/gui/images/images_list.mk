@@ -1,1 +1,1 @@
-GEN_CSRCS += _WIFI_RGB565A8_18x18.c _dial_RGB565A8_50x50.c
+GEN_CSRCS += main_robotrobot_1.c main_robotrobot_2.c main_robotrobot_3.c main_robotrobot_4.c main_robotrobot_5.c main_robotrobot_6.c main_robotrobot_7.c main_robotrobot_8.c _WIFI_alpha_30x30.c

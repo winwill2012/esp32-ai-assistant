@@ -7,12 +7,14 @@
 #include "GlobalState.h"
 
 CozeLLMAgent::CozeLLMAgent(DoubaoTTS tts, const String &url, const String &botId, const String &token) : _tts(
-    std::move(tts)) {
+        std::move(tts)) {
     _url = url;
     _botId = botId;
     _token = token;
     _state = Init;
 }
+
+static JsonDocument requestBody;
 
 CozeLLMAgent::~CozeLLMAgent() = default;
 
@@ -23,7 +25,7 @@ void CozeLLMAgent::begin(const String &input) {
     http.addHeader("Authorization", "Bearer " + _token);
     http.addHeader("Content-Type", "application/json");
     // 构建请求体
-    JsonDocument requestBody;
+    requestBody.clear();
     requestBody["stream"] = true;
     requestBody["bot_id"] = _botId;
     requestBody["user_id"] = getChipId(nullptr);
@@ -58,7 +60,6 @@ void CozeLLMAgent::begin(const String &input) {
         Serial.print("LLM调用失败: ");
         Serial.println(httpResponseCode);
     }
-    Serial.println("LLM调用结束");
     http.end();
 }
 
@@ -78,6 +79,7 @@ CozeLLMAgent::LLMState CozeLLMAgent::ProcessStreamOutput(String data) {
         return _state;
     }
     data.replace("data:", "");
+    Serial.printf("处理data: %s\n", data.c_str());
     _document.clear();
     const DeserializationError error = deserializeJson(_document, data);
     if (error != DeserializationError::Ok) {
