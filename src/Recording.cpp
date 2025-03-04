@@ -44,7 +44,7 @@ RecordingManager::~RecordingManager() {
                 // 如果之前有声音，本次没有声音
                 if (idleBeginTime == 0) {
                     idleBeginTime = millis();
-                } else if (millis() - idleBeginTime > Settings::getRecordingSilenceTime() * 60) {
+                } else if (millis() - idleBeginTime > Settings::getRecordingSilenceTime()) {
                     Serial.println("本次录音结束");
                     _sttClient.recognize(_recordingBuffer, bytesRead, firstPacket, true);
                     hasSoundFlag = false;

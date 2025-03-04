@@ -8,6 +8,7 @@ String Settings::_emotion;
 float Settings::_speedRatio;
 float Settings::_volumeRatio;
 double Settings::_backgroundNoiseRMS = 5000;
+int Settings::_recordingSilenceTime = 1000;
 
 void Settings::begin() {
     preferences.begin(SETTINGS_NAMESPACE, false);
