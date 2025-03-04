@@ -7,8 +7,8 @@ String Settings::_voiceType;
 String Settings::_emotion;
 float Settings::_speedRatio;
 float Settings::_volumeRatio;
-double Settings::_backgroundNoiseRMS = 5000;
-int Settings::_recordingSilenceTime = 1000;
+double Settings::_backgroundNoiseRMS;
+int Settings::_recordingSilenceTime;
 
 void Settings::begin() {
     preferences.begin(SETTINGS_NAMESPACE, false);
@@ -16,7 +16,8 @@ void Settings::begin() {
     _speedRatio = preferences.getFloat(SETTING_SPEED_RATIO, 1.0);
     _voiceType = preferences.getString(SETTING_VOICE_TYPE, "BV700_streaming");
     _emotion = preferences.getString(SETTING_EMOTION, "happy");
-    _recordingSilenceTime = preferences.getInt(SETTING_RECORDING_SILENCE_TIME, 1);
+    _backgroundNoiseRMS = preferences.getDouble(SETTING_BACKGROUND_NOISE_RMS, 5000);
+    _recordingSilenceTime = preferences.getInt(SETTING_RECORDING_SILENCE_TIME, 1000);
     preferences.end();
 }
 
