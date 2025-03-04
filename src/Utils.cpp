@@ -52,7 +52,7 @@ double calculateSoundRMS(const uint8_t *buffer, const size_t bufferSize) {
         const auto sample = static_cast<int16_t>((buffer[i] << 8) | buffer[i + 1]);
         sumSquares += (sample * sample);
     }
-    return sqrt(sumSquares / bufferSize);
+    return sqrt(sumSquares * 2 / bufferSize);
 }
 
 std::pair<int, size_t> findMinIndexOfDelimiter(const String &input) {
