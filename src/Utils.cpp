@@ -1,22 +1,23 @@
 #include <vector>
 #include "utils.h"
 
-String generateTaskId() {
+std::string generateTaskId() {
     randomSeed(millis());
-    String uuid = "";
+    char uuid[33]; // 32个字符 + 1个结束符
     const char *charset = "0123456789abcdef";
     for (int i = 0; i < 32; i++) {
-        uuid += charset[random(16)];
+        uuid[i] = charset[random(16)];
     }
-    return uuid;
+    uuid[32] = '\0';
+    return {uuid};
 }
 
 int32_t parseInt32(const uint8_t *bytes) {
     return (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
 }
 
-String parseString(const uint8_t *bytes, const uint32_t length) {
-    String result = "";
+std::string parseString(const uint8_t *bytes, const uint32_t length) {
+    std::string result;
     for (int i = 0; i < length; i++) {
         result += static_cast<char>(bytes[i]);
     }
@@ -53,7 +54,7 @@ double calculateSoundRMS(const uint8_t *buffer, const size_t bufferSize) {
         sumSquares += (sample * sample);
     }
     double rms = sqrt(sumSquares * 2 / bufferSize);
-//    Serial.printf("rms = %f\n", rms);
+    //    Serial.printf("rms = %f\n", rms);
     return rms;
 }
 

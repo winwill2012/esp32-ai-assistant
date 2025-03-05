@@ -7,7 +7,7 @@
 #include "GlobalState.h"
 
 CozeLLMAgent::CozeLLMAgent(DoubaoTTS tts, const String &url, const String &botId, const String &token) : _tts(
-        std::move(tts)) {
+    std::move(tts)) {
     _url = url;
     _botId = botId;
     _token = token;

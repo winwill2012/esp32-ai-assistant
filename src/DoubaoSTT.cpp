@@ -11,7 +11,7 @@ JsonDocument doc;
 
 DoubaoSTT::DoubaoSTT(const CozeLLMAgent &llmAgent, i2s_port_t i2sNumber, const String &appId, const String &token,
                      const String &host, int port, const String &url, int i2sDout, int i2sBclk, int i2sLrc)
-        : _llmAgent(llmAgent) {
+    : _llmAgent(llmAgent) {
     _i2sNumber = i2sNumber;
     _appId = appId;
     _token = token;
@@ -56,21 +56,21 @@ void DoubaoSTT::begin() {
 
 void DoubaoSTT::setupINMP441() const {
     constexpr i2s_config_t i2s_config = {
-            .mode = static_cast<i2s_mode_t>(I2S_MODE_MASTER | I2S_MODE_RX),
-            .sample_rate = AUDIO_SAMPLE_RATE,
-            .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
-            .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
-            .communication_format = I2S_COMM_FORMAT_STAND_I2S,
-            .intr_alloc_flags = 0,
-            .dma_buf_count = 8,
-            .dma_buf_len = 1024,
-            .use_apll = true
+        .mode = static_cast<i2s_mode_t>(I2S_MODE_MASTER | I2S_MODE_RX),
+        .sample_rate = AUDIO_SAMPLE_RATE,
+        .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
+        .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
+        .communication_format = I2S_COMM_FORMAT_STAND_I2S,
+        .intr_alloc_flags = 0,
+        .dma_buf_count = 8,
+        .dma_buf_len = 1024,
+        .use_apll = true
     };
     const i2s_pin_config_t pin_config = {
-            .bck_io_num = _i2sBclk,
-            .ws_io_num = _i2sLrc,
-            .data_out_num = -1,
-            .data_in_num = _i2sDout
+        .bck_io_num = _i2sBclk,
+        .ws_io_num = _i2sLrc,
+        .data_out_num = -1,
+        .data_in_num = _i2sDout
     };
 
     i2s_driver_install(_i2sNumber, &i2s_config, 0, nullptr);
@@ -169,7 +169,7 @@ void DoubaoSTT::parseResponse(const uint8_t *response) {
             // 服务端下发包含识别结果的 full server response
             const uint32_t payloadSize = parseInt32(payload);
             payload += 4;
-            String recognizeResult = parseString(payload, payloadSize);
+            std::string recognizeResult = parseString(payload, payloadSize);
             JsonDocument jsonResult;
             const DeserializationError err = deserializeJson(jsonResult, recognizeResult);
             if (err) {
@@ -203,7 +203,7 @@ void DoubaoSTT::parseResponse(const uint8_t *response) {
             payload += 4;
             const uint32_t messageLength = parseInt32(payload);
             payload += 4;
-            const String errorMessage = parseString(payload, messageLength);
+            const std::string errorMessage = parseString(payload, messageLength);
             Serial.println("语音识别失败: ");
             Serial.printf("   errorCode =  %u\n", errorCode);
             Serial.printf("errorMessage =  %s\n", errorMessage.c_str());

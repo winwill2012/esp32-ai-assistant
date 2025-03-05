@@ -4,13 +4,13 @@
 #include "Arduino.h"
 #include <vector>
 
-String generateTaskId();
+std::string generateTaskId();
 
 std::string getChipId(const char *prefix);
 
 int32_t parseInt32(const uint8_t *bytes);
 
-String parseString(const uint8_t *bytes, uint32_t length);
+std::string parseString(const uint8_t *bytes, uint32_t length);
 
 std::vector<uint8_t> int2Array(uint32_t size);
 

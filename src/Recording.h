@@ -17,7 +17,7 @@ private:
     DoubaoSTT _sttClient;
     float _soundPowerThreshold;
     size_t _recordingBufferSize;
-    uint8_t *_recordingBuffer;
+    std::vector<uint8_t> _recordingBuffer;
 };
 
 #endif //IOT_AI_CONTROLLER_RECORDING_H
