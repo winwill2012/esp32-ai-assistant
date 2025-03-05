@@ -19,6 +19,13 @@ void Settings::begin() {
     _backgroundNoiseRMS = preferences.getDouble(SETTING_BACKGROUND_NOISE_RMS, 8000);
     _recordingSilenceTime = preferences.getInt(SETTING_RECORDING_SILENCE_TIME, 1000);
     preferences.end();
+
+    setVolumeRatio(_volumeRatio);
+    setSpeedRatio(_speedRatio);
+    setVoiceType(_voiceType);
+    setEmotion(_emotion);
+    setBackgroundNoiseRMS(_backgroundNoiseRMS);
+    setRecordingSilenceTime(_recordingSilenceTime);
 }
 
 float Settings::getVolumeRatio() {

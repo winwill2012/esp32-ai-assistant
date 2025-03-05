@@ -18,11 +18,11 @@ extern "C" {
 typedef struct
 {
   
-	lv_obj_t *main;
-	bool main_del;
-	lv_obj_t *main_robot;
-	lv_obj_t *main_wifi;
-	lv_obj_t *main_time;
+	lv_obj_t *screen;
+	bool screen_del;
+	lv_obj_t *screen_wifi;
+	lv_obj_t *screen_label_1;
+	lv_obj_t *screen_animimg_1;
 }lv_ui;
 
 typedef void (*ui_setup_scr_t)(lv_ui * ui);
@@ -46,19 +46,19 @@ void init_keyboard(lv_ui *ui);
 extern lv_ui guider_ui;
 
 
-void setup_scr_main(lv_ui *ui);
+void setup_scr_screen(lv_ui *ui);
+LV_IMG_DECLARE(_WIFI_alpha_25x25);
 #include "extra/widgets/animimg/lv_animimg.h"
-LV_IMG_DECLARE(main_robotrobot_1);
-LV_IMG_DECLARE(main_robotrobot_2);
-LV_IMG_DECLARE(main_robotrobot_3);
-LV_IMG_DECLARE(main_robotrobot_4);
-LV_IMG_DECLARE(main_robotrobot_5);
-LV_IMG_DECLARE(main_robotrobot_6);
-LV_IMG_DECLARE(main_robotrobot_7);
-LV_IMG_DECLARE(main_robotrobot_8);
-LV_IMG_DECLARE(_WIFI_alpha_30x30);
+LV_IMG_DECLARE(screen_animimg_1robot_1);
+LV_IMG_DECLARE(screen_animimg_1robot_2);
+LV_IMG_DECLARE(screen_animimg_1robot_3);
+LV_IMG_DECLARE(screen_animimg_1robot_4);
+LV_IMG_DECLARE(screen_animimg_1robot_5);
+LV_IMG_DECLARE(screen_animimg_1robot_6);
+LV_IMG_DECLARE(screen_animimg_1robot_7);
+LV_IMG_DECLARE(screen_animimg_1robot_8);
 
-LV_FONT_DECLARE(lv_font_Antonio_Regular_16)
+LV_FONT_DECLARE(lv_font_Antonio_Regular_18)
 LV_FONT_DECLARE(lv_font_montserratMedium_16)
 
 

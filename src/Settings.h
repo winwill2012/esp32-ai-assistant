@@ -11,8 +11,8 @@
 #define SETTING_SPEED_RATIO                 "speedRatio"
 #define SETTING_VOICE_TYPE                  "voiceType"
 #define SETTING_EMOTION                     "emotion"
-#define SETTING_RECORDING_SILENCE_TIME      "recordingSilenceTime"
-#define SETTING_BACKGROUND_NOISE_RMS        "backgroundNoiseRMS"
+#define SETTING_RECORDING_SILENCE_TIME      "silenceTime"
+#define SETTING_BACKGROUND_NOISE_RMS        "noiseRMS"
 
 struct WifiInfo {
     WifiInfo(String ssid, const int rssi, const bool encrypted): _ssid(std::move(ssid)),

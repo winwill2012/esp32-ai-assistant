@@ -16,17 +16,16 @@
 #define APP_ID "8988564775"
 #define ACCESS_TOKEN "dsWgV1rCvxiinw_H2clmJuAI-O1D8P94"
 //
-#define TFT_WIDTH   320
-#define TFT_HEIGHT   480
-#define I2C_SDA 12
+#define TFT_WIDTH   240
+#define TFT_HEIGHT   320
+#define I2C_SDA 10
 #define I2C_SCL 13
-#define RST_N_PIN 10
-#define INT_N_PIN 9
-#define DRAW_BUF_SIZE (TFT_WIDTH * TFT_HEIGHT/10)
+#define RST_N_PIN 9
+#define INT_N_PIN 12
+#define DRAW_BUF_SIZE (TFT_WIDTH * TFT_HEIGHT / 10)
 
 static lv_disp_draw_buf_t draw_buf;
-
-FT6336 ts(I2C_SDA, I2C_SCL, RST_N_PIN, INT_N_PIN, TFT_WIDTH, TFT_HEIGHT);
+FT6336 ts(I2C_SDA, I2C_SCL, INT_N_PIN, RST_N_PIN, TFT_WIDTH, TFT_HEIGHT);
 TFT_eSPI tft = TFT_eSPI(TFT_WIDTH, TFT_HEIGHT);
 /**
  *  一定要记得修改WebSockets.h中的如下定义：
@@ -49,7 +48,7 @@ void my_disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *c
 
     tft.startWrite();
     tft.setAddrWindow(area->x1, area->y1, w, h);
-    tft.pushPixelsDMA(&color_p->full, w * h);
+    tft.pushColors(&color_p->full, w * h, true);
     tft.endWrite();
 
     lv_disp_flush_ready(disp_drv);
@@ -75,26 +74,16 @@ void setup() {
 
     lv_init();
     tft.begin();
-    tft.initDMA(); // 使用DMA传输数据，减小CPU压力
     ts.begin();
-    Serial.printf("Default free size =  %d\n", heap_caps_get_free_size(MALLOC_CAP_DEFAULT));
-    Serial.printf("  PSRAM free size =  %d\n", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
-    Serial.printf("    DMA free size =  %d\n", heap_caps_get_free_size(MALLOC_CAP_DMA));
 
-    static auto *buf1 = static_cast<lv_color_t *>(heap_caps_malloc(DRAW_BUF_SIZE, MALLOC_CAP_DMA));
-    static auto *buf2 = static_cast<lv_color_t *>(heap_caps_malloc(DRAW_BUF_SIZE, MALLOC_CAP_DMA));
-    if (buf1 == nullptr || buf2 == nullptr) {
-        Serial.println("Failed to allocate buffers!");
+    static auto *buf1 = (lv_color_t *) heap_caps_malloc(DRAW_BUF_SIZE, MALLOC_CAP_INTERNAL);
+    if (buf1 == nullptr) {
+        Serial.printf("申请内存失败");
         ESP.restart();
     } else {
-        Serial.println("Successfully allocated buffers!");
+        Serial.printf("申请内存成功");
     }
-    Serial.printf("Default free size =  %d\n", heap_caps_get_free_size(MALLOC_CAP_DEFAULT));
-    Serial.printf("  PSRAM free size =  %d\n", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
-    Serial.printf("    DMA free size =  %d\n", heap_caps_get_free_size(MALLOC_CAP_DMA));
-
-    // 双buff机制
-    lv_disp_draw_buf_init(&draw_buf, buf1, buf2, DRAW_BUF_SIZE);
+    lv_disp_draw_buf_init(&draw_buf, buf1, nullptr, DRAW_BUF_SIZE);
 
     static lv_disp_drv_t disp_drv;
     lv_disp_drv_init(&disp_drv);
@@ -102,7 +91,7 @@ void setup() {
     disp_drv.ver_res = TFT_HEIGHT;
     disp_drv.flush_cb = my_disp_flush;
     disp_drv.draw_buf = &draw_buf;
-    // disp_drv.full_refresh = true; // 全屏刷新
+    disp_drv.full_refresh = true;
     lv_disp_drv_register(&disp_drv);
 
     static lv_indev_drv_t indev_drv;
@@ -111,13 +100,12 @@ void setup() {
     indev_drv.read_cb = my_touchpad_read;
     lv_indev_drv_register(&indev_drv);
 
-    Serial.println("开始渲染LVGL");
     setup_ui(&guider_ui);
     events_init(&guider_ui);
 
+    WiFiClass::useStaticBuffers(true);
     WiFiClass::mode(WIFI_MODE_STA);
-    // WiFi.begin("Xiaomi_E15A", "19910226");
-    WiFi.begin("SmartHome", "9jismart");
+    WiFi.begin("Xiaomi_E15A", "19910226");
     while (!WiFi.isConnected()) {
         Serial.print(".");
         vTaskDelay(1000);

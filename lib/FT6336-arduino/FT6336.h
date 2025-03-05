@@ -49,6 +49,7 @@ class FT6336 {
     FT6336(uint8_t _sda, uint8_t _scl, uint8_t _int, uint8_t _rst, uint16_t _width, uint16_t _height);
     void begin(uint8_t _addr=FT6336_ADDR);
     uint8_t reset();
+    void setRotation(uint8_t rot);
     void read(void);
     uint8_t touches = 0;
     bool isTouched = false;

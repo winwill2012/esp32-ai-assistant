@@ -1,1 +1,1 @@
-GEN_CSRCS += main_robotrobot_1.c main_robotrobot_2.c main_robotrobot_3.c main_robotrobot_4.c main_robotrobot_5.c main_robotrobot_6.c main_robotrobot_7.c main_robotrobot_8.c _WIFI_alpha_30x30.c
+GEN_CSRCS += _WIFI_alpha_25x25.c screen_animimg_1robot_1.c screen_animimg_1robot_2.c screen_animimg_1robot_3.c screen_animimg_1robot_4.c screen_animimg_1robot_5.c screen_animimg_1robot_6.c screen_animimg_1robot_7.c screen_animimg_1robot_8.c
