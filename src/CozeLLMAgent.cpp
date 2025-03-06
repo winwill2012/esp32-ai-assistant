@@ -1,20 +1,18 @@
 #include "CozeLLMAgent.h"
 #include <HTTPClient.h>
-#include <ArduinoJson.h>
-
+#include <PsramJson.h>
 #include <utility>
 #include "Utils.h"
 #include "GlobalState.h"
+#include "LvglDisplay.h"
 
 CozeLLMAgent::CozeLLMAgent(DoubaoTTS tts, const String &url, const String &botId, const String &token) : _tts(
-    std::move(tts)) {
+        std::move(tts)) {
     _url = url;
     _botId = botId;
     _token = token;
     _state = Init;
 }
-
-static JsonDocument requestBody;
 
 CozeLLMAgent::~CozeLLMAgent() = default;
 
@@ -25,6 +23,7 @@ void CozeLLMAgent::begin(const String &input) {
     http.addHeader("Authorization", "Bearer " + _token);
     http.addHeader("Content-Type", "application/json");
     // 构建请求体
+    JsonDocument requestBody(&spiRamAllocator);
     requestBody.clear();
     requestBody["stream"] = true;
     requestBody["bot_id"] = _botId;
@@ -34,25 +33,20 @@ void CozeLLMAgent::begin(const String &input) {
     message["content_type"] = "text";
     message["content"] = input;
     message["role"] = "user";
-    String requestBodyStr;
+    std::string requestBodyStr;
     serializeJson(requestBody, requestBodyStr);
     _state = Started;
-    int httpResponseCode = http.POST(requestBodyStr);
+    int httpResponseCode = http.POST(requestBodyStr.c_str());
     if (httpResponseCode > 0) {
         WiFiClient *stream = http.getStreamPtr();
-        String line;
+        String line = "";
         while (stream->connected() || stream->available()) {
             if (stream->available()) {
-                const char c = static_cast<char>(stream->read());
-                if (c == '\n') {
-                    if (!line.isEmpty()) {
-                        if (ProcessStreamOutput(line) == ContentCompleted) {
-                            break;
-                        }
+                line = stream->readStringUntil('\n');
+                if (!line.isEmpty()) {
+                    if (ProcessStreamOutput(line) == ContentCompleted) {
+                        break;
                     }
-                    line = "";
-                } else {
-                    line += c;
                 }
             }
         }
@@ -79,16 +73,16 @@ CozeLLMAgent::LLMState CozeLLMAgent::ProcessStreamOutput(String data) {
         return _state;
     }
     data.replace("data:", "");
-    Serial.printf("处理data: %s\n", data.c_str());
-    _document.clear();
-    const DeserializationError error = deserializeJson(_document, data);
+    JsonDocument document(&spiRamAllocator);
+    document.clear();
+    const DeserializationError error = deserializeJson(document, data);
     if (error != DeserializationError::Ok) {
         Serial.printf("反序列化大模型返回结果失败: ");
         Serial.println(data);
         return _state;
     }
-    String content = _document["content"];
-    String conversationId = _document["conversation_id"];
+    String content = document["content"];
+    String conversationId = document["conversation_id"];
     GlobalState::setConversationId(conversationId);
     while (!content.isEmpty()) {
         ProcessContent(content);
@@ -114,6 +108,7 @@ void CozeLLMAgent::ProcessContent(String &content) {
         switch (_state) {
             case Started: {
                 _response += content;
+                LvglDisplay::updateChatText(_response.c_str());
                 _ttsTextBuffer += content;
                 // 回复的内容里面包含一些可以断句的标点符号时，直接发送给TTS进行语音合成，降低响应延迟
                 const std::pair<int, size_t> delimiterIndex = findMinIndexOfDelimiter(_ttsTextBuffer);

@@ -18,11 +18,27 @@ extern "C" {
 typedef struct
 {
   
-	lv_obj_t *screen;
-	bool screen_del;
-	lv_obj_t *screen_wifi;
-	lv_obj_t *screen_label_1;
-	lv_obj_t *screen_animimg_1;
+	lv_obj_t *main;
+	bool main_del;
+	lv_obj_t *main_wifi;
+	lv_obj_t *main_label_1;
+	lv_obj_t *main_animimg_1;
+	lv_obj_t *main_chat_text;
+	lv_obj_t *main_setting_button;
+	lv_obj_t *main_setting_button_label;
+	lv_obj_t *settings;
+	bool settings_del;
+	lv_obj_t *settings_label_1;
+	lv_obj_t *settings_network;
+	lv_obj_t *settings_label_2;
+	lv_obj_t *settings_label_3;
+	lv_obj_t *settings_volume;
+	lv_obj_t *settings_label_4;
+	lv_obj_t *settings_voiceType;
+	lv_obj_t *settings_label_5;
+	lv_obj_t *settings_speed;
+	lv_obj_t *settings_setting_confirm;
+	lv_obj_t *settings_setting_confirm_label;
 }lv_ui;
 
 typedef void (*ui_setup_scr_t)(lv_ui * ui);
@@ -46,20 +62,23 @@ void init_keyboard(lv_ui *ui);
 extern lv_ui guider_ui;
 
 
-void setup_scr_screen(lv_ui *ui);
-LV_IMG_DECLARE(_WIFI_alpha_25x25);
+void setup_scr_main(lv_ui *ui);
+void setup_scr_settings(lv_ui *ui);
+LV_IMG_DECLARE(_WIFI_alpha_20x20);
 #include "extra/widgets/animimg/lv_animimg.h"
-LV_IMG_DECLARE(screen_animimg_1robot_1);
-LV_IMG_DECLARE(screen_animimg_1robot_2);
-LV_IMG_DECLARE(screen_animimg_1robot_3);
-LV_IMG_DECLARE(screen_animimg_1robot_4);
-LV_IMG_DECLARE(screen_animimg_1robot_5);
-LV_IMG_DECLARE(screen_animimg_1robot_6);
-LV_IMG_DECLARE(screen_animimg_1robot_7);
-LV_IMG_DECLARE(screen_animimg_1robot_8);
+LV_IMG_DECLARE(main_animimg_1robot_1);
+LV_IMG_DECLARE(main_animimg_1robot_2);
+LV_IMG_DECLARE(main_animimg_1robot_3);
+LV_IMG_DECLARE(main_animimg_1robot_4);
+LV_IMG_DECLARE(main_animimg_1robot_5);
+LV_IMG_DECLARE(main_animimg_1robot_6);
+LV_IMG_DECLARE(main_animimg_1robot_7);
+LV_IMG_DECLARE(main_animimg_1robot_8);
+LV_IMG_DECLARE(_settings_alpha_20x20);
 
-LV_FONT_DECLARE(lv_font_Antonio_Regular_18)
+LV_FONT_DECLARE(lv_font_Antonio_Regular_15)
 LV_FONT_DECLARE(lv_font_montserratMedium_16)
+LV_FONT_DECLARE(AlibabaPuHuiTi_Bold_14)
 
 
 #ifdef __cplusplus

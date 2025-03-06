@@ -6,7 +6,7 @@
 
 RecordingManager::RecordingManager(DoubaoSTT sttClient) : _sttClient(std::move(sttClient)) {
     _soundPowerThreshold = RECORDING_POWER_THRESHOLD;
-    _recordingBufferSize = 800; // 25ms的音频数据
+    _recordingBufferSize = 4000; // 125ms的音频数据
     _recordingBuffer = std::vector<uint8_t>(_recordingBufferSize);
 }
 

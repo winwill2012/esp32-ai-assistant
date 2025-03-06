@@ -77,13 +77,13 @@ void clock_count(int *hour, int *min, int *sec)
 #endif
 
 
-const lv_img_dsc_t * screen_animimg_1_imgs[8] = {
-    &screen_animimg_1robot_1,
-    &screen_animimg_1robot_2,
-    &screen_animimg_1robot_3,
-    &screen_animimg_1robot_4,
-    &screen_animimg_1robot_5,
-    &screen_animimg_1robot_6,
-    &screen_animimg_1robot_7,
-    &screen_animimg_1robot_8,
+const lv_img_dsc_t * main_animimg_1_imgs[8] = {
+    &main_animimg_1robot_1,
+    &main_animimg_1robot_2,
+    &main_animimg_1robot_3,
+    &main_animimg_1robot_4,
+    &main_animimg_1robot_5,
+    &main_animimg_1robot_6,
+    &main_animimg_1robot_7,
+    &main_animimg_1robot_8,
 };

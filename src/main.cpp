@@ -6,27 +6,12 @@
 #include "DoubaoTTS.h"
 #include "DoubaoSTT.h"
 #include "Recording.h"
-#include <lvgl.h>
-#include "FT6336.h"
-#include "gui/gui_guider.h"
-#include "gui/events_init.h"
-#include "TFT_eSPI.h"
+#include "LvglDisplay.h"
 
 #define HOST "openspeech.bytedance.com"
 #define APP_ID "8988564775"
 #define ACCESS_TOKEN "dsWgV1rCvxiinw_H2clmJuAI-O1D8P94"
 //
-#define TFT_WIDTH   240
-#define TFT_HEIGHT   320
-#define I2C_SDA 10
-#define I2C_SCL 13
-#define RST_N_PIN 9
-#define INT_N_PIN 12
-#define DRAW_BUF_SIZE (TFT_WIDTH * TFT_HEIGHT / 10)
-
-static lv_disp_draw_buf_t draw_buf;
-FT6336 ts(I2C_SDA, I2C_SCL, INT_N_PIN, RST_N_PIN, TFT_WIDTH, TFT_HEIGHT);
-TFT_eSPI tft = TFT_eSPI(TFT_WIDTH, TFT_HEIGHT);
 /**
  *  一定要记得修改WebSockets.h中的如下定义：
  *  #define WEBSOCKETS_MAX_DATA_SIZE (64 * 1024)
@@ -42,66 +27,11 @@ DoubaoSTT sttClient(llmAgent, I2S_NUM_1, APP_ID, ACCESS_TOKEN,
 
 RecordingManager recordingManager(sttClient);
 
-void my_disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_t *color_p) {
-    uint32_t w = (area->x2 - area->x1 + 1);
-    uint32_t h = (area->y2 - area->y1 + 1);
-
-    tft.startWrite();
-    tft.setAddrWindow(area->x1, area->y1, w, h);
-    tft.pushColors(&color_p->full, w * h, true);
-    tft.endWrite();
-
-    lv_disp_flush_ready(disp_drv);
-}
-
-void my_touchpad_read(lv_indev_drv_t *indev, lv_indev_data_t *data) {
-    ts.read();
-    if (ts.isTouched) {
-        data->point.x = static_cast<lv_coord_t>(ts.points[0].x);
-        data->point.y = static_cast<lv_coord_t>(ts.points[0].y);
-        data->state = LV_INDEV_STATE_PR;
-        Serial.printf("点击: %d, %d\n", data->point.x, data->point.y);
-    } else {
-        data->state = LV_INDEV_STATE_REL;
-    }
-}
-
-lv_ui guider_ui;
 
 void setup() {
     Serial.begin(115200);
     Settings::begin();
-
-    lv_init();
-    tft.begin();
-    ts.begin();
-
-    static auto *buf1 = (lv_color_t *) heap_caps_malloc(DRAW_BUF_SIZE, MALLOC_CAP_INTERNAL);
-    if (buf1 == nullptr) {
-        Serial.printf("申请内存失败");
-        ESP.restart();
-    } else {
-        Serial.printf("申请内存成功");
-    }
-    lv_disp_draw_buf_init(&draw_buf, buf1, nullptr, DRAW_BUF_SIZE);
-
-    static lv_disp_drv_t disp_drv;
-    lv_disp_drv_init(&disp_drv);
-    disp_drv.hor_res = TFT_WIDTH;
-    disp_drv.ver_res = TFT_HEIGHT;
-    disp_drv.flush_cb = my_disp_flush;
-    disp_drv.draw_buf = &draw_buf;
-    disp_drv.full_refresh = true;
-    lv_disp_drv_register(&disp_drv);
-
-    static lv_indev_drv_t indev_drv;
-    lv_indev_drv_init(&indev_drv);
-    indev_drv.type = LV_INDEV_TYPE_POINTER;
-    indev_drv.read_cb = my_touchpad_read;
-    lv_indev_drv_register(&indev_drv);
-
-    setup_ui(&guider_ui);
-    events_init(&guider_ui);
+    LvglDisplay::begin();
 
     WiFiClass::useStaticBuffers(true);
     WiFiClass::mode(WIFI_MODE_STA);
@@ -113,12 +43,6 @@ void setup() {
     Serial.println("连接网络成功");
     Serial.printf("Default free size =  %d\n", heap_caps_get_free_size(MALLOC_CAP_DEFAULT));
     Serial.printf("  PSRAM free size =  %d\n", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
-    xTaskCreate([](void *ptr) {
-        while (true) {
-            lv_timer_handler();
-            vTaskDelay(5);
-        }
-    }, "lvgl", 4096, nullptr, 1, nullptr);
     recordingManager.begin();
 }
 

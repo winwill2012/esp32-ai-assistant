@@ -67,7 +67,6 @@ private :
     String _ttsTextBuffer;
 
     LLMState _state = Init;
-    JsonDocument _document;
 };
 
 

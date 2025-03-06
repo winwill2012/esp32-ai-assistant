@@ -23,7 +23,7 @@ void clock_count(int *hour, int *min, int *sec);
 #endif
 
 
-extern const lv_img_dsc_t * screen_animimg_1_imgs[8];
+extern const lv_img_dsc_t * main_animimg_1_imgs[8];
 
 #ifdef __cplusplus
 }

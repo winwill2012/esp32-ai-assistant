@@ -60,7 +60,7 @@ double calculateSoundRMS(const uint8_t *buffer, const size_t bufferSize) {
 
 std::pair<int, size_t> findMinIndexOfDelimiter(const String &input) {
     // 定义需要处理的中英文标点集合
-    std::vector<String> delimiters = {"，", "。", "！", "：", "；", "？"};
+    std::vector<String> delimiters = {"。", "！", "：", "；", "？"};
 
     int minIndex = -1;
     size_t minIndexDelimiterLength = 0;

@@ -1,1 +1,1 @@
-GEN_CSRCS += _WIFI_alpha_25x25.c screen_animimg_1robot_1.c screen_animimg_1robot_2.c screen_animimg_1robot_3.c screen_animimg_1robot_4.c screen_animimg_1robot_5.c screen_animimg_1robot_6.c screen_animimg_1robot_7.c screen_animimg_1robot_8.c
+GEN_CSRCS += _WIFI_alpha_20x20.c main_animimg_1robot_1.c main_animimg_1robot_2.c main_animimg_1robot_3.c main_animimg_1robot_4.c main_animimg_1robot_5.c main_animimg_1robot_6.c main_animimg_1robot_7.c main_animimg_1robot_8.c _settings_alpha_20x20.c

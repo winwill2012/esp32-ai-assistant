@@ -3,7 +3,6 @@
 
 #include <Arduino.h>
 #include <Preferences.h>
-#include <utility>
 #include <vector>
 
 #define SETTINGS_NAMESPACE                  "settings"
