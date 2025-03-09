@@ -1,7 +1,7 @@
 #include "LvglDisplay.h"
 
-#define TFT_WIDTH   240
-#define TFT_HEIGHT   320
+#define TFT_WIDTH   320
+#define TFT_HEIGHT   480
 #define I2C_SDA 10
 #define I2C_SCL 13
 #define RST_N_PIN 9
@@ -38,6 +38,8 @@ void my_touchpad_read(lv_indev_drv_t *indev, lv_indev_data_t *data) {
 }
 
 lv_ui guider_ui;
+lv_style_t *LvglDisplay::message_style_robot = (lv_style_t *) malloc(sizeof(lv_style_t));
+lv_style_t *LvglDisplay::message_style_user = (lv_style_t *) malloc(sizeof(lv_style_t));
 
 void LvglDisplay::begin() {
     lv_init();
@@ -64,6 +66,21 @@ void LvglDisplay::begin() {
     setup_ui(&guider_ui);
     events_init(&guider_ui);
 
+    lv_style_init(message_style_robot);
+    lv_style_init(message_style_user);
+
+    lv_style_set_text_font(message_style_robot, &lv_customer_font_Siyuan_ExtraLight_14);
+    lv_style_set_text_font(message_style_user, &lv_customer_font_Siyuan_ExtraLight_14);
+
+    lv_style_set_text_align(message_style_robot, LV_TEXT_ALIGN_LEFT);
+    lv_style_set_text_align(message_style_user, LV_TEXT_ALIGN_RIGHT);
+
+    lv_style_set_text_color(message_style_robot, lv_color_make(50, 50, 50));
+    lv_style_set_text_color(message_style_user, lv_color_make(0, 0, 0));
+
+    lv_style_set_bg_opa(message_style_robot, 0);
+    lv_style_set_bg_opa(message_style_user, 0);
+
     xTaskCreate([](void *ptr) {
         while (true) {
             lv_timer_handler();
@@ -72,6 +89,28 @@ void LvglDisplay::begin() {
     }, "lvgl", 4096, nullptr, 1, nullptr);
 }
 
-void LvglDisplay::updateChatText(std::string text) {
-    lv_label_set_text(guider_ui.main_chat_text, text.c_str());
+void LvglDisplay::updateChatText(MessageRole messageRole, const std::string &text) {
+    lv_obj_t *message = lv_list_add_text(guider_ui.home_page_message_list, text.c_str());
+    _lv_obj_t *label = lv_obj_get_child(message, 0);
+    if (label != nullptr) {
+        lv_label_set_long_mode(label, LV_LABEL_LONG_WRAP);
+    }
+    if (messageRole == Robot) {
+        lv_img_set_src(guider_ui.home_page_header_icon, &_robot_alpha_26x26);
+        lv_obj_add_style(message, message_style_robot, 0);
+    } else {
+        lv_img_set_src(guider_ui.home_page_header_icon, &_user_alpha_26x26);
+        lv_obj_add_style(message, message_style_user, 0);
+    }
 }
+
+void LvglDisplay::updateState(const std::string &state) {
+    lv_label_set_text(guider_ui.home_page_header_state, state.c_str());
+}
+
+void LvglDisplay::updateTime(const std::string &time) {
+    lv_label_set_text(guider_ui.home_page_header_time, time.c_str());
+}
+
+
+

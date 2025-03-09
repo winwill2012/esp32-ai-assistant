@@ -186,9 +186,10 @@ void DoubaoSTT::parseResponse(const uint8_t *response) {
             if (code == 1000 && result.size() > 0) {
                 for (const auto &item: result) {
                     String text = item["text"];
-                    LvglDisplay::updateChatText(text.c_str());
+                    LvglDisplay::updateChatText(User, text.c_str());
                     if (sequence < 0) {
                         Serial.printf("[语音识别] 识别到文字: %s\n", text.c_str());
+                        LvglDisplay::updateState("正在思考...");
                         _llmAgent.begin(text);
                     }
                 }

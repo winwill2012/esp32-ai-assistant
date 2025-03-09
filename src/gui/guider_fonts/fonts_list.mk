@@ -1,1 +1,1 @@
-GEN_CSRCS += lv_font_Antonio_Regular_15.c lv_font_montserratMedium_16.c lv_font_SourceHanSerifSC_Regular_14.c lv_font_SourceHanSerifSC_Regular_11.c lv_font_montserratMedium_12.c
+GEN_CSRCS += lv_font_Siyuan_Regular_16.c lv_font_montserratMedium_21.c lv_font_Siyuan_Regular_14.c lv_font_montserratMedium_16.c lv_font_Siyuan_yuanti_14.c lv_font_Siyuan_Heiti_18.c lv_font_Siyuan_Heiti_28.c lv_font_Siyuan_ExtraLight_14.c lv_font_Siyuan_yuanti_22.c

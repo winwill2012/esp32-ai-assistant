@@ -3,6 +3,7 @@
 #include <utility>
 #include "Utils.h"
 #include "GlobalState.h"
+#include "LvglDisplay.h"
 
 RecordingManager::RecordingManager(DoubaoSTT sttClient) : _sttClient(std::move(sttClient)) {
     _soundPowerThreshold = RECORDING_POWER_THRESHOLD;
@@ -28,6 +29,7 @@ RecordingManager::~RecordingManager() = default;
         if (err == ESP_OK) {
             // 如有有声音
             if (calculateSoundRMS(_recordingBuffer.data(), bytesRead) > Settings::getBackgroundNoiseRMS()) {
+                LvglDisplay::updateState("正在聆听...");
                 hasSoundFlag = true;
                 _sttClient.recognize(_recordingBuffer.data(), bytesRead, firstPacket, false);
                 if (firstPacket) {
@@ -39,6 +41,7 @@ RecordingManager::~RecordingManager() = default;
                 if (idleBeginTime == 0) {
                     idleBeginTime = millis();
                 } else if (millis() - idleBeginTime > Settings::getRecordingSilenceTime()) {
+                    LvglDisplay::updateState("正在识别...");
                     _sttClient.recognize(_recordingBuffer.data(), bytesRead, firstPacket, true);
                     hasSoundFlag = false;
                     firstPacket = true;

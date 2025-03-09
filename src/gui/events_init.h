@@ -18,8 +18,10 @@ extern "C" {
 
 void events_init(lv_ui *ui);
 
-void events_init_main(lv_ui *ui);
-void events_init_settings(lv_ui *ui);
+void events_init_home_page(lv_ui *ui);
+void events_init_settings_page(lv_ui *ui);
+void events_init_network_setting(lv_ui *ui);
+void events_init_speaker_setting(lv_ui *ui);
 
 #ifdef __cplusplus
 }

@@ -73,6 +73,7 @@ CozeLLMAgent::LLMState CozeLLMAgent::ProcessStreamOutput(String data) {
         return _state;
     }
     data.replace("data:", "");
+    log_d("处理LLM返回数据: %s", data.c_str());
     JsonDocument document(&spiRamAllocator);
     document.clear();
     const DeserializationError error = deserializeJson(document, data);
@@ -108,7 +109,7 @@ void CozeLLMAgent::ProcessContent(String &content) {
         switch (_state) {
             case Started: {
                 _response += content;
-                LvglDisplay::updateChatText(_response.c_str());
+                LvglDisplay::updateChatText(Robot, _response.c_str());
                 _ttsTextBuffer += content;
                 // 回复的内容里面包含一些可以断句的标点符号时，直接发送给TTS进行语音合成，降低响应延迟
                 const std::pair<int, size_t> delimiterIndex = findMinIndexOfDelimiter(_ttsTextBuffer);

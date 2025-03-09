@@ -76,14 +76,18 @@ void clock_count(int *hour, int *min, int *sec)
 }
 #endif
 
+void lv_speaker_setting_spinbox_1_increment_event_cb(lv_event_t * event)
+{
+    lv_event_code_t code = lv_event_get_code(event);
+    if(code == LV_EVENT_SHORT_CLICKED || code == LV_EVENT_LONG_PRESSED_REPEAT) {
+        lv_spinbox_increment(guider_ui.speaker_setting_spinbox_1);
+    }
+}
+void lv_speaker_setting_spinbox_1_decrement_event_cb(lv_event_t * event)
+{
+    lv_event_code_t code = lv_event_get_code(event);
+    if(code == LV_EVENT_SHORT_CLICKED || code == LV_EVENT_LONG_PRESSED_REPEAT) {
+        lv_spinbox_decrement(guider_ui.speaker_setting_spinbox_1);
+    }
+}
 
-const lv_img_dsc_t * main_animimg_1_imgs[8] = {
-    &main_animimg_1robot_1,
-    &main_animimg_1robot_2,
-    &main_animimg_1robot_3,
-    &main_animimg_1robot_4,
-    &main_animimg_1robot_5,
-    &main_animimg_1robot_6,
-    &main_animimg_1robot_7,
-    &main_animimg_1robot_8,
-};
