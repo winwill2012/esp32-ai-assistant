@@ -23,7 +23,7 @@ void CozeLLMAgent::begin(const String &input) {
     http.addHeader("Authorization", "Bearer " + _token);
     http.addHeader("Content-Type", "application/json");
     // 构建请求体
-    JsonDocument requestBody(&spiRamAllocator);
+    JsonDocument requestBody;
     requestBody.clear();
     requestBody["stream"] = true;
     requestBody["bot_id"] = _botId;
@@ -74,7 +74,7 @@ CozeLLMAgent::LLMState CozeLLMAgent::ProcessStreamOutput(String data) {
     }
     data.replace("data:", "");
     log_d("处理LLM返回数据: %s", data.c_str());
-    JsonDocument document(&spiRamAllocator);
+    JsonDocument document;
     document.clear();
     const DeserializationError error = deserializeJson(document, data);
     if (error != DeserializationError::Ok) {
@@ -97,6 +97,7 @@ void CozeLLMAgent::reset() {
     _ttsTextBuffer = "";
     _cmd = "";
     _content = "";
+    _firstPacket = true;
 }
 
 void CozeLLMAgent::ProcessContent(String &content) {
@@ -109,7 +110,10 @@ void CozeLLMAgent::ProcessContent(String &content) {
         switch (_state) {
             case Started: {
                 _response += content;
-                LvglDisplay::updateChatText(Robot, _response.c_str());
+                LvglDisplay::updateChatText(Robot, _firstPacket, _response.c_str());
+                if (_firstPacket) {
+                    _firstPacket = false;
+                }
                 _ttsTextBuffer += content;
                 // 回复的内容里面包含一些可以断句的标点符号时，直接发送给TTS进行语音合成，降低响应延迟
                 const std::pair<int, size_t> delimiterIndex = findMinIndexOfDelimiter(_ttsTextBuffer);
@@ -144,6 +148,7 @@ void CozeLLMAgent::ProcessContent(String &content) {
         _state = it->second;
     }
     if (_state == ResponseCompleted && !_ttsTextBuffer.isEmpty()) {
+        LvglDisplay::updateChatText(Robot, _firstPacket, _response.c_str());
         _tts.synth(_ttsTextBuffer);
     }
     content = content.substring(index + 1);

@@ -19,5 +19,5 @@ struct SpiRamAllocator : ArduinoJson::Allocator {
     }
 };
 
-extern SpiRamAllocator spiRamAllocator;
+//extern SpiRamAllocator spiRamAllocator;
 #endif //ESP32_AI_ASSISTANT_PSRAMJSON_H

@@ -20,7 +20,7 @@ void TimeUpdater::begin() {
 
     // 首次获取NTP时间
     timeClient.update();
-    ntpStartTime = timeClient.getEpochTime();
+    ntpStartTime = timeClient.getEpochTime(); // 获取秒级时间戳
     localTimeStart = millis();
     lastUpdateTime = millis();
 
@@ -43,13 +43,12 @@ void TimeUpdater::begin() {
 
             // 检查分钟是否变化
             if (currentMinute != lastMinute) {
+                log_d("当前分钟: %d, 上一次分钟: %d", currentMinute, lastMinute);
                 lastMinute = currentMinute;
 
                 // 格式化时间字符串
                 char timeStr[6];
                 snprintf(timeStr, sizeof(timeStr), "%02d:%02d", currentHour, currentMinute);
-
-                // 更新LVGL Label
                 LvglDisplay::updateTime(timeStr);
             }
             vTaskDelay(pdMS_TO_TICKS(1000));

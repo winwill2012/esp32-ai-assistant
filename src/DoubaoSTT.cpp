@@ -5,6 +5,7 @@
 #include <CozeLLMAgent.h>
 #include <vector>
 #include "LvglDisplay.h"
+
 #define AUDIO_SAMPLE_RATE 16000
 
 DoubaoSTT::DoubaoSTT(const CozeLLMAgent &llmAgent, i2s_port_t i2sNumber, const String &appId, const String &token,
@@ -77,7 +78,7 @@ void DoubaoSTT::setupINMP441() const {
 }
 
 void DoubaoSTT::buildFullClientRequest() {
-    JsonDocument doc(&spiRamAllocator);
+    JsonDocument doc;
     doc.clear();
     const JsonObject app = doc["app"].to<JsonObject>();
     app["appid"] = _appId;
@@ -169,7 +170,7 @@ void DoubaoSTT::parseResponse(const uint8_t *response) {
             const uint32_t payloadSize = parseInt32(payload);
             payload += 4;
             std::string recognizeResult = parseString(payload, payloadSize);
-            JsonDocument jsonResult(&spiRamAllocator);
+            JsonDocument jsonResult;
             const DeserializationError err = deserializeJson(jsonResult, recognizeResult);
             if (err) {
                 Serial.println("解析语音识别结果失败");
@@ -186,11 +187,15 @@ void DoubaoSTT::parseResponse(const uint8_t *response) {
             if (code == 1000 && result.size() > 0) {
                 for (const auto &item: result) {
                     String text = item["text"];
-                    LvglDisplay::updateChatText(User, text.c_str());
+                    LvglDisplay::updateChatText(User, _firstPacket, text.c_str());
+                    if (_firstPacket) {
+                        _firstPacket = false;
+                    }
                     if (sequence < 0) {
                         Serial.printf("[语音识别] 识别到文字: %s\n", text.c_str());
                         LvglDisplay::updateState("正在思考...");
                         _llmAgent.begin(text);
+                        _firstPacket = true;
                     }
                 }
             } else {

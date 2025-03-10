@@ -3,9 +3,6 @@
 
 #include "string"
 #include <lvgl.h>
-#include "FT6336.h"
-#include "gui/gui_guider.h"
-#include "gui/events_init.h"
 #include "TFT_eSPI.h"
 
 enum MessageRole {
@@ -17,13 +14,20 @@ class LvglDisplay {
 public:
     static void begin();
 
-    static void updateChatText(MessageRole messageRole, const std::string& text);
+    static void updateChatText(MessageRole messageRole, bool newLine, const std::string &text);
 
-    static void updateState(const std::string& state);
-    static void updateTime(const std::string& time);
+    static void updateState(const std::string &state);
+
+    static void updateTime(const std::string &time);
+
+    static void initMessageStyle();
+
 private:
     static lv_style_t *message_style_robot;
     static lv_style_t *message_style_user;
+    static lv_obj_t *last_message;
+    static int current_message_number;
+    static SemaphoreHandle_t lvglMutex;
 };
 
 

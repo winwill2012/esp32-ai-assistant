@@ -125,7 +125,7 @@ void setup_scr_speaker_setting(lv_ui *ui)
     lv_obj_set_style_pad_bottom(ui->speaker_setting_spinbox_1, 10, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_pad_left(ui->speaker_setting_spinbox_1, 10, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_color(ui->speaker_setting_spinbox_1, lv_color_hex(0x000000), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui->speaker_setting_spinbox_1, &lv_customer_font_Siyuan_ExtraLight_14, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui->speaker_setting_spinbox_1, &lv_customer_font_Siyuan_Regular_16, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->speaker_setting_spinbox_1, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_letter_space(ui->speaker_setting_spinbox_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->speaker_setting_spinbox_1, 7, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -163,7 +163,7 @@ void setup_scr_speaker_setting(lv_ui *ui)
 
     //Write style for speaker_setting_ddlist_1, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_text_color(ui->speaker_setting_ddlist_1, lv_color_hex(0x0D3055), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui->speaker_setting_ddlist_1, &lv_customer_font_Siyuan_ExtraLight_14, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui->speaker_setting_ddlist_1, &lv_customer_font_Siyuan_Regular_16, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->speaker_setting_ddlist_1, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_border_width(ui->speaker_setting_ddlist_1, 1, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(ui->speaker_setting_ddlist_1, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -228,7 +228,7 @@ void setup_scr_speaker_setting(lv_ui *ui)
 
     //Write style for speaker_setting_ddlist_2, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_text_color(ui->speaker_setting_ddlist_2, lv_color_hex(0x0D3055), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui->speaker_setting_ddlist_2, &lv_customer_font_Siyuan_ExtraLight_14, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui->speaker_setting_ddlist_2, &lv_customer_font_Siyuan_Regular_16, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui->speaker_setting_ddlist_2, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_border_width(ui->speaker_setting_ddlist_2, 1, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(ui->speaker_setting_ddlist_2, 255, LV_PART_MAIN|LV_STATE_DEFAULT);

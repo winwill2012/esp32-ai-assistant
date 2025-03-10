@@ -24,13 +24,13 @@ public:
     };
 
     std::map<std::pair<LLMState, LLMEvent>, LLMState> StateTransferRouter = {
-        {{Init, Begin}, Started},
-        {{Started, NormalCharReceived}, Started},
-        {{Started, DelimiterReceived}, ResponseCompleted},
-        {{ResponseCompleted, NormalCharReceived}, ResponseCompleted},
-        {{ResponseCompleted, DelimiterReceived}, CmdCompleted},
-        {{CmdCompleted, NormalCharReceived}, CmdCompleted},
-        {{CmdCompleted, DelimiterReceived}, ContentCompleted},
+            {{Init,              Begin},              Started},
+            {{Started,           NormalCharReceived}, Started},
+            {{Started,           DelimiterReceived},  ResponseCompleted},
+            {{ResponseCompleted, NormalCharReceived}, ResponseCompleted},
+            {{ResponseCompleted, DelimiterReceived},  CmdCompleted},
+            {{CmdCompleted,      NormalCharReceived}, CmdCompleted},
+            {{CmdCompleted,      DelimiterReceived},  ContentCompleted},
     };
 
     CozeLLMAgent(DoubaoTTS tts, const String &url, const String &botId, const String &token);
@@ -65,7 +65,7 @@ private :
     String _cmd;
     String _content;
     String _ttsTextBuffer;
-
+    bool _firstPacket;
     LLMState _state = Init;
 };
 

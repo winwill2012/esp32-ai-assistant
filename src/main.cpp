@@ -32,6 +32,7 @@ RecordingManager recordingManager(sttClient);
 void setup() {
     Serial.begin(115200);
     Settings::begin();
+    Settings::setEmotion("pleased");
     LvglDisplay::begin();
 
     WiFiClass::useStaticBuffers(true);
@@ -43,8 +44,11 @@ void setup() {
     }
     TimeUpdater::begin();
     Serial.println("连接网络成功");
-    Serial.printf("Default free size =  %d\n", heap_caps_get_free_size(MALLOC_CAP_DEFAULT));
-    Serial.printf("  PSRAM free size =  %d\n", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
+    Serial.printf("     Default free size =  %d\n", heap_caps_get_free_size(MALLOC_CAP_DEFAULT));
+    Serial.printf("       PSRAM free size =  %d\n", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
+    Serial.printf("         DMA free size =  %d\n", heap_caps_get_free_size(MALLOC_CAP_DMA));
+    Serial.printf("  SPIRAM DMA free size =  %d\n", heap_caps_get_free_size(MALLOC_CAP_SPIRAM | MALLOC_CAP_DMA));
+    Serial.printf("INTERNAL DMA free size =  %d\n", heap_caps_get_free_size(MALLOC_CAP_INTERNAL | MALLOC_CAP_DMA));
     recordingManager.begin();
 }
 

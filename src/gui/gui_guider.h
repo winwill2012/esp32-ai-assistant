@@ -24,7 +24,6 @@ typedef struct {
     lv_obj_t *home_page_header_time;
     lv_obj_t *home_page_header_wifi_no;
     lv_obj_t *home_page_header_state;
-    lv_obj_t *home_page_header_icon;
     lv_obj_t *home_page_microphone;
     lv_obj_t *home_page_line_stop_recording;
     lv_obj_t *home_page_message_list;
@@ -93,8 +92,6 @@ void setup_scr_network_setting(lv_ui *ui);
 void setup_scr_speaker_setting(lv_ui *ui);
 
 LV_IMG_DECLARE(_WIFI_alpha_26x26);
-LV_IMG_DECLARE(_robot_alpha_26x26);
-LV_IMG_DECLARE(_user_alpha_26x26);
 LV_IMG_DECLARE(_micphone_alpha_40x40);
 LV_IMG_DECLARE(_retrun_alpha_33x33);
 LV_IMG_DECLARE(_retrun_alpha_33x33);
@@ -107,7 +104,6 @@ LV_FONT_DECLARE(lv_customer_font_Siyuan_Regular_14)
 LV_FONT_DECLARE(lv_customer_font_Siyuan_yuanti_14)
 LV_FONT_DECLARE(lv_customer_font_Siyuan_Heiti_18)
 LV_FONT_DECLARE(lv_customer_font_Siyuan_Heiti_28)
-LV_FONT_DECLARE(lv_customer_font_Siyuan_ExtraLight_14)
 LV_FONT_DECLARE(lv_customer_font_Siyuan_yuanti_22)
 
 

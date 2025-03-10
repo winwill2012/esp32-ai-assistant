@@ -47,6 +47,7 @@ private:
     int _i2sDout;
     int _i2sBclk;
     int _i2sLrc;
+    bool _firstPacket;
     SemaphoreHandle_t _taskFinished;
     std::vector<uint8_t> _requestBuilder;
 };
