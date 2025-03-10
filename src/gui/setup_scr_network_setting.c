@@ -7,6 +7,8 @@
 * terms, then you may not retain, install, activate or otherwise use the software.
 */
 
+#include <esp_wifi_types.h>
+#include "esp_wifi.h"
 #include "lvgl.h"
 #include <stdio.h>
 #include "gui_guider.h"
@@ -15,6 +17,73 @@
 #include "custom.h"
 
 
+// 定义全局变量
+lv_obj_t *loading_anim;
+lv_obj_t *wifi_list;
+uint16_t wifi_count = 0;
+wifi_ap_record_t ap_info[20];
+
+static void connect_wifi_callback (lv_event_t * e) {
+
+}
+
+// 处理列表项点击事件
+static void list_item_click_event_cb(lv_event_t *e)
+{
+    // lv_obj_t *obj = lv_event_get_target(e);
+    // int index = lv_list_get_btn_index(wifi_list, obj);
+
+    // 创建输入框
+    lv_obj_t *kb = lv_keyboard_create(lv_scr_act());
+    lv_obj_t *ta = lv_textarea_create(lv_scr_act());
+    lv_textarea_set_one_line(ta, true);
+    lv_obj_set_width(ta, lv_pct(50));
+    lv_obj_align(ta, LV_ALIGN_CENTER, 0, -50);
+    lv_keyboard_set_textarea(kb, ta);
+
+    // 创建确定按钮
+    lv_obj_t *btn = lv_btn_create(lv_scr_act());
+    lv_obj_set_width(btn, lv_pct(20));
+    lv_obj_align(btn, LV_ALIGN_CENTER, 0, 50);
+    lv_obj_t *label = lv_label_create(btn);
+    lv_label_set_text(label, "确定");
+
+    lv_obj_add_event_cb(btn, connect_wifi_callback, LV_EVENT_CLICKED, e->user_data);
+}
+
+// 扫描 WiFi 网络
+static void scan_wifi()
+{
+    esp_wifi_scan_start(NULL, true);
+    esp_wifi_scan_get_ap_records(&wifi_count, ap_info);
+}
+
+// 创建加载动画
+static void create_loading_anim(lv_obj_t *parent)
+{
+    loading_anim = lv_spinner_create(parent, 1000, 60);
+    lv_obj_set_size(loading_anim, 50, 50);
+    lv_obj_align(loading_anim, LV_ALIGN_CENTER, 0, 0);
+}
+
+// 移除加载动画
+static void remove_loading_anim()
+{
+    lv_obj_del(loading_anim);
+}
+
+// 创建 WiFi 列表
+static void create_wifi_list(lv_obj_t *parent)
+{
+    wifi_list = lv_list_create(parent);
+    lv_obj_set_size(wifi_list, lv_pct(100), lv_pct(80));
+    lv_obj_align(wifi_list, LV_ALIGN_BOTTOM_MID, 0, 0);
+
+    for (int i = 0; i < wifi_count; i++) {
+        lv_obj_t *btn = lv_list_add_text(wifi_list, ap_info[i].ssid);
+        lv_obj_add_event_cb(btn, list_item_click_event_cb, LV_EVENT_CLICKED, ap_info[i].ssid);
+    }
+}
 
 void setup_scr_network_setting(lv_ui *ui)
 {
@@ -93,7 +162,17 @@ void setup_scr_network_setting(lv_ui *ui)
     lv_obj_set_style_shadow_width(ui->network_setting_label_title, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //The custom code of network_setting.
+    // 创建加载动画
+    create_loading_anim(ui->network_setting);
 
+    // 扫描 WiFi 网络
+    scan_wifi();
+
+    // 移除加载动画
+    remove_loading_anim();
+
+    // 创建 WiFi 列表
+    create_wifi_list(ui->network_setting);
 
     //Update current screen layout.
     lv_obj_update_layout(ui->network_setting);
