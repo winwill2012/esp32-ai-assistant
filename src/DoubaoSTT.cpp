@@ -193,7 +193,6 @@ void DoubaoSTT::parseResponse(const uint8_t *response) {
                     }
                     if (sequence < 0) {
                         Serial.printf("[语音识别] 识别到文字: %s\n", text.c_str());
-                        LvglDisplay::updateState("正在思考...");
                         _llmAgent.begin(text);
                         _firstPacket = true;
                     }

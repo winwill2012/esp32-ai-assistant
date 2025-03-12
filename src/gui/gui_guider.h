@@ -93,6 +93,7 @@ void setup_scr_speaker_setting(lv_ui *ui);
 
 LV_IMG_DECLARE(_WIFI_alpha_26x26);
 LV_IMG_DECLARE(_micphone_alpha_40x40);
+LV_IMG_DECLARE(_stop_alpha_40x40);
 LV_IMG_DECLARE(_retrun_alpha_33x33);
 LV_IMG_DECLARE(_retrun_alpha_33x33);
 LV_IMG_DECLARE(_retrun_alpha_33x33);

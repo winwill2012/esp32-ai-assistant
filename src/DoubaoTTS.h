@@ -8,12 +8,7 @@
 
 class DoubaoTTS : public WebSocketsClient {
 public:
-    DoubaoTTS(i2s_port_t i2SPort, uint32_t sampleRate,
-              const String &appId, const String &token,
-              const String &host, int port,
-              const String &url, int i2sDout, int i2sBclk, int i2sLrc);
-
-    void setupMax98357() const;
+    DoubaoTTS(const String &appId, const String &token, const String &host, int port, const String &url);
 
     void eventCallback(WStype_t type, uint8_t *payload, size_t length);
 
@@ -21,7 +16,7 @@ public:
 
     String buildFullClientRequest(const String &text) const;
 
-    void parseResponse(const uint8_t *response);
+    void parseResponse(uint8_t *response);
 
     void synth(const String &text);
 
@@ -31,11 +26,6 @@ private:
     String _host;
     uint16_t _port;
     String _url;
-    uint32_t _sampleRate;
-    i2s_port_t _i2sNumber;
-    int _i2sDout;
-    int _i2sBclk;
-    int _i2sLrc;
     SemaphoreHandle_t _taskFinished;
 };
 

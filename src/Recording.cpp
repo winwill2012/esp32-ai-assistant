@@ -3,12 +3,12 @@
 #include <utility>
 #include "Utils.h"
 #include "GlobalState.h"
-#include "LvglDisplay.h"
+#include "AudioPlayer.h"
 
 RecordingManager::RecordingManager(DoubaoSTT sttClient) : _sttClient(std::move(sttClient)) {
-    _soundPowerThreshold = RECORDING_POWER_THRESHOLD;
     _recordingBufferSize = 4000; // 125ms的音频数据
     _recordingBuffer = std::vector<uint8_t>(_recordingBufferSize);
+    _lastRecordingBuffer = std::vector<uint8_t>(_recordingBufferSize);
 }
 
 RecordingManager::~RecordingManager() = default;
@@ -29,24 +29,25 @@ RecordingManager::~RecordingManager() = default;
         if (err == ESP_OK) {
             // 如有有声音
             if (calculateSoundRMS(_recordingBuffer.data(), bytesRead) > Settings::getBackgroundNoiseRMS()) {
-                LvglDisplay::updateState("正在聆听...");
                 hasSoundFlag = true;
-                _sttClient.recognize(_recordingBuffer.data(), bytesRead, firstPacket, false);
                 if (firstPacket) {
+                    // 发送第一个数据包时，先发送能够检测到声音的前一帧数据(因为识别有误差，不发前一帧数据，语音识别会丢失一开始的数据)
+                    _sttClient.recognize(_lastRecordingBuffer.data(), bytesRead, firstPacket, false);
                     firstPacket = false;
                 }
+                _sttClient.recognize(_recordingBuffer.data(), bytesRead, firstPacket, false);
                 idleBeginTime = 0;
             } else if (hasSoundFlag) {
                 // 如果之前有声音，本次没有声音
                 if (idleBeginTime == 0) {
                     idleBeginTime = millis();
                 } else if (millis() - idleBeginTime > Settings::getRecordingSilenceTime()) {
-                    LvglDisplay::updateState("正在识别...");
                     _sttClient.recognize(_recordingBuffer.data(), bytesRead, firstPacket, true);
                     hasSoundFlag = false;
                     firstPacket = true;
                 }
             }
+            _lastRecordingBuffer = _recordingBuffer;
         }
     }
 }

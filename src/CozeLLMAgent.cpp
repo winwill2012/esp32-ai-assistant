@@ -17,6 +17,7 @@ CozeLLMAgent::CozeLLMAgent(DoubaoTTS tts, const String &url, const String &botId
 CozeLLMAgent::~CozeLLMAgent() = default;
 
 void CozeLLMAgent::begin(const String &input) {
+    GlobalState::setState(Thingking);
     reset();
     HTTPClient http;
     http.begin(_url + GlobalState::getConversationId());

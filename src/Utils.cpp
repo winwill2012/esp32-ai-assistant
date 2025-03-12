@@ -1,5 +1,6 @@
 #include <vector>
 #include "utils.h"
+#include "arduinoFFT.h"
 
 std::string generateTaskId() {
     randomSeed(millis());
@@ -58,9 +59,41 @@ double calculateSoundRMS(const uint8_t *buffer, const size_t bufferSize) {
     return rms;
 }
 
+// 判断是否有人声的工具函数
+//bool detectVoice(uint8_t *buff, size_t sampleSize, int samplingFrequency) {
+//    unsigned long start = millis();
+//    float vReal[sampleSize];
+//    float vImag[sampleSize];
+//    for (int i = 0; i < sampleSize; i++) {
+//        vReal[i] = static_cast<float>(buff[i * 2] | (buff[i * 2 + 1] << 8));
+//        vImag[i] = 0.0;
+//    }
+//    ArduinoFFT<float> FFT = ArduinoFFT<float>(vReal, vImag, sampleSize, samplingFrequency, true);
+//    FFT.windowing(FFT_WIN_TYP_HAMMING, FFT_FORWARD);
+//    FFT.compute(FFT_FORWARD);
+//    FFT.complexToMagnitude();
+//
+//    // 人声频率范围（300Hz - 3400Hz）
+//    int minIndex = 300 * sampleSize / samplingFrequency;
+//    int maxIndex = 3400 * sampleSize / samplingFrequency;
+//
+//    // 设定幅度阈值
+//    float threshold = 20000.0;
+//
+//    // 检查人声频率范围内的幅度
+//    for (int i = minIndex; i < maxIndex; i++) {
+//        if (vReal[i] > threshold) {
+//            Serial.printf("计算时间: %lu\n", millis() - start);
+//            return true; // 有人声
+//        }
+//    }
+//    Serial.printf("计算时间: %lu\n", millis() - start);
+//    return false; // 无人声
+//}
+
 std::pair<int, size_t> findMinIndexOfDelimiter(const String &input) {
     // 定义需要处理的中英文标点集合
-    std::vector<String> delimiters = {"，","。", "！", "：", "；", "？"};
+    std::vector<String> delimiters = {"，", "。", "！", "：", "；", "？"};
 
     int minIndex = -1;
     size_t minIndexDelimiterLength = 0;

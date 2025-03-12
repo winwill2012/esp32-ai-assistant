@@ -18,4 +18,6 @@ double calculateSoundRMS(const uint8_t *buffer, size_t bufferSize);
 
 std::pair<int, size_t> findMinIndexOfDelimiter(const String &input);
 
+//bool detectVoice(uint8_t *buff, size_t sampleSize, int samplingFrequency);
+
 #endif

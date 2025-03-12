@@ -20,6 +20,10 @@ public:
 
     static void updateTime(const std::string &time);
 
+    static void updateWifiState(bool success);
+
+    static void updateRecordingButtonState(bool recordingAllowed);
+    static void updateRecordingButtonImage(bool isPlaying);
     static void initMessageStyle();
 
 private:

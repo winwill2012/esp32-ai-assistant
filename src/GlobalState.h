@@ -11,7 +11,10 @@
 
 enum MachineState {
     Sleep,
+    NetworkConnecting,
+    NetworkConnected,
     Listening,
+    Thingking,
     Playing
 };
 
@@ -24,10 +27,10 @@ enum MachineEvent {
 class GlobalState {
 public:
     std::map<std::pair<MachineState, MachineEvent>, MachineState> machineStateTransferRouter = {
-        {{Sleep, StartListen}, Listening},
-        {{Listening, StopListening}, Sleep},
-        {{Playing, InterruptPlaying}, Listening},
-        {{Playing, StopListening}, Sleep}
+            {{Sleep,     StartListen},      Listening},
+            {{Listening, StopListening},    Sleep},
+            {{Playing,   InterruptPlaying}, Listening},
+            {{Playing,   StopListening},    Sleep}
     };
 
     static void setConversationId(String conversationId);

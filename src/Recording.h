@@ -3,8 +3,6 @@
 
 #include "DoubaoSTT.h"
 
-#define RECORDING_POWER_THRESHOLD 5000
-
 class RecordingManager {
 public:
     explicit RecordingManager(DoubaoSTT sttClient);
@@ -15,9 +13,9 @@ public:
 
 private:
     DoubaoSTT _sttClient;
-    float _soundPowerThreshold;
     size_t _recordingBufferSize;
     std::vector<uint8_t> _recordingBuffer;
+    std::vector<uint8_t> _lastRecordingBuffer;
 };
 
 #endif //IOT_AI_CONTROLLER_RECORDING_H

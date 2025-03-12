@@ -16,7 +16,7 @@ void Settings::begin() {
     _speedRatio = preferences.getFloat(SETTING_SPEED_RATIO, 1.0);
     _voiceType = preferences.getString(SETTING_VOICE_TYPE, "BV700_streaming");
     _emotion = preferences.getString(SETTING_EMOTION, "please");
-    _backgroundNoiseRMS = preferences.getDouble(SETTING_BACKGROUND_NOISE_RMS, 5000);
+    _backgroundNoiseRMS = preferences.getDouble(SETTING_BACKGROUND_NOISE_RMS, 4500);
     _recordingSilenceTime = preferences.getInt(SETTING_RECORDING_SILENCE_TIME, 1000);
     preferences.end();
 
