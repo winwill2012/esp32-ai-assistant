@@ -5,7 +5,7 @@
 #include "Arduino.h"
 #include "DoubaoTTS.h"
 #include "DoubaoSTT.h"
-#include "Recording.h"
+#include "RecordingManager.h"
 #include "LvglDisplay.h"
 #include "TimeUpdater.h"
 #include "AudioPlayer.h"
@@ -20,7 +20,7 @@
  */
 DoubaoTTS ttsClient(APP_ID, ACCESS_TOKEN, HOST, 443, "/api/v1/tts/ws_binary");
 
-CozeLLMAgent llmAgent(ttsClient, "https://api.coze.cn/v3/chat?conversation_id=", "7468218438402818082",
+CozeLLMAgent llmAgent(ttsClient, "https://api.coze.cn/v3/chat?conversation_id=", "7479628247178313747",
                       "pat_A5RMsa9C3wavFPz9BiTHnQtm0G3AmYZkhSSZ5vkHANDKWnX1yyx7wss7hsAnUMt4");
 
 DoubaoSTT sttClient(llmAgent, APP_ID, ACCESS_TOKEN, HOST, 443, "/api/v2/asr");
@@ -30,6 +30,8 @@ RecordingManager recordingManager(sttClient);
 void setup() {
     Serial.begin(115200);
     Settings::begin();
+    Settings::setEmotion("happy");
+    Settings::setVolumeRatio(2);
     LvglDisplay::begin();
 
     if (connectWifi("Xiaomi_E15A", "19910226", 10)) {

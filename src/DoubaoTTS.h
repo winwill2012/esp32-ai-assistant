@@ -18,7 +18,7 @@ public:
 
     void parseResponse(const uint8_t *response) const;
 
-    void synth(const String &text);
+    void synth(const String &text, bool disconnectAfter);
 
 private:
     String _appId;

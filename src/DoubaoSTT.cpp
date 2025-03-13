@@ -2,7 +2,7 @@
 #include "Utils.h"
 #include <Arduino.h>
 #include <CozeLLMAgent.h>
-#include <Recording.h>
+#include <RecordingManager.h>
 #include <vector>
 #include "LvglDisplay.h"
 
@@ -41,6 +41,7 @@ void DoubaoSTT::begin() {
         return;
     }
     setExtraHeaders(("Authorization: Bearer; " + _token).c_str());
+    enableHeartbeat(15000, 3000, 0);
     beginSSL(_host, _port, _url);
     onEvent([this](WStype_t type, uint8_t *payload, size_t length) {
         this->eventCallback(type, payload, length);

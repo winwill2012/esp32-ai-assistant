@@ -6,11 +6,10 @@
 #include "LvglDisplay.h"
 
 CozeLLMAgent::CozeLLMAgent(DoubaoTTS tts, const String &url, const String &botId, const String &token) : _tts(
-    std::move(tts)) {
+        std::move(tts)) {
     _url = url;
     _botId = botId;
     _token = token;
-    _state = Init;
     _firstPacket = true;
 }
 
@@ -37,7 +36,6 @@ void CozeLLMAgent::begin(const String &input) {
     message["role"] = "user";
     std::string requestBodyStr;
     serializeJson(requestBody, requestBodyStr);
-    _state = Started;
     int httpResponseCode = http.POST(requestBodyStr.c_str());
     if (httpResponseCode > 0) {
         WiFiClient *stream = http.getStreamPtr();
@@ -46,9 +44,15 @@ void CozeLLMAgent::begin(const String &input) {
             if (stream->available()) {
                 line = stream->readStringUntil('\n');
                 if (!line.isEmpty()) {
-                    if (ProcessStreamOutput(line) == ContentCompleted) {
+                    if (line.indexOf("conversation.message.completed") > 0) {
+                        if (_ttsTextBuffer != "") {
+                            _tts.synth(_ttsTextBuffer, true);
+                        } else {
+                            _tts.disconnect();
+                        }
                         break;
                     }
+                    ProcessStreamOutput(line);
                 }
             }
         }
@@ -58,11 +62,11 @@ void CozeLLMAgent::begin(const String &input) {
     http.end();
 }
 
-CozeLLMAgent::LLMState CozeLLMAgent::ProcessStreamOutput(String data) {
-    log_d("Process coze agent response fragment: %s", line.c_str());
+void CozeLLMAgent::ProcessStreamOutput(String data) {
+    log_d("Process coze agent response fragment: %s", data.c_str());
     // 只处理data开头，并且是助手回答的数据类型
     if (!data.startsWith("data:") || data.indexOf(R"("role":"assistant","type":"answer")") < 0) {
-        return _state;
+        return;
     }
     data.replace("data:", "");
     JsonDocument document;
@@ -70,19 +74,15 @@ CozeLLMAgent::LLMState CozeLLMAgent::ProcessStreamOutput(String data) {
     const DeserializationError error = deserializeJson(document, data);
     if (error != DeserializationError::Ok) {
         log_e("Deserialization coze agent response error: %s", data.c_str());
-        return _state;
+        return;
     }
     String content = document["content"];
     String conversationId = document["conversation_id"];
     GlobalState::setConversationId(conversationId);
-    while (!content.isEmpty()) {
-        ProcessContent(content);
-    }
-    return _state;
+    ProcessContent(content);
 }
 
 void CozeLLMAgent::reset() {
-    _state = Init;
     _response = "";
     _ttsTextBuffer = "";
     _cmd = "";
@@ -95,51 +95,20 @@ void CozeLLMAgent::ProcessContent(String &content) {
     if (content.isEmpty()) {
         return;
     }
-    // 内容不包含分隔符，状态不会发生变化
-    if (content.indexOf(DELIMITER) < 0) {
-        switch (_state) {
-            case Started: {
-                _response += content;
-                LvglDisplay::updateChatText(Robot, _firstPacket, _response.c_str());
-                if (_firstPacket) {
-                    _firstPacket = false;
-                }
-                _ttsTextBuffer += content;
-                // 回复的内容里面包含一些可以断句的标点符号时，直接发送给TTS进行语音合成，降低响应延迟
-                const std::pair<int, size_t> delimiterIndex = findMinIndexOfDelimiter(_ttsTextBuffer);
-                if (delimiterIndex.first >= 0) {
-                    _tts.synth(_ttsTextBuffer.substring(0, delimiterIndex.first));
-                    _ttsTextBuffer = _ttsTextBuffer.substring(delimiterIndex.first + delimiterIndex.second);
-                }
-                break;
-            }
-            case ResponseCompleted: {
-                _cmd += content;
-                break;
-            }
-            case CmdCompleted: {
-                _content += content;
-                break;
-            }
-            default:
-                break;
+    _response += content;
+    LvglDisplay::updateChatText(Robot, _firstPacket, _response.c_str());
+    if (_firstPacket) {
+        _firstPacket = false;
+    }
+    _ttsTextBuffer += content;
+    // 回复的内容里面包含一些可以断句的标点符号时，直接发送给TTS进行语音合成，降低响应延迟
+    while (true) {
+        const std::pair<int, size_t> delimiterIndex = findMinIndexOfDelimiter(_ttsTextBuffer);
+        if (delimiterIndex.first >= 0) {
+            _tts.synth(_ttsTextBuffer.substring(0, delimiterIndex.first), false);
+            _ttsTextBuffer = _ttsTextBuffer.substring(delimiterIndex.first + delimiterIndex.second);
+        } else {
+            break;
         }
-        content = "";
-        return;
     }
-    // 如果包含分隔符^,前半部分和后半部分分开处理，递归调用本函数
-    const int index = content.indexOf(DELIMITER);
-    String fistHalfContent = content.substring(0, index);
-    // 递归处理前半部分内容
-    ProcessContent(fistHalfContent);
-    // 执行状态转移相关逻辑
-    const auto it = StateTransferRouter.find(std::make_pair(_state, DelimiterReceived));
-    if (it != StateTransferRouter.end()) {
-        _state = it->second;
-    }
-    if (_state == ResponseCompleted && !_ttsTextBuffer.isEmpty()) {
-        LvglDisplay::updateChatText(Robot, _firstPacket, _response.c_str());
-        _tts.synth(_ttsTextBuffer);
-    }
-    content = content.substring(index + 1);
 }

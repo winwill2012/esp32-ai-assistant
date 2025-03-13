@@ -61,7 +61,7 @@ void LvglDisplay::initMessageStyle() {
         lv_style_set_pad_top(message_style_robot, 20);
         lv_style_set_pad_top(message_style_user, 20);
 
-        lv_style_set_text_color(message_style_robot, lv_color_make(100, 100, 100));
+        lv_style_set_text_color(message_style_robot, lv_color_make(50, 50, 50));
         lv_style_set_text_color(message_style_user, lv_color_make(0, 0, 0));
 
         lv_style_set_bg_opa(message_style_robot, 0);
@@ -71,11 +71,11 @@ void LvglDisplay::initMessageStyle() {
 }
 
 void LvglDisplay::initSpeakerDropdownOptions() {
-    if (xSemaphoreTake(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
-        lv_dropdown_set_options(guider_ui.speaker_setting_ddlist_1, "婉婉（温柔女声）");
-        lv_dropdown_set_options(guider_ui.speaker_setting_ddlist_2, "开心");
-        xSemaphoreGive(lvglUpdateLock);
-    }
+//    if (xSemaphoreTake(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
+//        lv_dropdown_set_options(guider_ui.speaker_setting_ddlist_1, "婉婉（温柔女声）");
+//        lv_dropdown_set_options(guider_ui.speaker_setting_ddlist_2, "开心");
+//        xSemaphoreGive(lvglUpdateLock);
+//    }
 }
 
 void LvglDisplay::begin() {

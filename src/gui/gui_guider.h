@@ -97,6 +97,7 @@ LV_IMG_DECLARE(_stop_alpha_40x40);
 LV_IMG_DECLARE(_retrun_alpha_33x33);
 LV_IMG_DECLARE(_retrun_alpha_33x33);
 LV_IMG_DECLARE(_retrun_alpha_33x33);
+LV_IMG_DECLARE(_backgroud_320x480);
 
 LV_FONT_DECLARE(lv_font_montserratMedium_16)
 LV_FONT_DECLARE(lv_font_montserratMedium_21)

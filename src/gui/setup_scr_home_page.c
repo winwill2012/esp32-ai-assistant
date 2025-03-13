@@ -15,21 +15,19 @@
 #include "custom.h"
 
 
-
-void setup_scr_home_page(lv_ui *ui)
-{
+void setup_scr_home_page(lv_ui *ui) {
     //Write codes home_page
     ui->home_page = lv_obj_create(NULL);
     lv_obj_set_size(ui->home_page, 320, 480);
     lv_obj_set_scrollbar_mode(ui->home_page, LV_SCROLLBAR_MODE_AUTO);
 
     //Write style for home_page, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_bg_opa(ui->home_page, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->home_page, lv_color_hex(0xf1adad), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_dir(ui->home_page, LV_GRAD_DIR_HOR, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_color(ui->home_page, lv_color_hex(0xded8d8), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_main_stop(ui->home_page, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_stop(ui->home_page, 77, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui->home_page, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->home_page, lv_color_make(255, 255, 255), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_grad_dir(ui->home_page, LV_GRAD_DIR_HOR, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_grad_color(ui->home_page, lv_color_hex(0xded8d8), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_main_stop(ui->home_page, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_grad_stop(ui->home_page, 77, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     //Write codes home_page_container_top
     ui->home_page_container_top = lv_obj_create(ui->home_page);
@@ -38,32 +36,32 @@ void setup_scr_home_page(lv_ui *ui)
     lv_obj_set_scrollbar_mode(ui->home_page_container_top, LV_SCROLLBAR_MODE_OFF);
 
     //Write style for home_page_container_top, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_border_width(ui->home_page_container_top, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(ui->home_page_container_top, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui->home_page_container_top, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->home_page_container_top, lv_color_hex(0x4c4a4a), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_dir(ui->home_page_container_top, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_top(ui->home_page_container_top, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_bottom(ui->home_page_container_top, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_left(ui->home_page_container_top, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_right(ui->home_page_container_top, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_width(ui->home_page_container_top, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(ui->home_page_container_top, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->home_page_container_top, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui->home_page_container_top, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->home_page_container_top, lv_color_hex(0x4c4a4a), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_grad_dir(ui->home_page_container_top, LV_GRAD_DIR_NONE, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui->home_page_container_top, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui->home_page_container_top, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_left(ui->home_page_container_top, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui->home_page_container_top, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_width(ui->home_page_container_top, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     //Write codes home_page_header_wifi
     ui->home_page_header_wifi = lv_img_create(ui->home_page_container_top);
     lv_obj_add_flag(ui->home_page_header_wifi, LV_OBJ_FLAG_CLICKABLE);
     lv_img_set_src(ui->home_page_header_wifi, &_WIFI_alpha_26x26);
-    lv_img_set_pivot(ui->home_page_header_wifi, 50,50);
+    lv_img_set_pivot(ui->home_page_header_wifi, 50, 50);
     lv_img_set_angle(ui->home_page_header_wifi, 0);
     lv_obj_set_pos(ui->home_page_header_wifi, 286, 1);
     lv_obj_set_size(ui->home_page_header_wifi, 26, 26);
 
     //Write style for home_page_header_wifi, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_img_recolor_opa(ui->home_page_header_wifi, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_img_recolor(ui->home_page_header_wifi, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_img_opa(ui->home_page_header_wifi, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(ui->home_page_header_wifi, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_clip_corner(ui->home_page_header_wifi, true, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_img_recolor_opa(ui->home_page_header_wifi, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_img_recolor(ui->home_page_header_wifi, lv_color_hex(0xffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_img_opa(ui->home_page_header_wifi, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->home_page_header_wifi, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_clip_corner(ui->home_page_header_wifi, true, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     //Write codes home_page_header_time
     ui->home_page_header_time = lv_label_create(ui->home_page_container_top);
@@ -73,33 +71,35 @@ void setup_scr_home_page(lv_ui *ui)
     lv_obj_set_size(ui->home_page_header_time, 44, 19);
 
     //Write style for home_page_header_time, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_border_width(ui->home_page_header_time, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(ui->home_page_header_time, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->home_page_header_time, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui->home_page_header_time, &lv_customer_font_Siyuan_Regular_16, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(ui->home_page_header_time, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_letter_space(ui->home_page_header_time, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_line_space(ui->home_page_header_time, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_align(ui->home_page_header_time, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui->home_page_header_time, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_top(ui->home_page_header_time, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_right(ui->home_page_header_time, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_bottom(ui->home_page_header_time, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_left(ui->home_page_header_time, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_width(ui->home_page_header_time, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(ui->home_page_header_time, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->home_page_header_time, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->home_page_header_time, lv_color_hex(0xffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui->home_page_header_time, &lv_customer_font_Siyuan_Regular_16,
+                               LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui->home_page_header_time, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_letter_space(ui->home_page_header_time, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_line_space(ui->home_page_header_time, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_align(ui->home_page_header_time, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui->home_page_header_time, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui->home_page_header_time, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui->home_page_header_time, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui->home_page_header_time, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_left(ui->home_page_header_time, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_width(ui->home_page_header_time, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     //Write codes home_page_header_wifi_no
     ui->home_page_header_wifi_no = lv_line_create(ui->home_page_container_top);
-    static lv_point_t home_page_header_wifi_no[] = {{2, 3},{24, 27},};
+    static lv_point_t home_page_header_wifi_no[] = {{2,  3},
+                                                    {24, 27},};
     lv_line_set_points(ui->home_page_header_wifi_no, home_page_header_wifi_no, 2);
     lv_obj_set_pos(ui->home_page_header_wifi_no, 286, 0);
     lv_obj_set_size(ui->home_page_header_wifi_no, 26, 26);
 
     //Write style for home_page_header_wifi_no, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_line_width(ui->home_page_header_wifi_no, 2, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_line_color(ui->home_page_header_wifi_no, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_line_opa(ui->home_page_header_wifi_no, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_line_rounded(ui->home_page_header_wifi_no, true, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_line_width(ui->home_page_header_wifi_no, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_line_color(ui->home_page_header_wifi_no, lv_color_hex(0xffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_line_opa(ui->home_page_header_wifi_no, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_line_rounded(ui->home_page_header_wifi_no, true, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     //Write codes home_page_header_state
     ui->home_page_header_state = lv_label_create(ui->home_page_container_top);
@@ -109,48 +109,51 @@ void setup_scr_home_page(lv_ui *ui)
     lv_obj_set_size(ui->home_page_header_state, 90, 16);
 
     //Write style for home_page_header_state, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_border_width(ui->home_page_header_state, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(ui->home_page_header_state, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->home_page_header_state, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui->home_page_header_state, &lv_customer_font_Siyuan_Regular_14, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(ui->home_page_header_state, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_letter_space(ui->home_page_header_state, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_line_space(ui->home_page_header_state, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_align(ui->home_page_header_state, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui->home_page_header_state, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_top(ui->home_page_header_state, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_right(ui->home_page_header_state, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_bottom(ui->home_page_header_state, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_pad_left(ui->home_page_header_state, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_width(ui->home_page_header_state, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(ui->home_page_header_state, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->home_page_header_state, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->home_page_header_state, lv_color_hex(0xffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui->home_page_header_state, &lv_customer_font_Siyuan_Regular_14,
+                               LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui->home_page_header_state, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_letter_space(ui->home_page_header_state, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_line_space(ui->home_page_header_state, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_align(ui->home_page_header_state, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui->home_page_header_state, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui->home_page_header_state, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui->home_page_header_state, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui->home_page_header_state, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_left(ui->home_page_header_state, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_width(ui->home_page_header_state, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     //Write codes home_page_microphone
     ui->home_page_microphone = lv_img_create(ui->home_page);
     lv_obj_add_flag(ui->home_page_microphone, LV_OBJ_FLAG_CLICKABLE);
     lv_img_set_src(ui->home_page_microphone, &_micphone_alpha_40x40);
-    lv_img_set_pivot(ui->home_page_microphone, 50,50);
+    lv_img_set_pivot(ui->home_page_microphone, 50, 50);
     lv_img_set_angle(ui->home_page_microphone, 0);
     lv_obj_set_pos(ui->home_page_microphone, 140, 420);
     lv_obj_set_size(ui->home_page_microphone, 40, 40);
 
     //Write style for home_page_microphone, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_img_recolor_opa(ui->home_page_microphone, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_img_opa(ui->home_page_microphone, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(ui->home_page_microphone, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_clip_corner(ui->home_page_microphone, true, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_img_recolor_opa(ui->home_page_microphone, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_img_opa(ui->home_page_microphone, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->home_page_microphone, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_clip_corner(ui->home_page_microphone, true, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     //Write codes home_page_line_stop_recording
     ui->home_page_line_stop_recording = lv_line_create(ui->home_page);
-    static lv_point_t home_page_line_stop_recording[] = {{2, 3},{37, 42},};
+    static lv_point_t home_page_line_stop_recording[] = {{2,  3},
+                                                         {37, 42},};
     lv_line_set_points(ui->home_page_line_stop_recording, home_page_line_stop_recording, 2);
     lv_obj_set_pos(ui->home_page_line_stop_recording, 140, 420);
     lv_obj_set_size(ui->home_page_line_stop_recording, 40, 40);
 
     //Write style for home_page_line_stop_recording, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_line_width(ui->home_page_line_stop_recording, 2, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_line_color(ui->home_page_line_stop_recording, lv_color_hex(0xff0000), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_line_opa(ui->home_page_line_stop_recording, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_line_rounded(ui->home_page_line_stop_recording, true, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_line_width(ui->home_page_line_stop_recording, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_line_color(ui->home_page_line_stop_recording, lv_color_hex(0xff0000),
+                                LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_line_opa(ui->home_page_line_stop_recording, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_line_rounded(ui->home_page_line_stop_recording, true, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     //Write codes home_page_message_list
     ui->home_page_message_list = lv_list_create(ui->home_page);
@@ -170,7 +173,8 @@ void setup_scr_home_page(lv_ui *ui)
     lv_style_set_border_width(&style_home_page_message_list_main_main_default, 0);
     lv_style_set_radius(&style_home_page_message_list_main_main_default, 4);
     lv_style_set_shadow_width(&style_home_page_message_list_main_main_default, 0);
-    lv_obj_add_style(ui->home_page_message_list, &style_home_page_message_list_main_main_default, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_add_style(ui->home_page_message_list, &style_home_page_message_list_main_main_default,
+                     LV_PART_MAIN | LV_STATE_DEFAULT);
 
     //Write style state: LV_STATE_DEFAULT for &style_home_page_message_list_main_scrollbar_default
     static lv_style_t style_home_page_message_list_main_scrollbar_default;
@@ -180,7 +184,8 @@ void setup_scr_home_page(lv_ui *ui)
     lv_style_set_bg_opa(&style_home_page_message_list_main_scrollbar_default, 255);
     lv_style_set_bg_color(&style_home_page_message_list_main_scrollbar_default, lv_color_hex(0xffffff));
     lv_style_set_bg_grad_dir(&style_home_page_message_list_main_scrollbar_default, LV_GRAD_DIR_NONE);
-    lv_obj_add_style(ui->home_page_message_list, &style_home_page_message_list_main_scrollbar_default, LV_PART_SCROLLBAR|LV_STATE_DEFAULT);
+    lv_obj_add_style(ui->home_page_message_list, &style_home_page_message_list_main_scrollbar_default,
+                     LV_PART_SCROLLBAR | LV_STATE_DEFAULT);
 
     //Write style state: LV_STATE_DEFAULT for &style_home_page_message_list_extra_btns_main_default
     static lv_style_t style_home_page_message_list_extra_btns_main_default;
@@ -229,16 +234,17 @@ void setup_scr_home_page(lv_ui *ui)
     lv_obj_set_size(ui->home_page_btn_settings, 74, 30);
 
     //Write style for home_page_btn_settings, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_bg_opa(ui->home_page_btn_settings, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->home_page_btn_settings, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_dir(ui->home_page_btn_settings, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_border_width(ui->home_page_btn_settings, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(ui->home_page_btn_settings, 7, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_width(ui->home_page_btn_settings, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->home_page_btn_settings, lv_color_hex(0x000000), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui->home_page_btn_settings, &lv_customer_font_Siyuan_yuanti_14, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(ui->home_page_btn_settings, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_align(ui->home_page_btn_settings, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui->home_page_btn_settings, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->home_page_btn_settings, lv_color_hex(0xffffff), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_grad_dir(ui->home_page_btn_settings, LV_GRAD_DIR_NONE, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(ui->home_page_btn_settings, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->home_page_btn_settings, 7, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_width(ui->home_page_btn_settings, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->home_page_btn_settings, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui->home_page_btn_settings, &lv_customer_font_Siyuan_yuanti_14,
+                               LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui->home_page_btn_settings, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_align(ui->home_page_btn_settings, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     //The custom code of home_page.
 
