@@ -30,6 +30,9 @@ void GlobalState::setState(MachineState state) {
             LvglDisplay::updateState("连网成功");
             LvglDisplay::updateWifiState(true);
             break;
+        case NetworkConnectFailed:
+            LvglDisplay::updateState("连网失败");
+            break;
         case Listening:
             LvglDisplay::updateState("正在聆听...");
             LvglDisplay::updateRecordingButtonState(true);

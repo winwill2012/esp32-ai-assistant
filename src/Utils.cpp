@@ -74,3 +74,24 @@ std::pair<int, size_t> findMinIndexOfDelimiter(const String &input) {
     }
     return std::make_pair(minIndex, minIndexDelimiterLength);
 }
+
+bool connectWifi(const String &ssid, const String &password, const int maxRetries) {
+    GlobalState::setState(NetworkConnecting);
+    WiFiClass::useStaticBuffers(true);
+    WiFiClass::mode(WIFI_MODE_STA);
+    WiFi.begin(ssid, password);
+    int retries = 0;
+    while (!WiFi.isConnected() && retries < maxRetries) {
+        Serial.print(".");
+        vTaskDelay(1000);
+        retries++;
+    }
+    if (WiFi.isConnected()) {
+        GlobalState::setState(NetworkConnected);
+        log_i("Network connect successfully!");
+        return true;
+    }
+    GlobalState::setState(NetworkConnectFailed);
+    log_e("Network connect failed!");
+    return false;
+}

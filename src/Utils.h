@@ -1,8 +1,11 @@
 #ifndef AI_ROBOT_UTILS_H
 #define AI_ROBOT_UTILS_H
 
+#include <GlobalState.h>
+
 #include "Arduino.h"
 #include <vector>
+#include <WiFi.h>
 
 std::string generateTaskId();
 
@@ -18,4 +21,5 @@ double calculateSoundRMS(const uint8_t *buffer, size_t bufferSize);
 
 std::pair<int, size_t> findMinIndexOfDelimiter(const String &input);
 
+bool connectWifi(const String &ssid, const String &password, int maxRetries);
 #endif

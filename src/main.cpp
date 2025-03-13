@@ -1,5 +1,6 @@
 #include <CozeLLMAgent.h>
 #include <Settings.h>
+#include <utils.h>
 #include <driver/i2s.h>
 #include "Arduino.h"
 #include "WiFi.h"
@@ -34,19 +35,11 @@ void setup() {
     Settings::begin();
     LvglDisplay::begin();
 
-    GlobalState::setState(NetworkConnecting);
-    WiFiClass::useStaticBuffers(true);
-    WiFiClass::mode(WIFI_MODE_STA);
-    WiFi.begin("Xiaomi_E15A", "19910226");
-    while (!WiFi.isConnected()) {
-        Serial.print(".");
-        vTaskDelay(1000);
+    if (connectWifi("Xiaomi_E15A", "19910226", 10)) {
+        TimeUpdater::begin();
+        AudioPlayer::begin();
+        recordingManager.begin();
     }
-    GlobalState::setState(NetworkConnected);
-    log_i("Network connect successfully!");
-    TimeUpdater::begin();
-    AudioPlayer::begin();
-    recordingManager.begin();
 }
 
 void loop() {

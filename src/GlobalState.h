@@ -13,6 +13,7 @@ enum MachineState {
     Sleep,
     NetworkConnecting,
     NetworkConnected,
+    NetworkConnectFailed,
     Listening,
     Thinking,
     Playing
