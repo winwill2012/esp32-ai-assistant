@@ -10,7 +10,7 @@ void playAudio(void *ptr) {
     while (true) {
         if (xQueueReceive(AudioPlayer::getTaskQueue(), &task, portMAX_DELAY) == pdPASS) {
             GlobalState::setState(Playing);
-            esp_err_t result = i2s_write(I2S_NUM, task.data, task.length, &bytes_written, portMAX_DELAY);
+            esp_err_t result = i2s_write(MAX98357_I2S_NUM, task.data, task.length, &bytes_written, portMAX_DELAY);
             if (result != ESP_OK) {
                 log_e("播放音频失败, 错误码: %d", result);
             } else {
@@ -52,9 +52,9 @@ void AudioPlayer::begin() {
         .data_in_num = -1
     };
 
-    i2s_driver_install(I2S_NUM, &max98357_i2s_config, 0, nullptr);
-    i2s_set_pin(I2S_NUM, &max98357_gpio_config);
-    i2s_zero_dma_buffer(I2S_NUM);
+    i2s_driver_install(MAX98357_I2S_NUM, &max98357_i2s_config, 0, nullptr);
+    i2s_set_pin(MAX98357_I2S_NUM, &max98357_gpio_config);
+    i2s_zero_dma_buffer(MAX98357_I2S_NUM);
 
     xTaskCreate(playAudio, "playAudio", 4096, nullptr, 1, nullptr);
 }

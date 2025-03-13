@@ -70,6 +70,14 @@ void LvglDisplay::initMessageStyle() {
     }
 }
 
+void LvglDisplay::initSpeakerDropdownOptions() {
+    if (xSemaphoreTake(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
+        lv_dropdown_set_options(guider_ui.speaker_setting_ddlist_1, "婉婉（温柔女声）");
+        lv_dropdown_set_options(guider_ui.speaker_setting_ddlist_2, "开心");
+        xSemaphoreGive(lvglUpdateLock);
+    }
+}
+
 void LvglDisplay::begin() {
     lv_init();
     tft.begin();
@@ -100,6 +108,7 @@ void LvglDisplay::begin() {
     setup_ui(&guider_ui);
     events_init(&guider_ui);
     initMessageStyle();
+    initSpeakerDropdownOptions();
 
     xTaskCreate([](void *ptr) {
         while (true) {

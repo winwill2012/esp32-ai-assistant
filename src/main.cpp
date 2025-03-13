@@ -3,14 +3,12 @@
 #include <utils.h>
 #include <driver/i2s.h>
 #include "Arduino.h"
-#include "WiFi.h"
 #include "DoubaoTTS.h"
 #include "DoubaoSTT.h"
 #include "Recording.h"
 #include "LvglDisplay.h"
 #include "TimeUpdater.h"
 #include "AudioPlayer.h"
-#include "GlobalState.h"
 
 #define HOST "openspeech.bytedance.com"
 #define APP_ID "8988564775"
@@ -25,8 +23,7 @@ DoubaoTTS ttsClient(APP_ID, ACCESS_TOKEN, HOST, 443, "/api/v1/tts/ws_binary");
 CozeLLMAgent llmAgent(ttsClient, "https://api.coze.cn/v3/chat?conversation_id=", "7468218438402818082",
                       "pat_A5RMsa9C3wavFPz9BiTHnQtm0G3AmYZkhSSZ5vkHANDKWnX1yyx7wss7hsAnUMt4");
 
-DoubaoSTT sttClient(llmAgent, I2S_NUM_1, APP_ID, ACCESS_TOKEN,
-                    HOST, 443, "/api/v2/asr", 1, 42, 2);
+DoubaoSTT sttClient(llmAgent, APP_ID, ACCESS_TOKEN, HOST, 443, "/api/v2/asr");
 
 RecordingManager recordingManager(sttClient);
 

@@ -3,17 +3,21 @@
 
 #include "DoubaoSTT.h"
 
+#define MICROPHONE_I2S_NUM          I2S_NUM_1
+#define AUDIO_SAMPLE_RATE           16000
+#define AUDIO_RECORDING_BUFFER_SIZE 4000 // 125ms音频数据
+#define MICROPHONE_I2S_BCLK         42
+#define MICROPHONE_I2S_LRC          2
+#define MICROPHONE_I2S_DOUT         1
+
 class RecordingManager {
 public:
-    explicit RecordingManager(DoubaoSTT sttClient);
-
-    ~RecordingManager();
+    RecordingManager(DoubaoSTT sttClient);
 
     [[noreturn]] void begin();
 
 private:
     DoubaoSTT _sttClient;
-    size_t _recordingBufferSize;
     std::vector<uint8_t> _recordingBuffer;
     std::vector<uint8_t> _lastRecordingBuffer;
 };

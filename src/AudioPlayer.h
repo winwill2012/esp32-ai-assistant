@@ -3,7 +3,7 @@
 
 #include "Arduino.h"
 
-#define I2S_NUM           I2S_NUM_0
+#define MAX98357_I2S_NUM  I2S_NUM_0
 #define SAMPLE_RATE       16000
 #define MAX98357_DOUT     38
 #define MAX98357_LRC      40

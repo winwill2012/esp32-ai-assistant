@@ -14,11 +14,8 @@ constexpr byte DefaultLastAudioWsHeader[] = {0x11, 0x22, 0x10, 0x00};
 
 class DoubaoSTT : public WebSocketsClient {
 public:
-    DoubaoSTT(const CozeLLMAgent &llmAgent, i2s_port_t i2SPort, const String &appId, const String &token,
-              const String &host,
-              int port, const String &url, int i2sDout, int i2sBclk, int i2sLrc);
-
-    void setupINMP441() const;
+    DoubaoSTT(const CozeLLMAgent &llmAgent, const String &appId, const String &token,
+              const String &host, int port, const String &url);
 
     void eventCallback(WStype_t type, uint8_t *payload, size_t length);
 
@@ -32,8 +29,6 @@ public:
 
     void recognize(uint8_t *audio, size_t size, bool firstPacket, bool lastPacket);
 
-    i2s_port_t getI2sNumber() const;
-
 private:
     String _appId;
     String _token;
@@ -42,11 +37,7 @@ private:
     String _url;
     String _voiceType;
     String _emotion;
-    i2s_port_t _i2sNumber;
     CozeLLMAgent _llmAgent;
-    int _i2sDout;
-    int _i2sBclk;
-    int _i2sLrc;
     bool _firstPacket;
     SemaphoreHandle_t _taskFinished;
     std::vector<uint8_t> _requestBuilder;

@@ -10,7 +10,7 @@ class DoubaoTTS : public WebSocketsClient {
 public:
     DoubaoTTS(const String &appId, const String &token, const String &host, int port, const String &url);
 
-    void eventCallback(WStype_t type, uint8_t *payload, size_t length);
+    void eventCallback(WStype_t type, uint8_t *payload, size_t length) const;
 
     void begin();
 

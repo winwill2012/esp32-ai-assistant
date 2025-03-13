@@ -2,27 +2,21 @@
 #include "Utils.h"
 #include <Arduino.h>
 #include <CozeLLMAgent.h>
+#include <Recording.h>
 #include <vector>
 #include "LvglDisplay.h"
 
-#define AUDIO_SAMPLE_RATE 16000
-
-DoubaoSTT::DoubaoSTT(const CozeLLMAgent &llmAgent, i2s_port_t i2sNumber, const String &appId, const String &token,
-                     const String &host, int port, const String &url, int i2sDout, int i2sBclk, int i2sLrc)
+DoubaoSTT::DoubaoSTT(const CozeLLMAgent &llmAgent, const String &appId, const String &token,
+                     const String &host, int port, const String &url)
     : _llmAgent(llmAgent) {
-    _i2sNumber = i2sNumber;
     _appId = appId;
     _token = token;
     _host = host;
     _port = port;
     _url = url;
-    _i2sDout = i2sDout;
-    _i2sBclk = i2sBclk;
-    _i2sLrc = i2sLrc;
     _requestBuilder = std::vector<uint8_t>();
     _taskFinished = xSemaphoreCreateBinary();
     _firstPacket = true;
-    setupINMP441();
     begin();
 }
 
@@ -53,29 +47,6 @@ void DoubaoSTT::begin() {
     });
 }
 
-void DoubaoSTT::setupINMP441() const {
-    constexpr i2s_config_t i2s_config = {
-        .mode = static_cast<i2s_mode_t>(I2S_MODE_MASTER | I2S_MODE_RX),
-        .sample_rate = AUDIO_SAMPLE_RATE,
-        .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
-        .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
-        .communication_format = I2S_COMM_FORMAT_STAND_I2S,
-        .intr_alloc_flags = 0,
-        .dma_buf_count = 8,
-        .dma_buf_len = 1024,
-        .use_apll = true
-    };
-    const i2s_pin_config_t pin_config = {
-        .bck_io_num = _i2sBclk,
-        .ws_io_num = _i2sLrc,
-        .data_out_num = -1,
-        .data_in_num = _i2sDout
-    };
-
-    i2s_driver_install(_i2sNumber, &i2s_config, 0, nullptr);
-    i2s_set_pin(_i2sNumber, &pin_config);
-    i2s_zero_dma_buffer(_i2sNumber);
-}
 
 void DoubaoSTT::buildFullClientRequest() {
     JsonDocument doc;
@@ -217,8 +188,4 @@ void DoubaoSTT::parseResponse(const uint8_t *response) {
             break;
         }
     }
-}
-
-i2s_port_t DoubaoSTT::getI2sNumber() const {
-    return _i2sNumber;
 }

@@ -157,7 +157,6 @@ void setup_scr_speaker_setting(lv_ui *ui)
 
     //Write codes speaker_setting_ddlist_1
     ui->speaker_setting_ddlist_1 = lv_dropdown_create(ui->speaker_setting);
-    lv_dropdown_set_options(ui->speaker_setting_ddlist_1, "婉婉（温柔女声）");
     lv_obj_set_pos(ui->speaker_setting_ddlist_1, 92, 260);
     lv_obj_set_size(ui->speaker_setting_ddlist_1, 213, 33);
 
@@ -222,7 +221,6 @@ void setup_scr_speaker_setting(lv_ui *ui)
 
     //Write codes speaker_setting_ddlist_2
     ui->speaker_setting_ddlist_2 = lv_dropdown_create(ui->speaker_setting);
-    lv_dropdown_set_options(ui->speaker_setting_ddlist_2, "开心");
     lv_obj_set_pos(ui->speaker_setting_ddlist_2, 92, 336);
     lv_obj_set_size(ui->speaker_setting_ddlist_2, 213, 33);
 

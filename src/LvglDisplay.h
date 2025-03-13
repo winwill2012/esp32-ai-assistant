@@ -25,6 +25,7 @@ public:
     static void updateRecordingButtonState(bool recordingAllowed);
     static void updateRecordingButtonImage(bool isPlaying);
     static void initMessageStyle();
+    static void initSpeakerDropdownOptions();
 
 private:
     static lv_style_t *message_style_robot;
