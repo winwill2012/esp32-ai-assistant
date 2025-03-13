@@ -16,7 +16,7 @@ public:
 
     String buildFullClientRequest(const String &text) const;
 
-    void parseResponse(uint8_t *response);
+    void parseResponse(const uint8_t *response) const;
 
     void synth(const String &text);
 

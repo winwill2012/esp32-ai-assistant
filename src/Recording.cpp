@@ -3,7 +3,6 @@
 #include <utility>
 #include "Utils.h"
 #include "GlobalState.h"
-#include "AudioPlayer.h"
 
 RecordingManager::RecordingManager(DoubaoSTT sttClient) : _sttClient(std::move(sttClient)) {
     _recordingBufferSize = 4000; // 125ms的音频数据

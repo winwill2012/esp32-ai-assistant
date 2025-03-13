@@ -2,12 +2,12 @@
 #define ESP32_AI_ASSISTANT_AUDIOPLAYER_H
 
 #include "Arduino.h"
-#include "driver/i2s.h"
 
-#define SAMPLE_RATE 16000
-#define MAX98357_DOUT  38
-#define MAX98357_LRC   40
-#define MAX98357_BCLK  39
+#define I2S_NUM           I2S_NUM_0
+#define SAMPLE_RATE       16000
+#define MAX98357_DOUT     38
+#define MAX98357_LRC      40
+#define MAX98357_BCLK     39
 
 struct PlayAudioTask {
     size_t length;
@@ -16,23 +16,14 @@ struct PlayAudioTask {
 
 class AudioPlayer {
 public:
-    static AudioPlayer &getInstance();
+    static void begin();
 
-    void begin();
+    static void publishTask(PlayAudioTask task);
 
-    void publishTask(PlayAudioTask task);
-
-    QueueHandle_t getTaskQueue();
+    static QueueHandle_t getTaskQueue();
 
 private:
-    AudioPlayer();
-
-    AudioPlayer(const AudioPlayer &) = delete;
-
-    AudioPlayer &operator=(const AudioPlayer &) = delete;
-
-    static AudioPlayer instance;
-    QueueHandle_t _taskQueue;
+    static QueueHandle_t _taskQueue;
 };
 
 

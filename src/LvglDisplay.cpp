@@ -45,10 +45,10 @@ lv_style_t *LvglDisplay::message_style_robot = static_cast<lv_style_t *>(malloc(
 lv_style_t *LvglDisplay::message_style_user = static_cast<lv_style_t *>(malloc(sizeof(lv_style_t)));
 lv_obj_t *LvglDisplay::last_message;
 int LvglDisplay::current_message_number = 0;
-SemaphoreHandle_t LvglDisplay::lvglMutex = xSemaphoreCreateMutex();
+SemaphoreHandle_t LvglDisplay::lvglUpdateLock = xSemaphoreCreateMutex();
 
 void LvglDisplay::initMessageStyle() {
-    if (xSemaphoreTake(lvglMutex, portMAX_DELAY) == pdTRUE) {
+    if (xSemaphoreTake(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
         lv_style_init(message_style_robot);
         lv_style_init(message_style_user);
 
@@ -66,7 +66,7 @@ void LvglDisplay::initMessageStyle() {
 
         lv_style_set_bg_opa(message_style_robot, 0);
         lv_style_set_bg_opa(message_style_user, 0);
-        xSemaphoreGive(lvglMutex);
+        xSemaphoreGive(lvglUpdateLock);
     }
 }
 
@@ -75,10 +75,10 @@ void LvglDisplay::begin() {
     tft.begin();
     ts.begin();
 
-    static auto *buf1 = static_cast<lv_color_t *>(heap_caps_malloc(DRAW_BUF_SIZE * sizeof(lv_color_t),
-                                                                   MALLOC_CAP_SPIRAM));
+    static auto *buf1 = static_cast<lv_color_t *>(ps_malloc(DRAW_BUF_SIZE * sizeof(lv_color_t)));
     if (buf1 == nullptr) {
-        log_e("分配buf1内存失败");
+        log_e("Lvgl display buffer malloc failed!");
+        ESP.restart();
     }
     lv_disp_draw_buf_init(&draw_buf, buf1, nullptr, DRAW_BUF_SIZE);
 
@@ -103,22 +103,22 @@ void LvglDisplay::begin() {
 
     xTaskCreate([](void *ptr) {
         while (true) {
-            if (xSemaphoreTake(lvglMutex, portMAX_DELAY) == pdTRUE) {
+            if (xSemaphoreTake(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
                 lv_timer_handler();
-                xSemaphoreGive(lvglMutex);
+                xSemaphoreGive(lvglUpdateLock);
             }
             vTaskDelay(5);
         }
-    }, "lvgl", 4096, nullptr, 1, nullptr);
+    }, "lvgl-updater", 4096, nullptr, 1, nullptr);
 }
 
 // 更新首页聊天列表
-void LvglDisplay::updateChatText(MessageRole messageRole, bool newLine, const std::string &text) {
-    if (xSemaphoreTake(lvglMutex, portMAX_DELAY) == pdTRUE) {
+void LvglDisplay::updateChatText(const MessageRole messageRole, const bool newLine, const std::string &text) {
+    if (xSemaphoreTake(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
         if (!newLine && last_message != nullptr) {
             lv_label_set_text(last_message, text.c_str());
             lv_obj_scroll_to_y(guider_ui.home_page_message_list, LV_COORD_MAX, LV_ANIM_ON);
-            xSemaphoreGive(lvglMutex);
+            xSemaphoreGive(lvglUpdateLock);
             return;
         }
         last_message = lv_list_add_text(guider_ui.home_page_message_list, text.c_str());
@@ -137,54 +137,54 @@ void LvglDisplay::updateChatText(MessageRole messageRole, bool newLine, const st
             }
         }
         lv_obj_scroll_to_y(guider_ui.home_page_message_list, LV_COORD_MAX, LV_ANIM_ON);
-        xSemaphoreGive(lvglMutex);
+        xSemaphoreGive(lvglUpdateLock);
     }
 }
 
 void LvglDisplay::updateState(const std::string &state) {
-    if (xSemaphoreTake(lvglMutex, portMAX_DELAY) == pdTRUE) {
+    if (xSemaphoreTake(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
         lv_label_set_text(guider_ui.home_page_header_state, state.c_str());
-        xSemaphoreGive(lvglMutex);
+        xSemaphoreGive(lvglUpdateLock);
     }
 }
 
 void LvglDisplay::updateTime(const std::string &time) {
-    if (xSemaphoreTake(lvglMutex, portMAX_DELAY) == pdTRUE) {
+    if (xSemaphoreTake(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
         lv_label_set_text(guider_ui.home_page_header_time, time.c_str());
-        xSemaphoreGive(lvglMutex);
+        xSemaphoreGive(lvglUpdateLock);
     }
 }
 
 void LvglDisplay::updateWifiState(bool success) {
-    if (xSemaphoreTake(lvglMutex, portMAX_DELAY) == pdTRUE) {
+    if (xSemaphoreTake(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
         if (success) {
             lv_obj_add_flag(guider_ui.home_page_header_wifi_no, LV_OBJ_FLAG_HIDDEN);
         } else {
             lv_obj_clear_flag(guider_ui.home_page_header_wifi_no, LV_OBJ_FLAG_HIDDEN);
         }
-        xSemaphoreGive(lvglMutex);
+        xSemaphoreGive(lvglUpdateLock);
     }
 }
 
 void LvglDisplay::updateRecordingButtonState(bool recordingAllowed) {
-    if (xSemaphoreTake(lvglMutex, portMAX_DELAY) == pdTRUE) {
+    if (xSemaphoreTake(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
         if (recordingAllowed) {
             lv_obj_add_flag(guider_ui.home_page_line_stop_recording, LV_OBJ_FLAG_HIDDEN);
         } else {
             lv_obj_clear_flag(guider_ui.home_page_line_stop_recording, LV_OBJ_FLAG_HIDDEN);
         }
-        xSemaphoreGive(lvglMutex);
+        xSemaphoreGive(lvglUpdateLock);
     }
 }
 
 void LvglDisplay::updateRecordingButtonImage(bool isPlaying) {
-    if (xSemaphoreTake(lvglMutex, portMAX_DELAY) == pdTRUE) {
+    if (xSemaphoreTake(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
         if (isPlaying) {
             lv_img_set_src(guider_ui.home_page_microphone, &_stop_alpha_40x40);
             lv_obj_add_flag(guider_ui.home_page_line_stop_recording, LV_OBJ_FLAG_HIDDEN);
         } else {
             lv_img_set_src(guider_ui.home_page_microphone, &_micphone_alpha_40x40);
         }
-        xSemaphoreGive(lvglMutex);
+        xSemaphoreGive(lvglUpdateLock);
     }
 }

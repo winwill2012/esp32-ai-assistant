@@ -35,7 +35,7 @@ void GlobalState::setState(MachineState state) {
             LvglDisplay::updateRecordingButtonState(true);
             LvglDisplay::updateRecordingButtonImage(false);
             break;
-        case Thingking:
+        case Thinking:
             LvglDisplay::updateState("正在思考...");
             LvglDisplay::updateRecordingButtonState(false);
             break;

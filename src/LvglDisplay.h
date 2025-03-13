@@ -31,7 +31,7 @@ private:
     static lv_style_t *message_style_user;
     static lv_obj_t *last_message;
     static int current_message_number;
-    static SemaphoreHandle_t lvglMutex;
+    static SemaphoreHandle_t lvglUpdateLock;
 };
 
 

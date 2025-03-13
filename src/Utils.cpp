@@ -2,10 +2,11 @@
 #include "utils.h"
 #include "arduinoFFT.h"
 
+auto charset = "0123456789abcdef";
+
 std::string generateTaskId() {
     randomSeed(millis());
-    char uuid[33]; // 32个字符 + 1个结束符
-    const char *charset = "0123456789abcdef";
+    char uuid[33];
     for (int i = 0; i < 32; i++) {
         uuid[i] = charset[random(16)];
     }
@@ -27,7 +28,7 @@ std::string parseString(const uint8_t *bytes, const uint32_t length) {
 
 std::string getChipId(const char *prefix) {
     std::string content{prefix ? prefix : ""};
-    std::size_t size = content.length();
+    const std::size_t size = content.length();
     content.resize(size + 12); // mac 地址 6 * 2
     uint8_t buffer[6];
     esp_efuse_mac_get_default(buffer);
@@ -54,42 +55,9 @@ double calculateSoundRMS(const uint8_t *buffer, const size_t bufferSize) {
         const auto sample = static_cast<int16_t>((buffer[i] << 8) | buffer[i + 1]);
         sumSquares += (sample * sample);
     }
-    double rms = sqrt(sumSquares * 2 / bufferSize);
-    //    Serial.printf("rms = %f\n", rms);
-    return rms;
+    return sqrt(sumSquares * 2 / bufferSize);
 }
 
-// 判断是否有人声的工具函数
-//bool detectVoice(uint8_t *buff, size_t sampleSize, int samplingFrequency) {
-//    unsigned long start = millis();
-//    float vReal[sampleSize];
-//    float vImag[sampleSize];
-//    for (int i = 0; i < sampleSize; i++) {
-//        vReal[i] = static_cast<float>(buff[i * 2] | (buff[i * 2 + 1] << 8));
-//        vImag[i] = 0.0;
-//    }
-//    ArduinoFFT<float> FFT = ArduinoFFT<float>(vReal, vImag, sampleSize, samplingFrequency, true);
-//    FFT.windowing(FFT_WIN_TYP_HAMMING, FFT_FORWARD);
-//    FFT.compute(FFT_FORWARD);
-//    FFT.complexToMagnitude();
-//
-//    // 人声频率范围（300Hz - 3400Hz）
-//    int minIndex = 300 * sampleSize / samplingFrequency;
-//    int maxIndex = 3400 * sampleSize / samplingFrequency;
-//
-//    // 设定幅度阈值
-//    float threshold = 20000.0;
-//
-//    // 检查人声频率范围内的幅度
-//    for (int i = minIndex; i < maxIndex; i++) {
-//        if (vReal[i] > threshold) {
-//            Serial.printf("计算时间: %lu\n", millis() - start);
-//            return true; // 有人声
-//        }
-//    }
-//    Serial.printf("计算时间: %lu\n", millis() - start);
-//    return false; // 无人声
-//}
 
 std::pair<int, size_t> findMinIndexOfDelimiter(const String &input) {
     // 定义需要处理的中英文标点集合

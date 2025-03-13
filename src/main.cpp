@@ -32,7 +32,6 @@ RecordingManager recordingManager(sttClient);
 void setup() {
     Serial.begin(115200);
     Settings::begin();
-    Settings::setEmotion("pleased");
     LvglDisplay::begin();
 
     GlobalState::setState(NetworkConnecting);
@@ -44,9 +43,9 @@ void setup() {
         vTaskDelay(1000);
     }
     GlobalState::setState(NetworkConnected);
-    Serial.println("连接网络成功");
+    log_i("Network connect successfully!");
     TimeUpdater::begin();
-    AudioPlayer::getInstance().begin();
+    AudioPlayer::begin();
     recordingManager.begin();
 }
 

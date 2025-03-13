@@ -1,4 +1,8 @@
 #include "TimeUpdater.h"
+
+#include <NTPClient.h>
+#include <WiFiUdp.h>
+
 #include "LvglDisplay.h"
 
 WiFiUDP ntpUDP;
@@ -8,7 +12,7 @@ int lastMinute = -1;
 // 上次更新NTP时间的时间戳
 unsigned long lastUpdateTime = 0;
 // NTP更新间隔（毫秒），这里设置为1分钟
-const unsigned long updateInterval = 60 * 1000;
+constexpr unsigned long updateInterval = 60 * 1000;
 // 本地时钟起始时间戳
 unsigned long localTimeStart = 0;
 // 从NTP获取的起始时间（秒）

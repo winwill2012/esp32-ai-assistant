@@ -1,23 +1,24 @@
 #include "CozeLLMAgent.h"
 #include <HTTPClient.h>
-#include <PsramJson.h>
 #include <utility>
 #include "Utils.h"
 #include "GlobalState.h"
 #include "LvglDisplay.h"
 
 CozeLLMAgent::CozeLLMAgent(DoubaoTTS tts, const String &url, const String &botId, const String &token) : _tts(
-        std::move(tts)) {
+    std::move(tts)) {
     _url = url;
     _botId = botId;
     _token = token;
     _state = Init;
+    _firstPacket = true;
 }
 
 CozeLLMAgent::~CozeLLMAgent() = default;
 
 void CozeLLMAgent::begin(const String &input) {
-    GlobalState::setState(Thingking);
+    log_d("Ready to send query to coze agent: %s", input.c_str());
+    GlobalState::setState(Thinking);
     reset();
     HTTPClient http;
     http.begin(_url + GlobalState::getConversationId());
@@ -52,35 +53,23 @@ void CozeLLMAgent::begin(const String &input) {
             }
         }
     } else {
-        Serial.print("LLM调用失败: ");
-        Serial.println(httpResponseCode);
+        log_e("Send query to coze agent error: %s", httpResponseCode);
     }
     http.end();
 }
 
-void CozeLLMAgent::show() const {
-    Serial.println("-----------LLMAgent调用结果--------------------");
-    Serial.printf("    state = %d\n", _state);
-    Serial.printf(" response = %s\n", _response.c_str());
-    Serial.printf("ttsBuffer = %s\n", _ttsTextBuffer.c_str());
-    Serial.printf("      cmd = %s\n", _cmd.c_str());
-    Serial.printf("  content = %s\n", _content.c_str());
-    Serial.println("-----------------------------------------------");
-}
-
 CozeLLMAgent::LLMState CozeLLMAgent::ProcessStreamOutput(String data) {
+    log_d("Process coze agent response fragment: %s", line.c_str());
     // 只处理data开头，并且是助手回答的数据类型
     if (!data.startsWith("data:") || data.indexOf(R"("role":"assistant","type":"answer")") < 0) {
         return _state;
     }
     data.replace("data:", "");
-    log_d("处理LLM返回数据: %s", data.c_str());
     JsonDocument document;
     document.clear();
     const DeserializationError error = deserializeJson(document, data);
     if (error != DeserializationError::Ok) {
-        Serial.printf("反序列化大模型返回结果失败: ");
-        Serial.println(data);
+        log_e("Deserialization coze agent response error: %s", data.c_str());
         return _state;
     }
     String content = document["content"];
