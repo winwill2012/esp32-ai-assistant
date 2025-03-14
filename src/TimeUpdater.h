@@ -4,11 +4,6 @@
 class TimeUpdater {
 public:
     static void begin();
-
-private:
-    TimeUpdater();
-
-    ~TimeUpdater();
 };
 
 

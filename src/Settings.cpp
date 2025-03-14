@@ -14,7 +14,7 @@ void Settings::begin() {
     preferences.begin(SETTINGS_NAMESPACE, false);
     _volumeRatio = preferences.getFloat(SETTING_VOLUME_RATIO, 1.0);
     _speedRatio = preferences.getFloat(SETTING_SPEED_RATIO, 1.0);
-    _voiceType = preferences.getString(SETTING_VOICE_TYPE, "BV700_streaming");
+    _voiceType = preferences.getString(SETTING_VOICE_TYPE, "zh_female_wanwanxiaohe_moon_bigtts");
     _emotion = preferences.getString(SETTING_EMOTION, "pleased");
     _backgroundNoiseRMS = preferences.getDouble(SETTING_BACKGROUND_NOISE_RMS, 4500);
     _recordingSilenceTime = preferences.getInt(SETTING_RECORDING_SILENCE_TIME, 1000);

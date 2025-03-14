@@ -1,59 +1,26 @@
 #include "TimeUpdater.h"
-
 #include <NTPClient.h>
 #include <WiFiUdp.h>
-
 #include "LvglDisplay.h"
 
 WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP, "pool.ntp.org");
-// 上一次的分钟数
-int lastMinute = -1;
-// 上次更新NTP时间的时间戳
-unsigned long lastUpdateTime = 0;
-// NTP更新间隔（毫秒），这里设置为1分钟
-constexpr unsigned long updateInterval = 60 * 1000;
-// 本地时钟起始时间戳
-unsigned long localTimeStart = 0;
-// 从NTP获取的起始时间（秒）
-unsigned long ntpStartTime = 0;
+NTPClient timeClient(ntpUDP, "time1.aliyun.com");
+unsigned long lastMinute = -1;
 
 void TimeUpdater::begin() {
     timeClient.begin();
     timeClient.setTimeOffset(28800); // 设置时区，这里是北京时间（UTC+8），8 * 60 * 60 = 28800
-
-    // 首次获取NTP时间
-    timeClient.update();
-    ntpStartTime = timeClient.getEpochTime(); // 获取秒级时间戳
-    localTimeStart = millis();
-    lastUpdateTime = millis();
-
     xTaskCreate([](void *ptr) {
         while (true) {
-            unsigned long currentTime = millis();
-            if (currentTime - lastUpdateTime >= updateInterval) {
-                timeClient.update();
-                ntpStartTime = timeClient.getEpochTime();
-                localTimeStart = millis();
-                lastUpdateTime = currentTime;
-            }
-
-            // 计算本地时钟的当前时间（秒）
-            unsigned long localEpochTime = ntpStartTime + (currentTime - localTimeStart) / 1000;
-
-            // 获取当前小时和分钟
-            int currentHour = (localEpochTime % 86400) / 3600;
-            int currentMinute = (localEpochTime % 3600) / 60;
-
-            // 检查分钟是否变化
+            timeClient.update(); // update函数内部做了更新间隔检测，并不会每一次都从网络获取时间
+            const unsigned long localEpochTime = timeClient.getEpochTime();
+            const unsigned long currentHour = (localEpochTime % 86400) / 3600;
+            const unsigned long currentMinute = (localEpochTime % 3600) / 60;
             if (currentMinute != lastMinute) {
-                log_d("当前分钟: %d, 上一次分钟: %d", currentMinute, lastMinute);
-                lastMinute = currentMinute;
-
-                // 格式化时间字符串
                 char timeStr[6];
                 snprintf(timeStr, sizeof(timeStr), "%02d:%02d", currentHour, currentMinute);
                 LvglDisplay::updateTime(timeStr);
+                lastMinute = currentMinute;
             }
             vTaskDelay(pdMS_TO_TICKS(1000));
         }

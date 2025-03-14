@@ -10,11 +10,9 @@ void playAudio(void *ptr) {
     while (true) {
         if (xQueueReceive(AudioPlayer::getTaskQueue(), &task, portMAX_DELAY) == pdPASS) {
             GlobalState::setState(Playing);
-            esp_err_t result = i2s_write(MAX98357_I2S_NUM, task.data, task.length, &bytes_written, portMAX_DELAY);
+            const esp_err_t result = i2s_write(MAX98357_I2S_NUM, task.data, task.length, &bytes_written, portMAX_DELAY);
             if (result != ESP_OK) {
-                log_e("播放音频失败, 错误码: %d", result);
-            } else {
-                log_d("播放音频成功: %d", task.length);
+                log_e("Play audio failed, errorCode: %d", result);
             }
             free(task.data);
             // 语音已经播放完成，并且队列里面没有数据，则进入监听模式
