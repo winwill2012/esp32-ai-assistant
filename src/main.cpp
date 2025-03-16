@@ -17,7 +17,6 @@
 void setup() {
     Serial.begin(115200);
     Settings::begin();
-    Settings::setCurrentSpeakVolumeRatio(10);
     LvglDisplay::begin();
 
     DoubaoTTS ttsClient;

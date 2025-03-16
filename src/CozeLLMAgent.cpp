@@ -36,6 +36,7 @@ void CozeLLMAgent::begin(const String &input) {
     std::string requestBodyStr;
     serializeJson(requestBody, requestBodyStr);
     int httpResponseCode = http.POST(requestBodyStr.c_str());
+    String lastEvent;
     if (httpResponseCode > 0) {
         WiFiClient *stream = http.getStreamPtr();
         String line = "";
@@ -43,7 +44,8 @@ void CozeLLMAgent::begin(const String &input) {
             if (stream->available()) {
                 line = stream->readStringUntil('\n');
                 if (!line.isEmpty()) {
-                    if (line.indexOf("conversation.message.completed") > 0) {
+                    if (line.compareTo("event:conversation.message.completed") == 0
+                        && lastEvent.compareTo("event:conversation.message.delta") == 0) {
                         if (_ttsTextBuffer != "") {
                             _tts.synth(_ttsTextBuffer, true);
                         } else {
@@ -52,6 +54,9 @@ void CozeLLMAgent::begin(const String &input) {
                         break;
                     }
                     ProcessStreamOutput(line);
+                    if (line.startsWith("event:")) {
+                        lastEvent = line;
+                    }
                 }
             }
         }
@@ -62,7 +67,7 @@ void CozeLLMAgent::begin(const String &input) {
 }
 
 void CozeLLMAgent::ProcessStreamOutput(String data) {
-    log_d("Process coze agent response fragment: %s", data.c_str());
+    log_v("Process coze agent response fragment: %s", data.c_str());
     // 只处理data开头，并且是助手回答的数据类型
     if (!data.startsWith("data:") || data.indexOf(R"("role":"assistant","type":"answer")") < 0) {
         return;

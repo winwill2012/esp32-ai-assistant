@@ -35,3 +35,7 @@ void set_environment_noise(const char *noise) {
 void set_speak_pause_duration(int duration) {
     Settings::setSpeakPauseDuration(duration);
 }
+
+void load_wifi_list(bool refresh) {
+    LvglDisplay::loadWifiList(refresh);
+}

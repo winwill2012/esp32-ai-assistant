@@ -110,8 +110,24 @@ static void network_setting_imgbtn_back_event_handler(lv_event_t *e) {
     }
 }
 
+static void network_setting_animimg_refresh_event_handler (lv_event_t *e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    switch (code) {
+        case LV_EVENT_CLICKED:
+        {
+            lv_animimg_start(guider_ui.network_setting_animimg_refresh);
+            load_wifi_list(true);
+            break;
+        }
+        default:
+            break;
+    }
+}
+
 void events_init_network_setting(lv_ui *ui) {
     lv_obj_add_event_cb(ui->network_setting_imgbtn_back, network_setting_imgbtn_back_event_handler, LV_EVENT_ALL, ui);
+    lv_obj_add_event_cb(ui->network_setting_animimg_refresh, network_setting_animimg_refresh_event_handler, LV_EVENT_ALL, ui);
 }
 
 static void speaker_setting_imgbtn_back_event_handler(lv_event_t *e) {

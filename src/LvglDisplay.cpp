@@ -70,6 +70,7 @@ void LvglDisplay::initMessageStyle() {
     }
 }
 
+
 // 这个函数是在lvgl线程中调用的，无需加锁
 void LvglDisplay::loadSpeakerSettingData() {
     const std::map<std::string, std::string> &voiceMap = Settings::getVoiceMap();
@@ -96,10 +97,15 @@ void LvglDisplay::loadSpeakerSettingData() {
     }
     personaList.pop_back();
     lv_dropdown_set_options(guider_ui.speaker_setting_voice_type, voiceList.c_str());
+    lv_dropdown_set_symbol(guider_ui.speaker_setting_voice_type, LV_SYMBOL_DOWN);
     lv_dropdown_set_selected(guider_ui.speaker_setting_voice_type, selectedVoiceIndex);
+
     lv_dropdown_set_options(guider_ui.speaker_setting_persona, personaList.c_str());
+    lv_dropdown_set_symbol(guider_ui.speaker_setting_persona, LV_SYMBOL_DOWN);
     lv_dropdown_set_selected(guider_ui.speaker_setting_persona, selectedPersonaIndex);
+
     lv_dropdown_set_options(guider_ui.speaker_setting_environment_noise, "安静\n一般\n嘈杂");
+    lv_dropdown_set_symbol(guider_ui.speaker_setting_environment_noise, LV_SYMBOL_DOWN);
     if (Settings::getRecordingRmsThreshold() == 4500) {
         lv_dropdown_set_selected(guider_ui.speaker_setting_environment_noise, 0);
     } else if (Settings::getRecordingRmsThreshold() == 6000) {
@@ -227,5 +233,14 @@ void LvglDisplay::updateRecordingButtonImage(bool isPlaying) {
             lv_img_set_src(guider_ui.home_page_microphone, &_micphone_alpha_40x40);
         }
         xSemaphoreGive(lvglUpdateLock);
+    }
+}
+
+void LvglDisplay::loadWifiList(bool refresh) {
+    const std::vector<WifiInfo> &list = Settings::getWifiList(refresh);
+    log_d("load wifi list: ");
+    for (const auto &wifi: list) {
+        log_d("wifi name: %s", wifi._ssid.c_str());
+        lv_list_add_btn(guider_ui.network_setting_list_1, LV_SYMBOL_WIFI, wifi._ssid.c_str());
     }
 }

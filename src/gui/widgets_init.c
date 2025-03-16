@@ -14,22 +14,21 @@
 #include <string.h>
 
 
-__attribute__((unused)) void kb_event_cb (lv_event_t *e) {
+__attribute__((unused)) void kb_event_cb(lv_event_t *e) {
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t *kb = lv_event_get_target(e);
-    if(code == LV_EVENT_READY || code == LV_EVENT_CANCEL) {
+    if (code == LV_EVENT_READY || code == LV_EVENT_CANCEL) {
         lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
     }
 }
 
-__attribute__((unused)) void ta_event_cb (lv_event_t *e) {
+__attribute__((unused)) void ta_event_cb(lv_event_t *e) {
     lv_event_code_t code = lv_event_get_code(e);
 #if LV_USE_KEYBOARD || LV_USE_ZH_KEYBOARD
     lv_obj_t *ta = lv_event_get_target(e);
 #endif
     lv_obj_t *kb = lv_event_get_user_data(e);
-    if (code == LV_EVENT_FOCUSED || code == LV_EVENT_CLICKED)
-    {
+    if (code == LV_EVENT_FOCUSED || code == LV_EVENT_CLICKED) {
 #if LV_USE_ZH_KEYBOARD != 0
         lv_zh_keyboard_set_textarea(kb, ta);
 #endif
@@ -39,8 +38,7 @@ __attribute__((unused)) void ta_event_cb (lv_event_t *e) {
         lv_obj_move_foreground(kb);
         lv_obj_clear_flag(kb, LV_OBJ_FLAG_HIDDEN);
     }
-    if (code == LV_EVENT_CANCEL || code == LV_EVENT_DEFOCUSED)
-    {
+    if (code == LV_EVENT_CANCEL || code == LV_EVENT_DEFOCUSED) {
 
 #if LV_USE_ZH_KEYBOARD != 0
         lv_zh_keyboard_set_textarea(kb, ta);
@@ -76,32 +74,36 @@ void clock_count(int *hour, int *min, int *sec)
 }
 #endif
 
-void lv_speaker_setting_speed_increment_event_cb(lv_event_t * event)
-{
+const lv_img_dsc_t *network_setting_animimg_refresh_imgs[3] = {
+        &network_setting_animimg_refreshrefresh_1,
+        &network_setting_animimg_refreshrefresh_2,
+        &network_setting_animimg_refreshrefresh_3,
+};
+
+void lv_speaker_setting_speed_increment_event_cb(lv_event_t *event) {
     lv_event_code_t code = lv_event_get_code(event);
-    if(code == LV_EVENT_SHORT_CLICKED || code == LV_EVENT_LONG_PRESSED_REPEAT) {
+    if (code == LV_EVENT_SHORT_CLICKED || code == LV_EVENT_LONG_PRESSED_REPEAT) {
         lv_spinbox_increment(guider_ui.speaker_setting_speed);
     }
 }
-void lv_speaker_setting_speed_decrement_event_cb(lv_event_t * event)
-{
+
+void lv_speaker_setting_speed_decrement_event_cb(lv_event_t *event) {
     lv_event_code_t code = lv_event_get_code(event);
-    if(code == LV_EVENT_SHORT_CLICKED || code == LV_EVENT_LONG_PRESSED_REPEAT) {
+    if (code == LV_EVENT_SHORT_CLICKED || code == LV_EVENT_LONG_PRESSED_REPEAT) {
         lv_spinbox_decrement(guider_ui.speaker_setting_speed);
     }
 }
 
-void lv_speaker_setting_recording_pause_increment_event_cb(lv_event_t * event)
-{
+void lv_speaker_setting_recording_pause_increment_event_cb(lv_event_t *event) {
     lv_event_code_t code = lv_event_get_code(event);
-    if(code == LV_EVENT_SHORT_CLICKED || code == LV_EVENT_LONG_PRESSED_REPEAT) {
+    if (code == LV_EVENT_SHORT_CLICKED || code == LV_EVENT_LONG_PRESSED_REPEAT) {
         lv_spinbox_increment(guider_ui.speaker_setting_recording_pause);
     }
 }
-void lv_speaker_setting_recording_pause_decrement_event_cb(lv_event_t * event)
-{
+
+void lv_speaker_setting_recording_pause_decrement_event_cb(lv_event_t *event) {
     lv_event_code_t code = lv_event_get_code(event);
-    if(code == LV_EVENT_SHORT_CLICKED || code == LV_EVENT_LONG_PRESSED_REPEAT) {
+    if (code == LV_EVENT_SHORT_CLICKED || code == LV_EVENT_LONG_PRESSED_REPEAT) {
         lv_spinbox_decrement(guider_ui.speaker_setting_recording_pause);
     }
 }

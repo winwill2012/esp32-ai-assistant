@@ -20,6 +20,7 @@ void set_speak_pause_duration(int duration);
 
 void load_speaker_setting_data();
 
+void load_wifi_list(bool refresh);
 #ifdef __cplusplus
 }
 #endif

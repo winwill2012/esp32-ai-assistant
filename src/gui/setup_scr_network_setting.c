@@ -7,83 +7,15 @@
 * terms, then you may not retain, install, activate or otherwise use the software.
 */
 
-#include <esp_wifi_types.h>
-#include "esp_wifi.h"
 #include "lvgl.h"
 #include <stdio.h>
 #include "gui_guider.h"
 #include "events_init.h"
 #include "widgets_init.h"
 #include "custom.h"
+#include "lvgl_interface.h"
 
 
-// 定义全局变量
-lv_obj_t *loading_anim;
-lv_obj_t *wifi_list;
-uint16_t wifi_count = 0;
-wifi_ap_record_t ap_info[20];
-
-static void connect_wifi_callback (lv_event_t * e) {
-
-}
-
-// 处理列表项点击事件
-static void list_item_click_event_cb(lv_event_t *e)
-{
-    // lv_obj_t *obj = lv_event_get_target(e);
-    // int index = lv_list_get_btn_index(wifi_list, obj);
-
-    // 创建输入框
-    lv_obj_t *kb = lv_keyboard_create(lv_scr_act());
-    lv_obj_t *ta = lv_textarea_create(lv_scr_act());
-    lv_textarea_set_one_line(ta, true);
-    lv_obj_set_width(ta, lv_pct(50));
-    lv_obj_align(ta, LV_ALIGN_CENTER, 0, -50);
-    lv_keyboard_set_textarea(kb, ta);
-
-    // 创建确定按钮
-    lv_obj_t *btn = lv_btn_create(lv_scr_act());
-    lv_obj_set_width(btn, lv_pct(20));
-    lv_obj_align(btn, LV_ALIGN_CENTER, 0, 50);
-    lv_obj_t *label = lv_label_create(btn);
-    lv_label_set_text(label, "确定");
-
-    lv_obj_add_event_cb(btn, connect_wifi_callback, LV_EVENT_CLICKED, e->user_data);
-}
-
-// 扫描 WiFi 网络
-static void scan_wifi()
-{
-    esp_wifi_scan_start(NULL, true);
-    esp_wifi_scan_get_ap_records(&wifi_count, ap_info);
-}
-
-// 创建加载动画
-static void create_loading_anim(lv_obj_t *parent)
-{
-    loading_anim = lv_spinner_create(parent, 1000, 60);
-    lv_obj_set_size(loading_anim, 50, 50);
-    lv_obj_align(loading_anim, LV_ALIGN_CENTER, 0, 0);
-}
-
-// 移除加载动画
-static void remove_loading_anim()
-{
-    lv_obj_del(loading_anim);
-}
-
-// 创建 WiFi 列表
-static void create_wifi_list(lv_obj_t *parent)
-{
-    wifi_list = lv_list_create(parent);
-    lv_obj_set_size(wifi_list, lv_pct(100), lv_pct(80));
-    lv_obj_align(wifi_list, LV_ALIGN_BOTTOM_MID, 0, 0);
-
-    for (int i = 0; i < wifi_count; i++) {
-        lv_obj_t *btn = lv_list_add_text(wifi_list, ap_info[i].ssid);
-        lv_obj_add_event_cb(btn, list_item_click_event_cb, LV_EVENT_CLICKED, ap_info[i].ssid);
-    }
-}
 
 void setup_scr_network_setting(lv_ui *ui)
 {
@@ -161,18 +93,110 @@ void setup_scr_network_setting(lv_ui *ui)
     lv_obj_set_style_pad_left(ui->network_setting_label_title, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->network_setting_label_title, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
 
+    //Write codes network_setting_list_1
+    ui->network_setting_list_1 = lv_list_create(ui->network_setting);
+    lv_obj_set_pos(ui->network_setting_list_1, 35, 85);
+    lv_obj_set_size(ui->network_setting_list_1, 250, 369);
+    lv_obj_set_scrollbar_mode(ui->network_setting_list_1, LV_SCROLLBAR_MODE_OFF);
+
+    //Write style state: LV_STATE_DEFAULT for &style_network_setting_list_1_main_main_default
+    static lv_style_t style_network_setting_list_1_main_main_default;
+    ui_init_style(&style_network_setting_list_1_main_main_default);
+
+    lv_style_set_pad_top(&style_network_setting_list_1_main_main_default, 5);
+    lv_style_set_pad_left(&style_network_setting_list_1_main_main_default, 5);
+    lv_style_set_pad_right(&style_network_setting_list_1_main_main_default, 5);
+    lv_style_set_pad_bottom(&style_network_setting_list_1_main_main_default, 5);
+    lv_style_set_bg_opa(&style_network_setting_list_1_main_main_default, 255);
+    lv_style_set_bg_color(&style_network_setting_list_1_main_main_default, lv_color_hex(0xffffff));
+    lv_style_set_bg_grad_dir(&style_network_setting_list_1_main_main_default, LV_GRAD_DIR_NONE);
+    lv_style_set_border_width(&style_network_setting_list_1_main_main_default, 1);
+    lv_style_set_border_opa(&style_network_setting_list_1_main_main_default, 255);
+    lv_style_set_border_color(&style_network_setting_list_1_main_main_default, lv_color_hex(0xe1e6ee));
+    lv_style_set_border_side(&style_network_setting_list_1_main_main_default, LV_BORDER_SIDE_FULL);
+    lv_style_set_radius(&style_network_setting_list_1_main_main_default, 3);
+    lv_style_set_shadow_width(&style_network_setting_list_1_main_main_default, 0);
+    lv_obj_add_style(ui->network_setting_list_1, &style_network_setting_list_1_main_main_default, LV_PART_MAIN|LV_STATE_DEFAULT);
+
+    //Write style state: LV_STATE_DEFAULT for &style_network_setting_list_1_main_scrollbar_default
+    static lv_style_t style_network_setting_list_1_main_scrollbar_default;
+    ui_init_style(&style_network_setting_list_1_main_scrollbar_default);
+
+    lv_style_set_radius(&style_network_setting_list_1_main_scrollbar_default, 3);
+    lv_style_set_bg_opa(&style_network_setting_list_1_main_scrollbar_default, 255);
+    lv_style_set_bg_color(&style_network_setting_list_1_main_scrollbar_default, lv_color_hex(0xffffff));
+    lv_style_set_bg_grad_dir(&style_network_setting_list_1_main_scrollbar_default, LV_GRAD_DIR_NONE);
+    lv_obj_add_style(ui->network_setting_list_1, &style_network_setting_list_1_main_scrollbar_default, LV_PART_SCROLLBAR|LV_STATE_DEFAULT);
+
+    //Write style state: LV_STATE_DEFAULT for &style_network_setting_list_1_extra_btns_main_default
+    static lv_style_t style_network_setting_list_1_extra_btns_main_default;
+    ui_init_style(&style_network_setting_list_1_extra_btns_main_default);
+
+    lv_style_set_pad_top(&style_network_setting_list_1_extra_btns_main_default, 5);
+    lv_style_set_pad_left(&style_network_setting_list_1_extra_btns_main_default, 5);
+    lv_style_set_pad_right(&style_network_setting_list_1_extra_btns_main_default, 5);
+    lv_style_set_pad_bottom(&style_network_setting_list_1_extra_btns_main_default, 5);
+    lv_style_set_border_width(&style_network_setting_list_1_extra_btns_main_default, 0);
+    lv_style_set_text_color(&style_network_setting_list_1_extra_btns_main_default, lv_color_hex(0x0D3055));
+    lv_style_set_text_font(&style_network_setting_list_1_extra_btns_main_default, &lv_customer_font_Siyuan_Regular_16);
+    lv_style_set_text_opa(&style_network_setting_list_1_extra_btns_main_default, 255);
+    lv_style_set_radius(&style_network_setting_list_1_extra_btns_main_default, 3);
+    lv_style_set_bg_opa(&style_network_setting_list_1_extra_btns_main_default, 255);
+    lv_style_set_bg_color(&style_network_setting_list_1_extra_btns_main_default, lv_color_hex(0xffffff));
+    lv_style_set_bg_grad_dir(&style_network_setting_list_1_extra_btns_main_default, LV_GRAD_DIR_NONE);
+
+    //Write style state: LV_STATE_DEFAULT for &style_network_setting_list_1_extra_texts_main_default
+    static lv_style_t style_network_setting_list_1_extra_texts_main_default;
+    ui_init_style(&style_network_setting_list_1_extra_texts_main_default);
+
+    lv_style_set_pad_top(&style_network_setting_list_1_extra_texts_main_default, 5);
+    lv_style_set_pad_left(&style_network_setting_list_1_extra_texts_main_default, 5);
+    lv_style_set_pad_right(&style_network_setting_list_1_extra_texts_main_default, 5);
+    lv_style_set_pad_bottom(&style_network_setting_list_1_extra_texts_main_default, 5);
+    lv_style_set_border_width(&style_network_setting_list_1_extra_texts_main_default, 0);
+    lv_style_set_text_color(&style_network_setting_list_1_extra_texts_main_default, lv_color_hex(0x0D3055));
+    lv_style_set_text_font(&style_network_setting_list_1_extra_texts_main_default, &lv_customer_font_Siyuan_Regular_16);
+    lv_style_set_text_opa(&style_network_setting_list_1_extra_texts_main_default, 255);
+    lv_style_set_radius(&style_network_setting_list_1_extra_texts_main_default, 3);
+    lv_style_set_transform_width(&style_network_setting_list_1_extra_texts_main_default, 0);
+    lv_style_set_bg_opa(&style_network_setting_list_1_extra_texts_main_default, 255);
+    lv_style_set_bg_color(&style_network_setting_list_1_extra_texts_main_default, lv_color_hex(0xffffff));
+    lv_style_set_bg_grad_dir(&style_network_setting_list_1_extra_texts_main_default, LV_GRAD_DIR_NONE);
+
+    //Write codes network_setting_label_1
+    ui->network_setting_label_1 = lv_label_create(ui->network_setting);
+    lv_label_set_text(ui->network_setting_label_1, "选取附近的WLAN");
+    lv_label_set_long_mode(ui->network_setting_label_1, LV_LABEL_LONG_WRAP);
+    lv_obj_set_pos(ui->network_setting_label_1, 33, 55);
+    lv_obj_set_size(ui->network_setting_label_1, 147, 18);
+
+    //Write style for network_setting_label_1, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
+    lv_obj_set_style_border_width(ui->network_setting_label_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->network_setting_label_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->network_setting_label_1, lv_color_hex(0x000000), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui->network_setting_label_1, &lv_customer_font_Siyuan_yuanti_18, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui->network_setting_label_1, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_letter_space(ui->network_setting_label_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_line_space(ui->network_setting_label_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_align(ui->network_setting_label_1, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui->network_setting_label_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui->network_setting_label_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui->network_setting_label_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui->network_setting_label_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_left(ui->network_setting_label_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_width(ui->network_setting_label_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+
+    //Write codes network_setting_animimg_refresh
+    ui->network_setting_animimg_refresh = lv_animimg_create(ui->network_setting);
+    lv_animimg_set_src(ui->network_setting_animimg_refresh, (const void **) network_setting_animimg_refresh_imgs, 3);
+    lv_animimg_set_duration(ui->network_setting_animimg_refresh, 500*3);
+    lv_animimg_set_repeat_count(ui->network_setting_animimg_refresh, LV_ANIM_REPEAT_INFINITE);
+    lv_img_set_src(ui->network_setting_animimg_refresh, network_setting_animimg_refresh_imgs[0]);
+    lv_obj_set_pos(ui->network_setting_animimg_refresh, 258, 55);
+    lv_obj_set_size(ui->network_setting_animimg_refresh, 25, 25);
+
     //The custom code of network_setting.
-    // 创建加载动画
-    create_loading_anim(ui->network_setting);
-
-    // 扫描 WiFi 网络
-    scan_wifi();
-
-    // 移除加载动画
-    remove_loading_anim();
-
-    // 创建 WiFi 列表
-    create_wifi_list(ui->network_setting);
+    load_wifi_list(false);
 
     //Update current screen layout.
     lv_obj_update_layout(ui->network_setting);

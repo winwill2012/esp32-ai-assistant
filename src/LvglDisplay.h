@@ -30,6 +30,8 @@ public:
 
     static void loadSpeakerSettingData();
 
+    static void loadWifiList(bool refresh);
+
 private:
     static lv_style_t *message_style_robot;
     static lv_style_t *message_style_user;

@@ -25,6 +25,7 @@ void clock_count(int *hour, int *min, int *sec);
 #endif
 
 extern lv_obj_t *speaker_setting_speed;
+extern const lv_img_dsc_t *network_setting_animimg_refresh_imgs[3];
 
 void lv_speaker_setting_speed_increment_event_cb(lv_event_t *event);
 

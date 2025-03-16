@@ -39,6 +39,9 @@ typedef struct {
     lv_obj_t *settings_page_btn_3;
     lv_obj_t *settings_page_btn_3_label;
     lv_obj_t *network_setting;
+    lv_obj_t *network_setting_label_1;
+    lv_obj_t *network_setting_list_1;
+    lv_obj_t *network_setting_animimg_refresh;
     bool network_setting_del;
     lv_obj_t *network_setting_imgbtn_back;
     lv_obj_t *network_setting_imgbtn_back_label;
@@ -104,6 +107,12 @@ LV_IMG_DECLARE(_retrun_alpha_33x33);
 LV_IMG_DECLARE(_retrun_alpha_33x33);
 LV_IMG_DECLARE(_retrun_alpha_33x33);
 LV_IMG_DECLARE(_backgroud_320x480);
+
+#include "extra/widgets/animimg/lv_animimg.h"
+LV_IMG_DECLARE(network_setting_animimg_refreshrefresh_1);
+LV_IMG_DECLARE(network_setting_animimg_refreshrefresh_2);
+LV_IMG_DECLARE(network_setting_animimg_refreshrefresh_3);
+LV_IMG_DECLARE(_retrun_alpha_33x33);
 
 LV_FONT_DECLARE(lv_font_montserratMedium_16)
 LV_FONT_DECLARE(lv_font_montserratMedium_21)
