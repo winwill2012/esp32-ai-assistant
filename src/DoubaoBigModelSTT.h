@@ -1,0 +1,38 @@
+#ifndef DOUBAO_BIGMODEL_STT_H
+#define DOUBAO_BIGMODEL_STT_H
+
+#include <Arduino.h>
+#include <CozeLLMAgent.h>
+#include <WebSocketsClient.h>
+#include "driver/i2s.h"
+#include <vector>
+
+// 默认头部
+constexpr byte DoubaoBigModelSTTDefaultFullClientWsHeader[] = {0x11, 0x10, 0x10, 0x00};
+constexpr byte DoubaoBigModelSTTDefaultAudioOnlyWsHeader[] = {0x11, 0x20, 0x10, 0x00};
+constexpr byte DoubaoBigModelSTTDefaultLastAudioWsHeader[] = {0x11, 0x22, 0x10, 0x00};
+
+class DoubaoBigModelSTT : public WebSocketsClient {
+public:
+    DoubaoBigModelSTT(const CozeLLMAgent &llmAgent);
+
+    void eventCallback(WStype_t type, uint8_t *payload, size_t length);
+
+    void begin();
+
+    void parseResponse(const uint8_t *response);
+
+    void buildFullClientRequest();
+
+    void buildAudioOnlyRequest(uint8_t *audio, size_t size, bool lastPacket);
+
+    void recognize(uint8_t *audio, size_t size, bool firstPacket, bool lastPacket);
+
+private:
+    CozeLLMAgent _llmAgent;
+    bool _firstPacket;
+    SemaphoreHandle_t _taskFinished;
+    std::vector<uint8_t> _requestBuilder;
+};
+
+#endif

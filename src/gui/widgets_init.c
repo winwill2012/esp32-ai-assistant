@@ -76,18 +76,33 @@ void clock_count(int *hour, int *min, int *sec)
 }
 #endif
 
-void lv_speaker_setting_spinbox_1_increment_event_cb(lv_event_t * event)
+void lv_speaker_setting_speed_increment_event_cb(lv_event_t * event)
 {
     lv_event_code_t code = lv_event_get_code(event);
     if(code == LV_EVENT_SHORT_CLICKED || code == LV_EVENT_LONG_PRESSED_REPEAT) {
-        lv_spinbox_increment(guider_ui.speaker_setting_spinbox_1);
+        lv_spinbox_increment(guider_ui.speaker_setting_speed);
     }
 }
-void lv_speaker_setting_spinbox_1_decrement_event_cb(lv_event_t * event)
+void lv_speaker_setting_speed_decrement_event_cb(lv_event_t * event)
 {
     lv_event_code_t code = lv_event_get_code(event);
     if(code == LV_EVENT_SHORT_CLICKED || code == LV_EVENT_LONG_PRESSED_REPEAT) {
-        lv_spinbox_decrement(guider_ui.speaker_setting_spinbox_1);
+        lv_spinbox_decrement(guider_ui.speaker_setting_speed);
+    }
+}
+
+void lv_speaker_setting_recording_pause_increment_event_cb(lv_event_t * event)
+{
+    lv_event_code_t code = lv_event_get_code(event);
+    if(code == LV_EVENT_SHORT_CLICKED || code == LV_EVENT_LONG_PRESSED_REPEAT) {
+        lv_spinbox_increment(guider_ui.speaker_setting_recording_pause);
+    }
+}
+void lv_speaker_setting_recording_pause_decrement_event_cb(lv_event_t * event)
+{
+    lv_event_code_t code = lv_event_get_code(event);
+    if(code == LV_EVENT_SHORT_CLICKED || code == LV_EVENT_LONG_PRESSED_REPEAT) {
+        lv_spinbox_decrement(guider_ui.speaker_setting_recording_pause);
     }
 }
 

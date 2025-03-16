@@ -8,14 +8,13 @@
 #include <vector>
 
 // 默认头部
-constexpr byte DefaultFullClientWsHeader[] = {0x11, 0x10, 0x10, 0x00};
-constexpr byte DefaultAudioOnlyWsHeader[] = {0x11, 0x20, 0x10, 0x00};
-constexpr byte DefaultLastAudioWsHeader[] = {0x11, 0x22, 0x10, 0x00};
+constexpr byte DoubaoTTSDefaultFullClientWsHeader[] = {0x11, 0x10, 0x10, 0x00};
+constexpr byte DoubaoTTSDefaultAudioOnlyWsHeader[] = {0x11, 0x20, 0x10, 0x00};
+constexpr byte DoubaoTTSDefaultLastAudioWsHeader[] = {0x11, 0x22, 0x10, 0x00};
 
 class DoubaoSTT : public WebSocketsClient {
 public:
-    DoubaoSTT(const CozeLLMAgent &llmAgent, const String &appId, const String &token,
-              const String &host, int port, const String &url);
+    DoubaoSTT(const CozeLLMAgent &llmAgent);
 
     void eventCallback(WStype_t type, uint8_t *payload, size_t length);
 
@@ -30,13 +29,6 @@ public:
     void recognize(uint8_t *audio, size_t size, bool firstPacket, bool lastPacket);
 
 private:
-    String _appId;
-    String _token;
-    String _host;
-    uint16_t _port;
-    String _url;
-    String _voiceType;
-    String _emotion;
     CozeLLMAgent _llmAgent;
     bool _firstPacket;
     SemaphoreHandle_t _taskFinished;

@@ -48,16 +48,22 @@ typedef struct {
     lv_obj_t *speaker_setting_imgbtn_back;
     lv_obj_t *speaker_setting_imgbtn_back_label;
     lv_obj_t *speaker_setting_label_title;
-    lv_obj_t *speaker_setting_spinbox_1;
-    lv_obj_t *speaker_setting_spinbox_1_btn_plus;
-    lv_obj_t *speaker_setting_spinbox_1_btn_minus;
-    lv_obj_t *speaker_setting_ddlist_1;
-    lv_obj_t *speaker_setting_ddlist_2;
-    lv_obj_t *speaker_setting_bar_1;
+    lv_obj_t *speaker_setting_speed;
+    lv_obj_t *speaker_setting_speed_btn_plus;
+    lv_obj_t *speaker_setting_speed_btn_minus;
+    lv_obj_t *speaker_setting_voice_type;
+    lv_obj_t *speaker_setting_persona;
+    lv_obj_t *speaker_setting_volume;
+    lv_obj_t *speaker_setting_environment_noise;
+    lv_obj_t *speaker_setting_recording_pause;
+    lv_obj_t *speaker_setting_recording_pause_btn_plus;
+    lv_obj_t *speaker_setting_recording_pause_btn_minus;
     lv_obj_t *speaker_setting_label_1;
     lv_obj_t *speaker_setting_label_2;
     lv_obj_t *speaker_setting_label_3;
     lv_obj_t *speaker_setting_label_4;
+    lv_obj_t *speaker_setting_label_5;
+    lv_obj_t *speaker_setting_label_6;
 } lv_ui;
 
 typedef void (*ui_setup_scr_t)(lv_ui *ui);
@@ -106,7 +112,7 @@ LV_FONT_DECLARE(lv_customer_font_Siyuan_Regular_14)
 LV_FONT_DECLARE(lv_customer_font_Siyuan_yuanti_14)
 LV_FONT_DECLARE(lv_customer_font_Siyuan_Heiti_18)
 LV_FONT_DECLARE(lv_customer_font_Siyuan_Heiti_28)
-LV_FONT_DECLARE(lv_customer_font_Siyuan_yuanti_22)
+LV_FONT_DECLARE(lv_customer_font_Siyuan_yuanti_18)
 
 
 #ifdef __cplusplus

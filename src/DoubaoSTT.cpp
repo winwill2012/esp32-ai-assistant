@@ -1,19 +1,14 @@
 #include "DoubaoSTT.h"
 #include "Utils.h"
+#include "Settings.h"
 #include <Arduino.h>
 #include <CozeLLMAgent.h>
 #include <RecordingManager.h>
 #include <vector>
 #include "LvglDisplay.h"
 
-DoubaoSTT::DoubaoSTT(const CozeLLMAgent &llmAgent, const String &appId, const String &token,
-                     const String &host, int port, const String &url)
-    : _llmAgent(llmAgent) {
-    _appId = appId;
-    _token = token;
-    _host = host;
-    _port = port;
-    _url = url;
+DoubaoSTT::DoubaoSTT(const CozeLLMAgent &llmAgent)
+        : _llmAgent(llmAgent) {
     _requestBuilder = std::vector<uint8_t>();
     _taskFinished = xSemaphoreCreateBinary();
     _firstPacket = true;
@@ -37,12 +32,8 @@ void DoubaoSTT::eventCallback(WStype_t type, uint8_t *payload, size_t length) {
 }
 
 void DoubaoSTT::begin() {
-    if (isConnected()) {
-        return;
-    }
-    setExtraHeaders(("Authorization: Bearer; " + _token).c_str());
-    enableHeartbeat(15000, 3000, 0);
-    beginSSL(_host, _port, _url);
+    setExtraHeaders(("Authorization: Bearer; " + Settings::getDoubaoAccessToken()).c_str());
+    beginSSL("openspeech.bytedance.com", 443, "/api/v2/asr");
     onEvent([this](WStype_t type, uint8_t *payload, size_t length) {
         this->eventCallback(type, payload, length);
     });
@@ -53,9 +44,9 @@ void DoubaoSTT::buildFullClientRequest() {
     JsonDocument doc;
     doc.clear();
     const JsonObject app = doc["app"].to<JsonObject>();
-    app["appid"] = _appId;
+    app["appid"] = Settings::getDoubaoAppId();
     app["cluster"] = "volcengine_input_common";
-    app["token"] = _token;
+    app["token"] = Settings::getDoubaoAccessToken();
     const JsonObject user = doc["user"].to<JsonObject>();
     user["uid"] = getChipId(nullptr);
     const JsonObject request = doc["request"].to<JsonObject>();
@@ -63,7 +54,7 @@ void DoubaoSTT::buildFullClientRequest() {
     request["nbest"] = 1;
     request["result_type"] = "full";
     request["sequence"] = 1;
-    request["workflow"] = "audio_in,resample,partition,vad,fe,decode,nlu_punctuate";
+    request["workflow"] = "audio_in,resample,partition,vad,fe,decode,itn,nlu_ddc,nlu_punctuate";
     const JsonObject audio = doc["audio"].to<JsonObject>();
     audio["format"] = "raw";
     audio["codec"] = "raw";
@@ -71,7 +62,7 @@ void DoubaoSTT::buildFullClientRequest() {
     audio["rate"] = AUDIO_SAMPLE_RATE;
     String payloadStr;
     serializeJson(doc, payloadStr);
-
+    log_d("stt full request json: %s", payloadStr.c_str());
     uint8_t payload[payloadStr.length()];
     for (int i = 0; i < payloadStr.length(); i++) {
         payload[i] = static_cast<uint8_t>(payloadStr.charAt(i));
@@ -81,8 +72,8 @@ void DoubaoSTT::buildFullClientRequest() {
 
     _requestBuilder.clear();
     // 先写入报头（四字节）
-    _requestBuilder.insert(_requestBuilder.end(), DefaultFullClientWsHeader,
-                           DefaultFullClientWsHeader + sizeof(DefaultFullClientWsHeader));
+    _requestBuilder.insert(_requestBuilder.end(), DoubaoTTSDefaultFullClientWsHeader,
+                           DoubaoTTSDefaultFullClientWsHeader + sizeof(DoubaoTTSDefaultFullClientWsHeader));
     // 写入payload长度（四字节）
     _requestBuilder.insert(_requestBuilder.end(), payloadSize.begin(), payloadSize.end());
     // 写入payload内容
@@ -95,12 +86,12 @@ void DoubaoSTT::buildAudioOnlyRequest(uint8_t *audio, const size_t size, const b
 
     if (lastPacket) {
         // 先写入报头（四字节）
-        _requestBuilder.insert(_requestBuilder.end(), DefaultLastAudioWsHeader,
-                               DefaultLastAudioWsHeader + sizeof(DefaultLastAudioWsHeader));
+        _requestBuilder.insert(_requestBuilder.end(), DoubaoTTSDefaultLastAudioWsHeader,
+                               DoubaoTTSDefaultLastAudioWsHeader + sizeof(DoubaoTTSDefaultLastAudioWsHeader));
     } else {
         // 先写入报头（四字节）
-        _requestBuilder.insert(_requestBuilder.end(), DefaultAudioOnlyWsHeader,
-                               DefaultAudioOnlyWsHeader + sizeof(DefaultAudioOnlyWsHeader));
+        _requestBuilder.insert(_requestBuilder.end(), DoubaoTTSDefaultAudioOnlyWsHeader,
+                               DoubaoTTSDefaultAudioOnlyWsHeader + sizeof(DoubaoTTSDefaultAudioOnlyWsHeader));
     }
 
     // 写入payload长度（四字节）

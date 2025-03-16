@@ -8,24 +8,19 @@
 
 class DoubaoTTS : public WebSocketsClient {
 public:
-    DoubaoTTS(const String &appId, const String &token, const String &host, int port, const String &url);
+    DoubaoTTS();
 
     void eventCallback(WStype_t type, uint8_t *payload, size_t length) const;
 
     void begin();
 
-    String buildFullClientRequest(const String &text) const;
+    static String buildFullClientRequest(const String &text);
 
     void parseResponse(const uint8_t *response) const;
 
     void synth(const String &text, bool disconnectAfter);
 
 private:
-    String _appId;
-    String _token;
-    String _host;
-    uint16_t _port;
-    String _url;
     SemaphoreHandle_t _taskFinished;
 };
 

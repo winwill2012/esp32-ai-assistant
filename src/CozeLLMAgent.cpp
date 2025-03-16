@@ -2,32 +2,31 @@
 #include <HTTPClient.h>
 #include <utility>
 #include "Utils.h"
+#include "Settings.h"
 #include "GlobalState.h"
 #include "LvglDisplay.h"
 
-CozeLLMAgent::CozeLLMAgent(DoubaoTTS tts, const String &url, const String &botId, const String &token) : _tts(
-        std::move(tts)) {
-    _url = url;
-    _botId = botId;
-    _token = token;
+CozeLLMAgent::CozeLLMAgent(DoubaoTTS &tts) : _tts(tts) {
     _firstPacket = true;
 }
 
 CozeLLMAgent::~CozeLLMAgent() = default;
 
 void CozeLLMAgent::begin(const String &input) {
+    if (input == "") return;
     log_d("Ready to send query to coze agent: %s", input.c_str());
     GlobalState::setState(Thinking);
     reset();
     HTTPClient http;
-    http.begin(_url + GlobalState::getConversationId());
-    http.addHeader("Authorization", "Bearer " + _token);
+    http.begin("https://api.coze.cn/v3/chat?conversation_id=" + GlobalState::getConversationId());
+    http.addHeader("Authorization", ("Bearer " + Settings::getCozeToken()).c_str());
     http.addHeader("Content-Type", "application/json");
     // 构建请求体
     JsonDocument requestBody;
     requestBody.clear();
     requestBody["stream"] = true;
-    requestBody["bot_id"] = _botId;
+    std::map<std::string, std::string> personaMap = Settings::getPersonaMap();
+    requestBody["bot_id"] = personaMap[Settings::getCurrentPersona().c_str()];
     requestBody["user_id"] = getChipId(nullptr);
     const JsonArray additionalMessages = requestBody["additional_messages"].to<JsonArray>();
     JsonObject message = additionalMessages.add<JsonObject>();

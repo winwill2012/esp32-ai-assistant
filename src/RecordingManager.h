@@ -5,14 +5,14 @@
 
 #define MICROPHONE_I2S_NUM          I2S_NUM_1
 #define AUDIO_SAMPLE_RATE           16000
-#define AUDIO_RECORDING_BUFFER_SIZE 4000 // 125ms音频数据
+#define AUDIO_RECORDING_BUFFER_SIZE 3200 // 100ms音频数据
 #define MICROPHONE_I2S_BCLK         42
 #define MICROPHONE_I2S_LRC          2
 #define MICROPHONE_I2S_DOUT         1
 
 class RecordingManager {
 public:
-    RecordingManager(DoubaoSTT sttClient);
+    explicit RecordingManager(DoubaoSTT &sttClient);
 
     [[noreturn]] void begin();
 

@@ -8,7 +8,7 @@
 class CozeLLMAgent {
 public:
 
-    CozeLLMAgent(DoubaoTTS tts, const String &url, const String &botId, const String &token);
+    CozeLLMAgent(DoubaoTTS &tts);
 
     ~CozeLLMAgent();
 
@@ -22,10 +22,6 @@ public:
 
 private :
     DoubaoTTS _tts;
-    String _url;
-    String _botId;
-    String _token;
-
     String _response;
     String _cmd;
     String _content;

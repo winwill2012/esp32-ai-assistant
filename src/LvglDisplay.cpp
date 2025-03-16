@@ -1,5 +1,5 @@
 #include "LvglDisplay.h"
-
+#include "Settings.h"
 #include <FT6336.h>
 #include <gui/events_init.h>
 #include <gui/gui_guider.h>
@@ -70,12 +70,45 @@ void LvglDisplay::initMessageStyle() {
     }
 }
 
-void LvglDisplay::initSpeakerDropdownOptions() {
-//    if (xSemaphoreTake(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
-//        lv_dropdown_set_options(guider_ui.speaker_setting_ddlist_1, "婉婉（温柔女声）");
-//        lv_dropdown_set_options(guider_ui.speaker_setting_ddlist_2, "开心");
-//        xSemaphoreGive(lvglUpdateLock);
-//    }
+// 这个函数是在lvgl线程中调用的，无需加锁
+void LvglDisplay::loadSpeakerSettingData() {
+    const std::map<std::string, std::string> &voiceMap = Settings::getVoiceMap();
+    const std::map<std::string, std::string> &personaMap = Settings::getPersonaMap();
+    std::string voiceList;
+    std::string personaList;
+    uint16_t selectedVoiceIndex = 0;
+    uint16_t selectedPersonaIndex = 0;
+    uint16_t i = 0, j = 0;
+    for (const auto &item: voiceMap) {
+        voiceList += (item.first + "\n");
+        if (Settings::getCurrentVoice().compareTo(item.first.c_str()) == 0) {
+            selectedVoiceIndex = i;
+        }
+        i++;
+    }
+    voiceList.pop_back();
+    for (const auto &item: personaMap) {
+        personaList += (item.first + "\n");
+        if (Settings::getCurrentPersona().compareTo(item.first.c_str()) == 0) {
+            selectedPersonaIndex = j;
+        }
+        j++;
+    }
+    personaList.pop_back();
+    lv_dropdown_set_options(guider_ui.speaker_setting_voice_type, voiceList.c_str());
+    lv_dropdown_set_selected(guider_ui.speaker_setting_voice_type, selectedVoiceIndex);
+    lv_dropdown_set_options(guider_ui.speaker_setting_persona, personaList.c_str());
+    lv_dropdown_set_selected(guider_ui.speaker_setting_persona, selectedPersonaIndex);
+    lv_dropdown_set_options(guider_ui.speaker_setting_environment_noise, "安静\n一般\n嘈杂");
+    if (Settings::getRecordingRmsThreshold() == 4500) {
+        lv_dropdown_set_selected(guider_ui.speaker_setting_environment_noise, 0);
+    } else if (Settings::getRecordingRmsThreshold() == 6000) {
+        lv_dropdown_set_selected(guider_ui.speaker_setting_environment_noise, 1);
+    } else {
+        lv_dropdown_set_selected(guider_ui.speaker_setting_environment_noise, 2);
+    }
+    lv_spinbox_set_value(guider_ui.speaker_setting_speed, (int32_t) (Settings::getCurrentSpeakSpeedRatio() * 10));
+    lv_spinbox_set_value(guider_ui.speaker_setting_recording_pause, Settings::getSpeakPauseDuration() / 100);
 }
 
 void LvglDisplay::begin() {
@@ -108,7 +141,6 @@ void LvglDisplay::begin() {
     setup_ui(&guider_ui);
     events_init(&guider_ui);
     initMessageStyle();
-    initSpeakerDropdownOptions();
 
     xTaskCreate([](void *ptr) {
         while (true) {

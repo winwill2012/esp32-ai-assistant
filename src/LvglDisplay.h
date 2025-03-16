@@ -23,9 +23,12 @@ public:
     static void updateWifiState(bool success);
 
     static void updateRecordingButtonState(bool recordingAllowed);
+
     static void updateRecordingButtonImage(bool isPlaying);
+
     static void initMessageStyle();
-    static void initSpeakerDropdownOptions();
+
+    static void loadSpeakerSettingData();
 
 private:
     static lv_style_t *message_style_robot;
