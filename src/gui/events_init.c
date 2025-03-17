@@ -21,7 +21,6 @@ static void home_page_microphone_event_handler(lv_event_t *e) {
     lv_event_code_t code = lv_event_get_code(e);
     switch (code) {
         case LV_EVENT_CLICKED: {
-
             break;
         }
         default:
@@ -110,12 +109,10 @@ static void network_setting_imgbtn_back_event_handler(lv_event_t *e) {
     }
 }
 
-static void network_setting_animimg_refresh_event_handler (lv_event_t *e)
-{
+static void network_setting_animimg_refresh_event_handler(lv_event_t *e) {
     lv_event_code_t code = lv_event_get_code(e);
     switch (code) {
-        case LV_EVENT_CLICKED:
-        {
+        case LV_EVENT_CLICKED: {
             lv_animimg_start(guider_ui.network_setting_animimg_refresh);
             load_wifi_list(true);
             break;
@@ -127,7 +124,8 @@ static void network_setting_animimg_refresh_event_handler (lv_event_t *e)
 
 void events_init_network_setting(lv_ui *ui) {
     lv_obj_add_event_cb(ui->network_setting_imgbtn_back, network_setting_imgbtn_back_event_handler, LV_EVENT_ALL, ui);
-    lv_obj_add_event_cb(ui->network_setting_animimg_refresh, network_setting_animimg_refresh_event_handler, LV_EVENT_ALL, ui);
+    lv_obj_add_event_cb(ui->network_setting_animimg_refresh, network_setting_animimg_refresh_event_handler,
+                        LV_EVENT_ALL, ui);
 }
 
 static void speaker_setting_imgbtn_back_event_handler(lv_event_t *e) {
@@ -191,6 +189,13 @@ static void speak_pause_duration_event_cb(lv_event_t *e) {
     }
 }
 
+static void speak_volume_event_cb(lv_event_t *e) {
+    if (lv_event_get_code(e) == LV_EVENT_VALUE_CHANGED) {
+        const int32_t value = lv_slider_get_value(lv_event_get_target(e));
+        set_volume_ratio(float(value) / 100);
+    }
+}
+
 void events_init_speaker_setting(lv_ui *ui) {
     lv_obj_add_event_cb(ui->speaker_setting_imgbtn_back, speaker_setting_imgbtn_back_event_handler, LV_EVENT_ALL, ui);
     lv_obj_add_event_cb(ui->speaker_setting_voice_type, voice_type_dropdown_event_cb, LV_EVENT_ALL, ui);
@@ -198,9 +203,9 @@ void events_init_speaker_setting(lv_ui *ui) {
     lv_obj_add_event_cb(ui->speaker_setting_environment_noise, environment_noise_dropdown_event_cb, LV_EVENT_ALL, ui);
     lv_obj_add_event_cb(ui->speaker_setting_speed, speak_speed_event_cb, LV_EVENT_ALL, ui);
     lv_obj_add_event_cb(ui->speaker_setting_recording_pause, speak_pause_duration_event_cb, LV_EVENT_ALL, ui);
+    lv_obj_add_event_cb(ui->speaker_setting_volume, speak_volume_event_cb, LV_EVENT_ALL, ui);
 }
 
 
 void events_init(lv_ui *ui) {
-
 }

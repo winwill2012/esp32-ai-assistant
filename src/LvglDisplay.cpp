@@ -113,8 +113,9 @@ void LvglDisplay::loadSpeakerSettingData() {
     } else {
         lv_dropdown_set_selected(guider_ui.speaker_setting_environment_noise, 2);
     }
-    lv_spinbox_set_value(guider_ui.speaker_setting_speed, (int32_t) (Settings::getCurrentSpeakSpeedRatio() * 10));
+    lv_spinbox_set_value(guider_ui.speaker_setting_speed, static_cast<int32_t>(Settings::getCurrentSpeakSpeedRatio() * 10));
     lv_spinbox_set_value(guider_ui.speaker_setting_recording_pause, Settings::getSpeakPauseDuration() / 100);
+    lv_slider_set_value(guider_ui.speaker_setting_volume, static_cast<int32_t>(Settings::getCurrentSpeakVolumeRatio() * 100), LV_ANIM_ON);
 }
 
 void LvglDisplay::begin() {

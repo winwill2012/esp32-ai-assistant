@@ -9,9 +9,9 @@ RecordingManager::RecordingManager(DoubaoSTT &sttClient) : _sttClient(sttClient)
             .mode = static_cast<i2s_mode_t>(I2S_MODE_MASTER | I2S_MODE_RX),
             .sample_rate = AUDIO_SAMPLE_RATE,
             .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
-            .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
+            .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT, // 这里的左右声道要和电路保持一致
             .communication_format = I2S_COMM_FORMAT_STAND_I2S,
-            .intr_alloc_flags = 0,
+            .intr_alloc_flags = ESP_INTR_FLAG_LEVEL6,
             .dma_buf_count = 8,
             .dma_buf_len = 1024,
             .use_apll = true

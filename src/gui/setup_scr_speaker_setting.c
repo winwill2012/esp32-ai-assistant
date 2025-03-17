@@ -295,9 +295,9 @@ void setup_scr_speaker_setting(lv_ui *ui)
     lv_obj_set_style_anim_time(ui->speaker_setting_volume, 1000, 0);
     lv_bar_set_mode(ui->speaker_setting_volume, LV_BAR_MODE_NORMAL);
     lv_bar_set_range(ui->speaker_setting_volume, 0, 100);
-    lv_bar_set_value(ui->speaker_setting_volume, 80, LV_ANIM_ON);
     lv_obj_set_pos(ui->speaker_setting_volume, 129, 69);
     lv_obj_set_size(ui->speaker_setting_volume, 180, 12);
+    lv_obj_add_flag(ui->speaker_setting_volume, LV_OBJ_FLAG_CLICKABLE);
 
     //Write style for speaker_setting_volume, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_radius(ui->speaker_setting_volume, 15, LV_PART_MAIN|LV_STATE_DEFAULT);

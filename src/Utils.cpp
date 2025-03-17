@@ -55,8 +55,8 @@ double calculateSoundRMS(const uint8_t *buffer, const size_t bufferSize) {
         const auto sample = static_cast<int16_t>((buffer[i] << 8) | buffer[i + 1]);
         sumSquares += (sample * sample);
     }
-    double rms =  sqrt(sumSquares * 2 / bufferSize);
-//    log_d("rms = %f", rms);
+    double rms = sqrt(sumSquares * 2 / bufferSize);
+    //    log_d("rms = %f", rms);
     return rms;
 }
 
@@ -96,4 +96,31 @@ bool connectWifi(const String &ssid, const String &password, const int maxRetrie
     GlobalState::setState(NetworkConnectFailed);
     log_e("Network connect failed!");
     return false;
+}
+
+// 将 int16_t 数组转换成 uint8_t 数组，采用大端序，返回 std::vector<uint8_t>
+std::vector<uint8_t> int16ToUint8BigEndian(const std::vector<int16_t> &input) {
+    std::vector<uint8_t> output;
+    output.reserve(input.size() * 2);
+
+    for (const int16_t value: input) {
+        output.push_back(static_cast<uint8_t>(value >> 8)); // 高字节
+        output.push_back(static_cast<uint8_t>(value & 0xFF)); // 低字节
+    }
+
+    return output;
+}
+
+// 将 uint8_t 数组转换成 int16_t 数组，采用大端序，返回 std::vector<int16_t>
+std::vector<int16_t> uint8ToInt16BigEndian(const std::vector<uint8_t> &input) {
+    std::vector<int16_t> output;
+    if (input.size() % 2 != 0) {
+        return output;
+    }
+    output.reserve(input.size() / 2);
+    for (size_t i = 0; i < input.size(); i += 2) {
+        auto value = static_cast<int16_t>((input[i] << 8) | input[i + 1]);
+        output.push_back(value);
+    }
+    return output;
 }
