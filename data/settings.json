@@ -3,7 +3,7 @@
     "volumeRatio": 8,
     "speakSpeed": 1.0,
     "voiceType": "湾湾小何",
-    "persona": "灵犀一点通",
+    "persona": "幽默风趣",
     "speakPauseDuration": 1000,
     "recordingRmsThreshold": 8000.00
   },
@@ -15,142 +15,142 @@
     "token": "pat_A5RMsa9C3wavFPz9BiTHnQtm0G3AmYZkhSSZ5vkHANDKWnX1yyx7wss7hsAnUMt4",
     "personaList": [
       {
-        "name": "灵犀一点通",
+        "name": "幽默风趣",
         "botId": "7479628247178313747"
       },
       {
-        "name": "物联网小秘",
+        "name": "暴躁易怒",
         "botId": "7468218438402818082"
       }
     ]
   },
   "voiceList": [
     {
-      "name": "湾湾小何",
+      "name": "湾湾小何(女)",
       "value": "zh_female_wanwanxiaohe_moon_bigtts"
     },
     {
-      "name": "四郎",
+      "name": "四郎(男)",
       "value": "zh_male_silang_mars_bigtts"
     },
     {
-      "name": "甜美小源",
+      "name": "甜美小源(女)",
       "value": "zh_female_tianmeixiaoyuan_moon_bigtts"
     },
     {
-      "name": "暖心体贴",
+      "name": "暖心体贴(男)",
       "value": "ICL_zh_male_nuanxintitie_tob"
     },
     {
-      "name": "成熟姐姐",
+      "name": "成熟姐姐(女)",
       "value": "ICL_zh_female_chengshujiejie_tob"
     },
     {
-      "name": "妩媚御姐",
+      "name": "妩媚御姐(女)",
       "value": "ICL_zh_female_wumeiyujie_tob"
     },
     {
-      "name": "性感御姐",
+      "name": "性感御姐(女)",
       "value": "ICL_zh_female_xingganyujie_tob"
     },
     {
-      "name": "傲娇女友",
+      "name": "傲娇女友(女)",
       "value": "ICL_zh_female_aojiaonvyou_tob"
     },
     {
-      "name": "猴哥",
+      "name": "猴哥(男)",
       "value": "zh_male_sunwukong_mars_bigtts"
     },
     {
-      "name": "熊二",
+      "name": "熊二(男)",
       "value": "zh_male_xionger_mars_bigtts"
     },
     {
-      "name": "佩奇猪",
+      "name": "佩奇猪(女)",
       "value": "zh_female_peiqi_mars_bigtts"
     },
     {
-      "name": "武则天",
+      "name": "武则天(女)",
       "value": "zh_female_wuzetian_mars_bigtts"
     },
     {
-      "name": "呆萌川妹",
+      "name": "呆萌川妹(女)",
       "value": "zh_female_daimengchuanmei_moon_bigtts"
     },
     {
-      "name": "北京小爷",
+      "name": "北京小爷(男)",
       "value": "zh_male_beijingxiaoye_moon_bigtts"
     },
     {
-      "name": "少年梓辛/Brayan",
+      "name": "少年梓辛(男)",
       "value": "zh_male_shaonianzixin_moon_bigtts"
     },
     {
-      "name": "魅力女友",
+      "name": "魅力女友(女)",
       "value": "zh_female_meilinvyou_moon_bigtts"
     },
     {
-      "name": "深夜播客",
+      "name": "深夜播客(男)",
       "value": "zh_male_shenyeboke_moon_bigtts"
     },
     {
-      "name": "柔美女友",
+      "name": "柔美女友(女)",
       "value": "zh_female_sajiaonvyou_moon_bigtts"
     },
     {
-      "name": "撒娇学妹",
+      "name": "撒娇学妹(女)",
       "value": "zh_female_yuanqinvyou_moon_bigtts"
     },
     {
-      "name": "广西远舟",
+      "name": "广西远舟(男)",
       "value": "zh_male_guangxiyuanzhou_moon_bigtts"
     },
     {
-      "name": "妹坨洁儿",
+      "name": "妹坨洁儿(女)",
       "value": "zh_female_meituojieer_moon_bigtts"
     },
     {
-      "name": "豫州子轩",
+      "name": "豫州子轩(男)",
       "value": "zh_male_yuzhouzixuan_moon_bigtts"
     },
     {
-      "name": "邻家女孩",
+      "name": "邻家女孩(女)",
       "value": "zh_female_linjianvhai_moon_bigtts"
     },
     {
-      "name": "高冷御姐",
+      "name": "高冷御姐(女)",
       "value": "zh_female_gaolengyujie_moon_bigtts"
     },
     {
-      "name": "渊博小叔",
+      "name": "渊博小叔(男)",
       "value": "zh_male_yuanboxiaoshu_moon_bigtts"
     },
     {
-      "name": "阳光青年",
+      "name": "阳光青年(男)",
       "value": "zh_male_yangguangqingnian_moon_bigtts"
     },
     {
-      "name": "爽快思思/Skye",
+      "name": "爽快思思(女)",
       "value": "zh_female_shuangkuaisisi_moon_bigtts"
     },
     {
-      "name": "温暖阿虎/Alvin",
+      "name": "温暖阿虎(男)",
       "value": "zh_male_wennuanahu_moon_bigtts"
     },
     {
-      "name": "通用女声",
+      "name": "通用女声(女)",
       "value": "BV001_streaming"
     },
     {
-      "name": "通用男声",
+      "name": "通用男声(男)",
       "value": "BV002_streaming"
     },
     {
-      "name": "灿灿",
+      "name": "灿灿(女)",
       "value": "BV700_streaming"
     },
     {
-      "name": "亲切女声",
+      "name": "亲切女声(女)",
       "value": "BV007_streaming"
     }
   ]
