@@ -28,12 +28,33 @@ void setup_scr_settings_page(lv_ui *ui)
     lv_obj_set_style_bg_color(ui->settings_page, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->settings_page, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
 
+    //Write codes settings_page_cont_1
+    ui->settings_page_cont_1 = lv_obj_create(ui->settings_page);
+    lv_obj_set_pos(ui->settings_page_cont_1, 10, 63);
+    lv_obj_set_size(ui->settings_page_cont_1, 300, 353);
+    lv_obj_set_scrollbar_mode(ui->settings_page_cont_1, LV_SCROLLBAR_MODE_OFF);
+
+    //Write style for settings_page_cont_1, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
+    lv_obj_set_style_border_width(ui->settings_page_cont_1, 1, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(ui->settings_page_cont_1, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_border_color(ui->settings_page_cont_1, lv_color_hex(0x2195f6), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_border_side(ui->settings_page_cont_1, LV_BORDER_SIDE_FULL, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->settings_page_cont_1, 5, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(ui->settings_page_cont_1, 58, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->settings_page_cont_1, lv_color_hex(0xfcfdea), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_grad_dir(ui->settings_page_cont_1, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_top(ui->settings_page_cont_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_bottom(ui->settings_page_cont_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_left(ui->settings_page_cont_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_pad_right(ui->settings_page_cont_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_width(ui->settings_page_cont_1, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+
     //Write codes settings_page_label_setting_title
     ui->settings_page_label_setting_title = lv_label_create(ui->settings_page);
-    lv_label_set_text(ui->settings_page_label_setting_title, "系统设置");
+    lv_label_set_text(ui->settings_page_label_setting_title, "" LV_SYMBOL_SETTINGS " 系统设置");
     lv_label_set_long_mode(ui->settings_page_label_setting_title, LV_LABEL_LONG_WRAP);
     lv_obj_set_pos(ui->settings_page_label_setting_title, 33, 15);
-    lv_obj_set_size(ui->settings_page_label_setting_title, 88, 22);
+    lv_obj_set_size(ui->settings_page_label_setting_title, 95, 22);
 
     //Write style for settings_page_label_setting_title, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->settings_page_label_setting_title, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -92,57 +113,57 @@ void setup_scr_settings_page(lv_ui *ui)
     lv_obj_set_style_img_recolor_opa(ui->settings_page_imgbtn_back, 0, LV_PART_MAIN|LV_IMGBTN_STATE_RELEASED);
     lv_obj_set_style_img_opa(ui->settings_page_imgbtn_back, 255, LV_PART_MAIN|LV_IMGBTN_STATE_RELEASED);
 
-    //Write codes settings_page_btn_2
-    ui->settings_page_btn_2 = lv_btn_create(ui->settings_page);
-    ui->settings_page_btn_2_label = lv_label_create(ui->settings_page_btn_2);
-    lv_label_set_text(ui->settings_page_btn_2_label, "网络设置");
-    lv_label_set_long_mode(ui->settings_page_btn_2_label, LV_LABEL_LONG_WRAP);
-    lv_obj_align(ui->settings_page_btn_2_label, LV_ALIGN_CENTER, 0, 0);
-    lv_obj_set_style_pad_all(ui->settings_page_btn_2, 0, LV_STATE_DEFAULT);
-    lv_obj_set_width(ui->settings_page_btn_2_label, LV_PCT(100));
-    lv_obj_set_pos(ui->settings_page_btn_2, 26, 138);
-    lv_obj_set_size(ui->settings_page_btn_2, 266, 75);
+    //Write codes settings_page_btn_network_setting
+    ui->settings_page_btn_network_setting = lv_btn_create(ui->settings_page);
+    ui->settings_page_btn_network_setting_label = lv_label_create(ui->settings_page_btn_network_setting);
+    lv_label_set_text(ui->settings_page_btn_network_setting_label, "" LV_SYMBOL_WIFI "网络设置 ");
+    lv_label_set_long_mode(ui->settings_page_btn_network_setting_label, LV_LABEL_LONG_WRAP);
+    lv_obj_align(ui->settings_page_btn_network_setting_label, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_set_style_pad_all(ui->settings_page_btn_network_setting, 0, LV_STATE_DEFAULT);
+    lv_obj_set_width(ui->settings_page_btn_network_setting_label, LV_PCT(100));
+    lv_obj_set_pos(ui->settings_page_btn_network_setting, 26, 138);
+    lv_obj_set_size(ui->settings_page_btn_network_setting, 266, 75);
 
-    //Write style for settings_page_btn_2, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_bg_opa(ui->settings_page_btn_2, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->settings_page_btn_2, lv_color_hex(0x4a96d6), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_dir(ui->settings_page_btn_2, LV_GRAD_DIR_HOR, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_color(ui->settings_page_btn_2, lv_color_hex(0x3e5a71), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_main_stop(ui->settings_page_btn_2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_stop(ui->settings_page_btn_2, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_border_width(ui->settings_page_btn_2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(ui->settings_page_btn_2, 7, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_width(ui->settings_page_btn_2, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->settings_page_btn_2, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui->settings_page_btn_2, &lv_customer_font_Siyuan_Heiti_28, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(ui->settings_page_btn_2, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_align(ui->settings_page_btn_2, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
+    //Write style for settings_page_btn_network_setting, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
+    lv_obj_set_style_bg_opa(ui->settings_page_btn_network_setting, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->settings_page_btn_network_setting, lv_color_hex(0x4a96d6), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_grad_dir(ui->settings_page_btn_network_setting, LV_GRAD_DIR_HOR, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_grad_color(ui->settings_page_btn_network_setting, lv_color_hex(0x3e5a71), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_main_stop(ui->settings_page_btn_network_setting, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_grad_stop(ui->settings_page_btn_network_setting, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(ui->settings_page_btn_network_setting, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->settings_page_btn_network_setting, 7, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_width(ui->settings_page_btn_network_setting, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->settings_page_btn_network_setting, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui->settings_page_btn_network_setting, &lv_customer_font_Siyuan_Heiti_28, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui->settings_page_btn_network_setting, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_align(ui->settings_page_btn_network_setting, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
 
-    //Write codes settings_page_btn_3
-    ui->settings_page_btn_3 = lv_btn_create(ui->settings_page);
-    ui->settings_page_btn_3_label = lv_label_create(ui->settings_page_btn_3);
-    lv_label_set_text(ui->settings_page_btn_3_label, "语音设置");
-    lv_label_set_long_mode(ui->settings_page_btn_3_label, LV_LABEL_LONG_WRAP);
-    lv_obj_align(ui->settings_page_btn_3_label, LV_ALIGN_CENTER, 0, 0);
-    lv_obj_set_style_pad_all(ui->settings_page_btn_3, 0, LV_STATE_DEFAULT);
-    lv_obj_set_width(ui->settings_page_btn_3_label, LV_PCT(100));
-    lv_obj_set_pos(ui->settings_page_btn_3, 26, 249);
-    lv_obj_set_size(ui->settings_page_btn_3, 266, 75);
+    //Write codes settings_page_btn_voice_setting
+    ui->settings_page_btn_voice_setting = lv_btn_create(ui->settings_page);
+    ui->settings_page_btn_voice_setting_label = lv_label_create(ui->settings_page_btn_voice_setting);
+    lv_label_set_text(ui->settings_page_btn_voice_setting_label, "" LV_SYMBOL_VOLUME_MAX "语音设置 ");
+    lv_label_set_long_mode(ui->settings_page_btn_voice_setting_label, LV_LABEL_LONG_WRAP);
+    lv_obj_align(ui->settings_page_btn_voice_setting_label, LV_ALIGN_CENTER, 0, 0);
+    lv_obj_set_style_pad_all(ui->settings_page_btn_voice_setting, 0, LV_STATE_DEFAULT);
+    lv_obj_set_width(ui->settings_page_btn_voice_setting_label, LV_PCT(100));
+    lv_obj_set_pos(ui->settings_page_btn_voice_setting, 26, 249);
+    lv_obj_set_size(ui->settings_page_btn_voice_setting, 266, 75);
 
-    //Write style for settings_page_btn_3, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_bg_opa(ui->settings_page_btn_3, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->settings_page_btn_3, lv_color_hex(0x171e24), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_dir(ui->settings_page_btn_3, LV_GRAD_DIR_HOR, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_color(ui->settings_page_btn_3, lv_color_hex(0x6dcbc7), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_main_stop(ui->settings_page_btn_3, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_stop(ui->settings_page_btn_3, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_border_width(ui->settings_page_btn_3, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(ui->settings_page_btn_3, 7, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_width(ui->settings_page_btn_3, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->settings_page_btn_3, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui->settings_page_btn_3, &lv_customer_font_Siyuan_Heiti_28, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(ui->settings_page_btn_3, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_align(ui->settings_page_btn_3, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
+    //Write style for settings_page_btn_voice_setting, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
+    lv_obj_set_style_bg_opa(ui->settings_page_btn_voice_setting, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->settings_page_btn_voice_setting, lv_color_hex(0x171e24), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_grad_dir(ui->settings_page_btn_voice_setting, LV_GRAD_DIR_HOR, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_grad_color(ui->settings_page_btn_voice_setting, lv_color_hex(0x6dcbc7), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_main_stop(ui->settings_page_btn_voice_setting, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_grad_stop(ui->settings_page_btn_voice_setting, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(ui->settings_page_btn_voice_setting, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->settings_page_btn_voice_setting, 7, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_width(ui->settings_page_btn_voice_setting, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->settings_page_btn_voice_setting, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui->settings_page_btn_voice_setting, &lv_customer_font_Siyuan_Heiti_28, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui->settings_page_btn_voice_setting, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_align(ui->settings_page_btn_voice_setting, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
 
     //The custom code of settings_page.
 

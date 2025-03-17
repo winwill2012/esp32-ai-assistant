@@ -59,14 +59,19 @@ void Settings::begin() {
         personaMap[item["name"].as<std::string>()] = item["botId"].as<std::string>();
     }
     show();
-    TimerHandle_t scanWifiTimer = xTimerCreate("scanWifi", pdMS_TO_TICKS(5 * 60 * 1000), true, nullptr, [](void *ptr) {
-        int16_t scanResult = WiFi.scanNetworks(true);
+    TimerHandle_t scanWifiTimer = xTimerCreate("scanWifi", pdMS_TO_TICKS(1 * 60 * 1000), true, nullptr, [](void *ptr) {
+        log_d("定时扫描wifi信息");
+        WiFi.scanNetworks(true);
+        int16_t scanResult = WiFi.scanComplete();
         while (true) {
             if (scanResult == WIFI_SCAN_FAILED) {
+                log_e("扫描wifi信息失败");
                 break;
             } else if (scanResult == WIFI_SCAN_RUNNING) {
                 vTaskDelay(pdMS_TO_TICKS(1000));
+                scanResult = WiFi.scanComplete();
             } else if (scanResult >= 0) {
+                log_d("扫描成功，一共扫描到%d个wifi信息", scanResult);
                 scannedWifiList.clear();
                 for (int i = 0; i < scanResult; i++) {
                     scannedWifiList.emplace_back(WiFi.SSID(i), WiFi.RSSI(i),
@@ -110,10 +115,12 @@ std::vector<WifiInfo> Settings::getWifiList(bool refresh) {
     if (!refresh) {
         return scannedWifiList;
     }
+    log_d("开始扫描wifi");
     const int16_t number = WiFi.scanNetworks();
     if (number == 0) {
         return {};
     }
+    log_e("扫描wifi结束: %d", number);
     scannedWifiList.clear();
     for (int i = 0; i < number; i++) {
         scannedWifiList.emplace_back(WiFi.SSID(i), WiFi.RSSI(i), WiFi.encryptionType(i) != WIFI_AUTH_OPEN);

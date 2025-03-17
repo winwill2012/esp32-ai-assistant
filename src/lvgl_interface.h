@@ -4,6 +4,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#define ENV_QUIET   4500  // 安静
+#define ENV_GENERAL 6500  // 正常
+#define ENV_NOISY   8000  // 嘈杂
 
 void set_current_voice(const char *voice);
 
@@ -19,7 +22,8 @@ void set_speak_pause_duration(int duration);
 
 void load_speaker_setting_data();
 
-void load_wifi_list(bool refresh);
+void load_wifi_list(void *refresh);
+
 #ifdef __cplusplus
 }
 #endif

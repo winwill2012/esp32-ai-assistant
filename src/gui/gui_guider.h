@@ -34,10 +34,11 @@ typedef struct {
     lv_obj_t *settings_page_label_setting_title;
     lv_obj_t *settings_page_imgbtn_back;
     lv_obj_t *settings_page_imgbtn_back_label;
-    lv_obj_t *settings_page_btn_2;
-    lv_obj_t *settings_page_btn_2_label;
-    lv_obj_t *settings_page_btn_3;
-    lv_obj_t *settings_page_btn_3_label;
+    lv_obj_t *settings_page_btn_network_setting;
+    lv_obj_t *settings_page_btn_network_setting_label;
+    lv_obj_t *settings_page_btn_voice_setting;
+    lv_obj_t *settings_page_btn_voice_setting_label;
+    lv_obj_t *settings_page_cont_1;
     lv_obj_t *network_setting;
     lv_obj_t *network_setting_label_1;
     lv_obj_t *network_setting_list_1;

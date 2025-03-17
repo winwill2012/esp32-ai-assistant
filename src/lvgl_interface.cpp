@@ -24,11 +24,11 @@ void load_speaker_setting_data() {
 
 void set_environment_noise(const char *noise) {
     if (strcmp(noise, "安静") == 0) {
-        Settings::setRecordingRmsThreshold(4500);
+        Settings::setRecordingRmsThreshold(ENV_QUIET);
     } else if (strcmp(noise, "一般") == 0) {
-        Settings::setRecordingRmsThreshold(6000);
+        Settings::setRecordingRmsThreshold(ENV_GENERAL);
     } else if (strcmp(noise, "嘈杂") == 0) {
-        Settings::setRecordingRmsThreshold(7500);
+        Settings::setRecordingRmsThreshold(ENV_NOISY);
     }
 }
 
@@ -36,6 +36,6 @@ void set_speak_pause_duration(int duration) {
     Settings::setSpeakPauseDuration(duration);
 }
 
-void load_wifi_list(bool refresh) {
-    LvglDisplay::loadWifiList(refresh);
+void load_wifi_list(void *refresh) {
+    LvglDisplay::loadWifiList((bool *) refresh);
 }

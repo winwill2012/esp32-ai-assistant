@@ -71,10 +71,10 @@ void setup_scr_speaker_setting(lv_ui *ui)
 
     //Write codes speaker_setting_label_title
     ui->speaker_setting_label_title = lv_label_create(ui->speaker_setting);
-    lv_label_set_text(ui->speaker_setting_label_title, "语音设置");
+    lv_label_set_text(ui->speaker_setting_label_title, LV_SYMBOL_VOLUME_MAX" 语音设置");
     lv_label_set_long_mode(ui->speaker_setting_label_title, LV_LABEL_LONG_WRAP);
     lv_obj_set_pos(ui->speaker_setting_label_title, 33, 15);
-    lv_obj_set_size(ui->speaker_setting_label_title, 88, 24);
+    lv_obj_set_size(ui->speaker_setting_label_title, 97, 24);
 
     //Write style for speaker_setting_label_title, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_radius(ui->speaker_setting_label_title, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -291,13 +291,12 @@ void setup_scr_speaker_setting(lv_ui *ui)
     lv_obj_add_style(lv_dropdown_get_list(ui->speaker_setting_persona), &style_speaker_setting_persona_extra_list_scrollbar_default, LV_PART_SCROLLBAR|LV_STATE_DEFAULT);
 
     //Write codes speaker_setting_volume
-    ui->speaker_setting_volume = lv_bar_create(ui->speaker_setting);
+    ui->speaker_setting_volume = lv_slider_create(ui->speaker_setting);
     lv_obj_set_style_anim_time(ui->speaker_setting_volume, 1000, 0);
     lv_bar_set_mode(ui->speaker_setting_volume, LV_BAR_MODE_NORMAL);
     lv_bar_set_range(ui->speaker_setting_volume, 0, 100);
     lv_obj_set_pos(ui->speaker_setting_volume, 129, 69);
     lv_obj_set_size(ui->speaker_setting_volume, 180, 12);
-    lv_obj_add_flag(ui->speaker_setting_volume, LV_OBJ_FLAG_CLICKABLE);
 
     //Write style for speaker_setting_volume, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_radius(ui->speaker_setting_volume, 15, LV_PART_MAIN|LV_STATE_DEFAULT);

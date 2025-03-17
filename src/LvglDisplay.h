@@ -28,13 +28,16 @@ public:
 
     static void initMessageStyle();
 
+    static void initWiFiItemStyle();
+
     static void loadSpeakerSettingData();
 
-    static void loadWifiList(bool refresh);
+    static void loadWifiList(bool forceRefresh);
 
 private:
     static lv_style_t *message_style_robot;
     static lv_style_t *message_style_user;
+    static lv_style_t *wifi_item_style;
     static lv_obj_t *last_message;
     static int current_message_number;
     static SemaphoreHandle_t lvglUpdateLock;

@@ -11,11 +11,11 @@
 #include <stdio.h>
 #include "lvgl_interface.h"
 #include "lvgl.h"
+#include "Arduino.h"
 
 #if LV_USE_GUIDER_SIMULATOR && LV_USE_FREEMASTER
 #include "freemaster_client.h"
 #endif
-
 
 static void home_page_microphone_event_handler(lv_event_t *e) {
     lv_event_code_t code = lv_event_get_code(e);
@@ -61,7 +61,7 @@ static void settings_page_imgbtn_back_event_handler(lv_event_t *e) {
     }
 }
 
-static void settings_page_btn_2_event_handler(lv_event_t *e) {
+static void settings_page_btn_network_setting_event_handler(lv_event_t *e) {
     lv_event_code_t code = lv_event_get_code(e);
     switch (code) {
         case LV_EVENT_CLICKED: {
@@ -75,7 +75,7 @@ static void settings_page_btn_2_event_handler(lv_event_t *e) {
     }
 }
 
-static void settings_page_btn_3_event_handler(lv_event_t *e) {
+static void settings_page_btn_voice_setting_event_handler(lv_event_t *e) {
     lv_event_code_t code = lv_event_get_code(e);
     switch (code) {
         case LV_EVENT_CLICKED: {
@@ -91,8 +91,10 @@ static void settings_page_btn_3_event_handler(lv_event_t *e) {
 
 void events_init_settings_page(lv_ui *ui) {
     lv_obj_add_event_cb(ui->settings_page_imgbtn_back, settings_page_imgbtn_back_event_handler, LV_EVENT_ALL, ui);
-    lv_obj_add_event_cb(ui->settings_page_btn_2, settings_page_btn_2_event_handler, LV_EVENT_ALL, ui);
-    lv_obj_add_event_cb(ui->settings_page_btn_3, settings_page_btn_3_event_handler, LV_EVENT_ALL, ui);
+    lv_obj_add_event_cb(ui->settings_page_btn_network_setting, settings_page_btn_network_setting_event_handler,
+                        LV_EVENT_ALL, ui);
+    lv_obj_add_event_cb(ui->settings_page_btn_voice_setting, settings_page_btn_voice_setting_event_handler,
+                        LV_EVENT_ALL, ui);
 }
 
 static void network_setting_imgbtn_back_event_handler(lv_event_t *e) {
@@ -109,12 +111,17 @@ static void network_setting_imgbtn_back_event_handler(lv_event_t *e) {
     }
 }
 
+static void load_wifi_list_task(void *arg) {
+    load_wifi_list((bool *) arg);
+    vTaskDelete(NULL);
+}
+
 static void network_setting_animimg_refresh_event_handler(lv_event_t *e) {
     lv_event_code_t code = lv_event_get_code(e);
     switch (code) {
         case LV_EVENT_CLICKED: {
-            lv_animimg_start(guider_ui.network_setting_animimg_refresh);
-            load_wifi_list(true);
+            lv_animimg_start(lv_event_get_target(e));
+            xTaskCreate(load_wifi_list_task, "loadWifiTask", 4096, (void *) true, 0, NULL);
             break;
         }
         default:
@@ -192,7 +199,7 @@ static void speak_pause_duration_event_cb(lv_event_t *e) {
 static void speak_volume_event_cb(lv_event_t *e) {
     if (lv_event_get_code(e) == LV_EVENT_VALUE_CHANGED) {
         const int32_t value = lv_slider_get_value(lv_event_get_target(e));
-        set_volume_ratio(float(value) / 100);
+        set_volume_ratio((float) (value / 100.0));
     }
 }
 

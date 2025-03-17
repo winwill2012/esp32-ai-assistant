@@ -62,7 +62,6 @@ void DoubaoSTT::buildFullClientRequest() {
     audio["rate"] = AUDIO_SAMPLE_RATE;
     String payloadStr;
     serializeJson(doc, payloadStr);
-    log_d("stt full request json: %s", payloadStr.c_str());
     uint8_t payload[payloadStr.length()];
     for (int i = 0; i < payloadStr.length(); i++) {
         payload[i] = static_cast<uint8_t>(payloadStr.charAt(i));
@@ -159,8 +158,6 @@ void DoubaoSTT::parseResponse(const uint8_t *response) {
                         _firstPacket = true;
                     }
                 }
-            } else {
-                log_d("未识别到文字: %d, %s\n", code, message.c_str());
             }
             break;
         }
