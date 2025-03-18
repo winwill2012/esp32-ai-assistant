@@ -12,9 +12,9 @@ RecordingManager::RecordingManager(DoubaoSTT &sttClient) : _sttClient(sttClient)
             .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT, // 这里的左右声道要和电路保持一致
             .communication_format = I2S_COMM_FORMAT_STAND_I2S,
             .intr_alloc_flags = ESP_INTR_FLAG_LEVEL6,
-            .dma_buf_count = 8,
+            .dma_buf_count = 4,
             .dma_buf_len = 1024,
-            .use_apll = true
+            .use_apll = false
     };
     constexpr i2s_pin_config_t pin_config = {
             .bck_io_num = MICROPHONE_I2S_BCLK,

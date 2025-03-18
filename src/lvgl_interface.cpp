@@ -39,3 +39,7 @@ void set_speak_pause_duration(int duration) {
 void load_wifi_list(void *refresh) {
     LvglDisplay::loadWifiList((bool *) refresh);
 }
+
+void connect_wifi(const char *ssid, const char *password) {
+    log_d("连接网络: %s, %s", ssid, password);
+}

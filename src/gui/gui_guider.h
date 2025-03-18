@@ -42,6 +42,14 @@ typedef struct {
     lv_obj_t *network_setting_label_1;
     lv_obj_t *network_setting_wifi_list;
     lv_obj_t *network_setting_animimg_refresh;
+    lv_obj_t *network_setting_connect_wifi_window;     // 连接wifi弹框
+    lv_obj_t *network_setting_connect_wifi_window_title;     // 连接wifi弹框
+    lv_obj_t *network_setting_wifi_password_textarea;  // wifi密码输入框
+    lv_obj_t *network_setting_keyboard;                // wifi密码输入框绑定键盘
+    lv_obj_t *network_setting_confirm_btn;             // 确认联网按钮
+    char *clicked_wifi_ssid;                           // 当前点击了那个wifi
+    char *input_wifi_password;                         // 当前输入的wifi密码
+
     bool network_setting_del;
     lv_obj_t *network_setting_imgbtn_back;
     lv_obj_t *network_setting_imgbtn_back_label;
@@ -108,6 +116,7 @@ LV_IMG_DECLARE(_retrun_alpha_33x33);
 LV_IMG_DECLARE(_backgroud_320x480);
 
 #include "extra/widgets/animimg/lv_animimg.h"
+
 LV_IMG_DECLARE(network_setting_animimg_refreshrefresh_1);
 LV_IMG_DECLARE(network_setting_animimg_refreshrefresh_2);
 LV_IMG_DECLARE(network_setting_animimg_refreshrefresh_3);

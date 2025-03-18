@@ -37,8 +37,8 @@ void AudioPlayer::begin() {
         .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
         .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
         .communication_format = I2S_COMM_FORMAT_STAND_I2S,
-        .intr_alloc_flags = ESP_INTR_FLAG_LEVEL6, // 中断优先级，如果对实时性要求高，可以调高优先级
-        .dma_buf_count = 4,
+        .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1, // 中断优先级，如果对实时性要求高，可以调高优先级
+        .dma_buf_count = 16,
         .dma_buf_len = 1024,
         .tx_desc_auto_clear = true
     };

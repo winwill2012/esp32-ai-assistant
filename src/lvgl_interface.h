@@ -24,6 +24,8 @@ void load_speaker_setting_data();
 
 void load_wifi_list(void *refresh);
 
+void connect_wifi(const char *ssid, const char *password);
+
 #ifdef __cplusplus
 }
 #endif

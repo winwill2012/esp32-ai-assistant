@@ -207,6 +207,7 @@ void setup_scr_network_setting(lv_ui *ui) {
 
     //The custom code of network_setting.
     load_wifi_list(false);
+    network_setting_custom_init(ui);
 
     //Update current screen layout.
     lv_obj_update_layout(ui->network_setting);
