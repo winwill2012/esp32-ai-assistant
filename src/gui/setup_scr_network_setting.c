@@ -100,10 +100,10 @@ void setup_scr_network_setting(lv_ui *ui) {
     lv_obj_set_style_shadow_width(ui->network_setting_label_title, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     //Write codes network_setting_list_1
-    ui->network_setting_list_1 = lv_list_create(ui->network_setting);
-    lv_obj_set_pos(ui->network_setting_list_1, 10, 85);
-    lv_obj_set_size(ui->network_setting_list_1, 300, 369);
-    lv_obj_set_scrollbar_mode(ui->network_setting_list_1, LV_SCROLLBAR_MODE_OFF);
+    ui->network_setting_wifi_list = lv_list_create(ui->network_setting);
+    lv_obj_set_pos(ui->network_setting_wifi_list, 10, 85);
+    lv_obj_set_size(ui->network_setting_wifi_list, 300, 369);
+    lv_obj_set_scrollbar_mode(ui->network_setting_wifi_list, LV_SCROLLBAR_MODE_OFF);
 
     //Write style state: LV_STATE_DEFAULT for &style_network_setting_list_1_main_main_default
     static lv_style_t style_network_setting_list_1_main_main_default;
@@ -122,7 +122,7 @@ void setup_scr_network_setting(lv_ui *ui) {
     lv_style_set_border_side(&style_network_setting_list_1_main_main_default, LV_BORDER_SIDE_FULL);
     lv_style_set_radius(&style_network_setting_list_1_main_main_default, 5);
     lv_style_set_shadow_width(&style_network_setting_list_1_main_main_default, 0);
-    lv_obj_add_style(ui->network_setting_list_1, &style_network_setting_list_1_main_main_default,
+    lv_obj_add_style(ui->network_setting_wifi_list, &style_network_setting_list_1_main_main_default,
                      LV_PART_MAIN | LV_STATE_DEFAULT);
 
     //Write style state: LV_STATE_DEFAULT for &style_network_setting_list_1_main_scrollbar_default
@@ -133,7 +133,7 @@ void setup_scr_network_setting(lv_ui *ui) {
     lv_style_set_bg_opa(&style_network_setting_list_1_main_scrollbar_default, 255);
     lv_style_set_bg_color(&style_network_setting_list_1_main_scrollbar_default, lv_color_hex(0xffffff));
     lv_style_set_bg_grad_dir(&style_network_setting_list_1_main_scrollbar_default, LV_GRAD_DIR_NONE);
-    lv_obj_add_style(ui->network_setting_list_1, &style_network_setting_list_1_main_scrollbar_default,
+    lv_obj_add_style(ui->network_setting_wifi_list, &style_network_setting_list_1_main_scrollbar_default,
                      LV_PART_SCROLLBAR | LV_STATE_DEFAULT);
 
     //Write style state: LV_STATE_DEFAULT for &style_network_setting_list_1_extra_btns_main_default

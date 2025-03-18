@@ -42,43 +42,9 @@ void my_touchpad_read(lv_indev_drv_t *indev, lv_indev_data_t *data) {
 }
 
 lv_ui guider_ui;
-lv_style_t *LvglDisplay::message_style_robot = static_cast<lv_style_t *>(malloc(sizeof(lv_style_t)));
-lv_style_t *LvglDisplay::message_style_user = static_cast<lv_style_t *>(malloc(sizeof(lv_style_t)));
-lv_style_t *LvglDisplay::wifi_item_style = static_cast<lv_style_t *>(malloc(sizeof(lv_style_t)));
 lv_obj_t *LvglDisplay::last_message;
 int LvglDisplay::current_message_number = 0;
 SemaphoreHandle_t LvglDisplay::lvglUpdateLock = xSemaphoreCreateMutex();
-
-void LvglDisplay::initMessageStyle() {
-    if (xSemaphoreTake(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
-        lv_style_init(message_style_robot);
-        lv_style_init(message_style_user);
-
-        lv_style_set_text_font(message_style_robot, &lv_customer_font_Siyuan_Regular_16);
-        lv_style_set_text_font(message_style_user, &lv_customer_font_Siyuan_Regular_16);
-
-        lv_style_set_text_align(message_style_robot, LV_TEXT_ALIGN_LEFT);
-        lv_style_set_text_align(message_style_user, LV_TEXT_ALIGN_LEFT);
-
-        lv_style_set_pad_top(message_style_robot, 20);
-        lv_style_set_pad_top(message_style_user, 20);
-
-        lv_style_set_text_color(message_style_robot, lv_color_make(50, 50, 50));
-        lv_style_set_text_color(message_style_user, lv_color_make(0, 0, 0));
-
-        lv_style_set_bg_opa(message_style_robot, 0);
-        lv_style_set_bg_opa(message_style_user, 0);
-        xSemaphoreGive(lvglUpdateLock);
-    }
-}
-
-void LvglDisplay::initWiFiItemStyle() {
-    if (xSemaphoreTake(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
-        lv_style_init(wifi_item_style);
-        lv_style_set_text_font(wifi_item_style, &lv_customer_font_Siyuan_Regular_16);
-        xSemaphoreGive(lvglUpdateLock);
-    }
-}
 
 // 这个函数是在lvgl线程中调用的，无需加锁
 void LvglDisplay::loadSpeakerSettingData() {
@@ -158,7 +124,6 @@ void LvglDisplay::begin() {
 
     setup_ui(&guider_ui);
     events_init(&guider_ui);
-    initMessageStyle();
     initWiFiItemStyle();
 
     xTaskCreate([](void *ptr) {
@@ -185,9 +150,17 @@ void LvglDisplay::updateChatText(const MessageRole messageRole, const bool newLi
         lv_label_set_long_mode(last_message, LV_LABEL_LONG_WRAP);
         current_message_number++;
         if (messageRole == Robot) {
-            lv_obj_add_style(last_message, message_style_robot, 0);
+            lv_obj_set_style_text_font(last_message, &lv_customer_font_Siyuan_Regular_16, 0);
+            lv_obj_set_style_text_align(last_message, LV_TEXT_ALIGN_LEFT, 0);
+            lv_obj_set_style_pad_top(last_message, 20, 0);
+            lv_obj_set_style_text_color(last_message, lv_color_make(50, 50, 50), 0);
+            lv_obj_set_style_opa(last_message, 0, 0);
         } else {
-            lv_obj_add_style(last_message, message_style_user, 0);
+            lv_obj_set_style_text_align(last_message, LV_TEXT_ALIGN_LEFT, 0);
+            lv_obj_set_style_text_align(last_message, LV_TEXT_ALIGN_LEFT, 0);
+            lv_obj_set_style_pad_top(last_message, 20, 0);
+            lv_obj_set_style_text_color(last_message, lv_color_make(0, 0, 0), 0);
+            lv_obj_set_style_opa(last_message, 0, 0);
         }
         if (current_message_number > 20) {
             lv_obj_t *first_message = lv_obj_get_child(guider_ui.home_page_message_list, 0);
@@ -250,23 +223,49 @@ void LvglDisplay::updateRecordingButtonImage(bool isPlaying) {
 }
 
 static lv_obj_t *global_keyboard = nullptr;
-char *current_ssid = nullptr;
+static lv_obj_t *connect_wifi_window = nullptr;
+char *clicked_ssid = nullptr;
+char *input_password = nullptr;
 
 static void confirm_btn_event_cb(lv_event_t *e) {
-    log_d("点击了确认: %s", (char *) lv_event_get_user_data(e));
-    if (global_keyboard != nullptr) { // 如果连接成功，删除键盘
+    log_d("开始连接wifi: %s, 密码: %s", clicked_ssid, input_password);
+    if (global_keyboard != nullptr) {
+        // 如果连接成功，删除键盘
         lv_obj_del(global_keyboard);
+    }
+    if (clicked_ssid != nullptr) {
+        free(clicked_ssid);
+        clicked_ssid = nullptr;
+    }
+    if (input_password != nullptr) {
+        free(input_password);
+        input_password = nullptr;
+    }
+    lv_obj_t *win = lv_obj_get_parent(lv_event_get_target(e));
+    if (win != nullptr) {
+        lv_obj_del(win);
     }
 }
 
+// 点击对话框上的取消按钮 -> 销毁对话框
 static void cancel_btn_event_cb(lv_event_t *e) {
     lv_obj_t *obj = lv_event_get_target(e);
     lv_obj_t *win = lv_obj_get_parent(obj);
-    if (current_ssid != nullptr) {
-        free(current_ssid);
-        current_ssid = nullptr;
+    if (global_keyboard != nullptr) {
+        // 如果连接成功，删除键盘
+        lv_obj_del(global_keyboard);
     }
-    lv_obj_del(win);
+    if (clicked_ssid != nullptr) {
+        free(clicked_ssid);
+        clicked_ssid = nullptr;
+    }
+    if (input_password != nullptr) {
+        free(input_password);
+        input_password = nullptr;
+    }
+    if (win != nullptr) {
+        lv_obj_del(win);
+    }
 }
 
 static void textarea_focus_event_cb(lv_event_t *e) {
@@ -274,92 +273,102 @@ static void textarea_focus_event_cb(lv_event_t *e) {
     if (global_keyboard == nullptr) {
         global_keyboard = lv_keyboard_create(lv_scr_act());
         lv_keyboard_set_textarea(global_keyboard, textarea);
-        lv_obj_clear_flag(global_keyboard, LV_OBJ_FLAG_HIDDEN);
         // 为键盘的确认按钮添加事件回调函数
         lv_obj_add_event_cb(global_keyboard, [](lv_event_t *e) {
             lv_obj_t *kb = lv_event_get_target(e);
             lv_obj_t *ta = lv_keyboard_get_textarea(kb);
-            lv_keyboard_set_textarea(kb, NULL);
-            lv_obj_clear_state(ta, LV_STATE_FOCUSED);
-            lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
-            global_keyboard = nullptr;
-        }, LV_EVENT_READY, NULL);
+            input_password = strdup(lv_textarea_get_text(ta)); // 获得当前输入框输入的密码
+            lv_keyboard_set_textarea(kb, nullptr);
+            lv_obj_clear_state(ta, LV_STATE_FOCUSED); // 输入框失去焦点
+            lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN); // 隐藏键盘
+        }, LV_EVENT_READY, nullptr);
     }
+    lv_obj_clear_flag(global_keyboard, LV_OBJ_FLAG_HIDDEN);
 }
 
 static void textarea_blur_event_cb(lv_event_t *e) {
     if (global_keyboard != nullptr) {
-        lv_obj_del(global_keyboard);
-        global_keyboard = nullptr;
+        input_password = strdup(lv_textarea_get_text(lv_event_get_target(e))); // 获取当前输入框输入的密码
+        lv_obj_add_flag(global_keyboard, LV_OBJ_FLAG_HIDDEN);
     }
 }
 
+// 点击了列表中的某一个wifi后，弹出对话框，输入wifi密码
 static void click_wifi_item_event_callback(lv_event_t *e) {
     void *user_data = lv_event_get_user_data(e);
     if (user_data != nullptr) {
-        log_d("用户点击了wifi: %s", (char *) user_data);
-        lv_obj_t *window = lv_win_create(guider_ui.network_setting, 30);
-        char title[100];
-        snprintf(title, sizeof(title), "请输入WiFi密码(%s)", (char *) user_data);
-        lv_obj_set_style_text_font(lv_win_add_title(window, title), &lv_customer_font_Siyuan_Regular_16, 0);
-        lv_obj_set_size(window, 280, 200);
-        lv_obj_t *password_field = lv_textarea_create(window);
+        clicked_ssid = strdup(static_cast<char *>(user_data));
+        free(user_data);
+        connect_wifi_window = lv_win_create(guider_ui.network_setting, 30);
+        lv_obj_set_style_text_font(lv_win_add_title(connect_wifi_window, clicked_ssid),
+                                   &lv_customer_font_Siyuan_Regular_16, 0);
+        lv_obj_set_size(connect_wifi_window, 300, 120);
+
+        lv_obj_t *password_field = lv_textarea_create(connect_wifi_window);
         lv_textarea_set_password_mode(password_field, true);
+        static lv_style_t *style_textarea;
+        lv_style_init(style_textarea);
+        lv_style_set_text_font(style_textarea, &lv_customer_font_Siyuan_Regular_16);
+        lv_obj_add_style(password_field, style_textarea, 0);
+        lv_textarea_set_placeholder_text(password_field, "请输入wifi密码");
         lv_textarea_set_one_line(password_field, true);
         lv_obj_set_width(password_field, lv_pct(100));
-        lv_obj_align_to(password_field, lv_win_get_header(window), LV_ALIGN_TOP_MID, 0, 0);
-        lv_obj_add_event_cb(password_field, textarea_focus_event_cb, LV_EVENT_FOCUSED, NULL);
-        lv_obj_add_event_cb(password_field, textarea_blur_event_cb, LV_EVENT_DEFOCUSED, NULL);
+        lv_obj_align_to(password_field, lv_win_get_header(connect_wifi_window), LV_ALIGN_TOP_MID, 0, 35);
+        // 输入框获取焦点事件  -> 加载键盘
+        lv_obj_add_event_cb(password_field, textarea_focus_event_cb, LV_EVENT_FOCUSED, nullptr);
+        // 输入护框失去焦点事件 -> 隐藏键盘
+        lv_obj_add_event_cb(password_field, textarea_blur_event_cb, LV_EVENT_DEFOCUSED, nullptr);
 
         // 创建确认按钮
-        lv_obj_t *confirm_btn = lv_btn_create(window);
+        lv_obj_t *confirm_btn = lv_btn_create(connect_wifi_window);
         lv_obj_set_width(confirm_btn, lv_pct(45));
-        lv_obj_align_to(confirm_btn, password_field, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 10);
         lv_obj_t *confirm_label = lv_label_create(confirm_btn);
-        lv_label_set_text(confirm_label, "确认");
-        lv_obj_set_style_text_font(confirm_btn, &lv_customer_font_Siyuan_Regular_16, 0);
         lv_obj_center(confirm_label);
-        lv_obj_add_event_cb(confirm_btn, confirm_btn_event_cb, LV_EVENT_CLICKED, NULL);
+        lv_label_set_text(confirm_label, "确认");
+        lv_obj_set_style_text_font(confirm_label, &lv_customer_font_Siyuan_Regular_16, 0);
+        lv_obj_align_to(confirm_btn, password_field, LV_ALIGN_BOTTOM_LEFT, 2, -5);
+        // 点击确认后的事件 -> 连接wifi
+        lv_obj_add_event_cb(confirm_btn, confirm_btn_event_cb, LV_EVENT_CLICKED, nullptr);
 
         // 创建取消按钮
-        lv_obj_t *cancel_btn = lv_btn_create(window);
+        lv_obj_t *cancel_btn = lv_btn_create(connect_wifi_window);
         lv_obj_set_width(cancel_btn, lv_pct(45));
-        lv_obj_align_to(cancel_btn, password_field, LV_ALIGN_OUT_BOTTOM_RIGHT, 0, 10);
         lv_obj_t *cancel_label = lv_label_create(cancel_btn);
+        lv_obj_center(cancel_label);
         lv_label_set_text(cancel_label, "取消");
         lv_obj_set_style_text_font(cancel_label, &lv_customer_font_Siyuan_Regular_16, 0);
-        lv_obj_center(cancel_label);
-        lv_obj_add_event_cb(cancel_btn, cancel_btn_event_cb, LV_EVENT_CLICKED, user_data);
+        lv_obj_align_to(cancel_btn, password_field, LV_ALIGN_BOTTOM_RIGHT, -2, -5);
+        // 点击取消按钮后的事件 -> 销毁对话框
+        lv_obj_add_event_cb(cancel_btn, cancel_btn_event_cb, LV_EVENT_CLICKED, nullptr);
 
-        const char *password = lv_textarea_get_text(password_field);
-        lv_obj_add_event_cb(confirm_btn, confirm_btn_event_cb, LV_EVENT_CLICKED, (void *) password);
-        lv_obj_center(window);
-        free(user_data);
+        lv_obj_center(connect_wifi_window);
     }
 }
 
-void add_wifi_item(WifiInfo wifi, lv_style_t *wifi_item_style) {
-    lv_obj_t *wifi_item = lv_list_add_btn(guider_ui.network_setting_list_1, LV_SYMBOL_WIFI, wifi._ssid.c_str());
-    lv_obj_add_style(wifi_item, wifi_item_style, 0);
+// 渲染wifi列表，添加每一条wifi信息
+void add_wifi_item(const WifiInfo &wifi) {
+    lv_obj_t *wifi_item = lv_list_add_btn(guider_ui.network_setting_wifi_list, LV_SYMBOL_WIFI, wifi._ssid.c_str());
+    lv_obj_set_style_text_font(wifi_item, &lv_customer_font_Siyuan_Regular_16, 0);
     char *ssid_copy = strdup(wifi._ssid.c_str());
     if (ssid_copy != nullptr) {
-        lv_obj_add_event_cb(wifi_item, click_wifi_item_event_callback, LV_EVENT_CLICKED, (void *) ssid_copy);
+        lv_obj_add_event_cb(wifi_item, click_wifi_item_event_callback, LV_EVENT_CLICKED, ssid_copy);
     }
 }
 
-void LvglDisplay::loadWifiList(bool forceRefresh) {
+void LvglDisplay::loadWifiList(const bool forceRefresh) {
     const std::vector<WifiInfo> &list = Settings::getWifiList(forceRefresh);
     for (const auto &wifi: list) {
         if (forceRefresh) {
             // 强制刷新的时候，是点击了UI上的刷新按钮，那里会创建一个新的task来加载wifi，
             // 所以本段逻辑不在lv_timer_handler中执行，需要加锁
             if (xSemaphoreTake(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
-                add_wifi_item(wifi, wifi_item_style);
-                lv_anim_del(guider_ui.network_setting_animimg_refresh, NULL);
+                add_wifi_item(wifi);
+                // wifi列表加载完毕，停止播放动画
+                lv_anim_del(guider_ui.network_setting_animimg_refresh, nullptr);
                 xSemaphoreGive(lvglUpdateLock);
             }
         } else {
-            add_wifi_item(wifi, wifi_item_style);
+            add_wifi_item(wifi);
         }
     }
 }

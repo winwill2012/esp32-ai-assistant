@@ -14,7 +14,6 @@
 #include "widgets_init.h"
 #include "custom.h"
 
-
 void setup_scr_home_page(lv_ui *ui) {
     //Write codes home_page
     ui->home_page = lv_obj_create(NULL);
@@ -247,7 +246,6 @@ void setup_scr_home_page(lv_ui *ui) {
     lv_obj_set_style_text_align(ui->home_page_btn_settings, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     //The custom code of home_page.
-
 
     //Update current screen layout.
     lv_obj_update_layout(ui->home_page);

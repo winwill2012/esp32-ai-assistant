@@ -33,8 +33,6 @@
 /**
  * Create a demo application
  */
-void custom_init(lv_ui *ui)
-{
+void custom_init(lv_ui *ui) {
     /* Add your codes here */
 }
-

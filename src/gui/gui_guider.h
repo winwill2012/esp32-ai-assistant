@@ -13,10 +13,11 @@
 extern "C" {
 #endif
 
+#include <esp32-hal-psram.h>
+
 #include "lvgl.h"
 
 typedef struct {
-
     lv_obj_t *home_page;
     bool home_page_del;
     lv_obj_t *home_page_container_top;
@@ -41,7 +42,7 @@ typedef struct {
     lv_obj_t *settings_page_cont_1;
     lv_obj_t *network_setting;
     lv_obj_t *network_setting_label_1;
-    lv_obj_t *network_setting_list_1;
+    lv_obj_t *network_setting_wifi_list;
     lv_obj_t *network_setting_animimg_refresh;
     bool network_setting_del;
     lv_obj_t *network_setting_imgbtn_back;
@@ -91,7 +92,6 @@ void setup_ui(lv_ui *ui);
 void init_keyboard(lv_ui *ui);
 
 extern lv_ui guider_ui;
-
 
 void setup_scr_home_page(lv_ui *ui);
 

@@ -11,8 +11,8 @@ float Settings::currentSpeakSpeedRatio;
 float Settings::currentSpeakVolumeRatio;
 double Settings::recordingRmsThreshold;
 int Settings::speakPauseDuration;
-std::map<std::string, std::string> Settings::voiceMap = std::map<std::string, std::string>();    // <声音，声音值>列表
-std::map<std::string, std::string> Settings::personaMap = std::map<std::string, std::string>();  // <人设，botId>列表
+std::map<std::string, std::string> Settings::voiceMap = std::map<std::string, std::string>(); // <声音，声音值>列表
+std::map<std::string, std::string> Settings::personaMap = std::map<std::string, std::string>(); // <人设，botId>列表
 std::string Settings::doubaoAppId;
 std::string Settings::doubaoAccessToken;
 std::string Settings::cozeToken;
@@ -20,12 +20,12 @@ std::vector<WifiInfo> Settings::scannedWifiList = std::vector<WifiInfo>();
 
 void Settings::begin() {
     if (!SPIFFS.begin(true)) {
-        log_e("An Error has occurred while mounting SPIFFS");
+        log_e("an Error has occurred while mounting SPIFFS");
         ESP.restart();
     }
     File file = SPIFFS.open("/settings.json", "r");
     if (!file) {
-        log_e("Failed to open settings.json file for reading");
+        log_e("failed to open settings.json file for reading");
         ESP.restart();
     }
     JsonDocument doc;
@@ -60,18 +60,18 @@ void Settings::begin() {
     }
     show();
     TimerHandle_t scanWifiTimer = xTimerCreate("scanWifi", pdMS_TO_TICKS(1 * 60 * 1000), true, nullptr, [](void *ptr) {
-        log_d("定时扫描wifi信息");
+        log_d("schedule scan wifi");
         WiFi.scanNetworks(true);
         int16_t scanResult = WiFi.scanComplete();
         while (true) {
             if (scanResult == WIFI_SCAN_FAILED) {
-                log_e("扫描wifi信息失败");
+                log_e("scan wifi failed");
                 break;
             } else if (scanResult == WIFI_SCAN_RUNNING) {
                 vTaskDelay(pdMS_TO_TICKS(1000));
                 scanResult = WiFi.scanComplete();
             } else if (scanResult >= 0) {
-                log_d("扫描成功，一共扫描到%d个wifi信息", scanResult);
+                log_d("scan wifi completed, found %d ap", scanResult);
                 scannedWifiList.clear();
                 for (int i = 0; i < scanResult; i++) {
                     scannedWifiList.emplace_back(WiFi.SSID(i), WiFi.RSSI(i),
@@ -115,12 +115,12 @@ std::vector<WifiInfo> Settings::getWifiList(bool refresh) {
     if (!refresh) {
         return scannedWifiList;
     }
-    log_d("开始扫描wifi");
+    log_d("start scan wifi...");
     const int16_t number = WiFi.scanNetworks();
     if (number == 0) {
         return {};
     }
-    log_e("扫描wifi结束: %d", number);
+    log_d("scan wifi completed, found %d ap", number);
     scannedWifiList.clear();
     for (int i = 0; i < number; i++) {
         scannedWifiList.emplace_back(WiFi.SSID(i), WiFi.RSSI(i), WiFi.encryptionType(i) != WIFI_AUTH_OPEN);
@@ -133,7 +133,7 @@ String Settings::getCurrentVoice() {
 }
 
 void Settings::setCurrentVoice(const String &voice) {
-    Settings::currentVoice = voice;
+    currentVoice = voice;
     preferences.begin(SETTINGS_NAMESPACE);
     preferences.putString(SETTING_VOICE_TYPE, voice);
     preferences.end();
@@ -144,7 +144,7 @@ String Settings::getCurrentPersona() {
 }
 
 void Settings::setCurrentPersona(const String &persona) {
-    Settings::currentPersona = persona;
+    currentPersona = persona;
     preferences.begin(SETTINGS_NAMESPACE);
     preferences.putString(SETTING_PERSONA, persona);
     preferences.end();
@@ -166,7 +166,6 @@ float Settings::getCurrentSpeakSpeedRatio() {
 }
 
 void Settings::setCurrentSpeakSpeedRatio(float speakSpeedRatio) {
-    log_e("设置说话语速: %f", speakSpeedRatio);
     currentSpeakSpeedRatio = speakSpeedRatio;
     preferences.begin(SETTINGS_NAMESPACE);
     preferences.putFloat(SETTING_SPEED_RATIO, speakSpeedRatio);
@@ -178,8 +177,7 @@ int Settings::getSpeakPauseDuration() {
 }
 
 void Settings::setSpeakPauseDuration(int pauseDuration) {
-    log_e("设置录音停顿时间: %d ms", pauseDuration);
-    Settings::speakPauseDuration = pauseDuration;
+    speakPauseDuration = pauseDuration;
     preferences.begin(SETTINGS_NAMESPACE);
     preferences.putInt(SETTING_SPEAK_PAUSE_DURATION, pauseDuration);
     preferences.end();
@@ -190,7 +188,7 @@ double Settings::getRecordingRmsThreshold() {
 }
 
 void Settings::setRecordingRmsThreshold(double rmsThreshold) {
-    Settings::recordingRmsThreshold = rmsThreshold;
+    recordingRmsThreshold = rmsThreshold;
     preferences.begin(SETTINGS_NAMESPACE);
     preferences.putDouble(SETTING_RECORDING_RMS_THRESHOLD, rmsThreshold);
     preferences.end();
@@ -215,4 +213,3 @@ std::string Settings::getDoubaoAccessToken() {
 std::string Settings::getCozeToken() {
     return cozeToken;
 }
-
