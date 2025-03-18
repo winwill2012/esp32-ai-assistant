@@ -124,7 +124,6 @@ void LvglDisplay::begin() {
 
     setup_ui(&guider_ui);
     events_init(&guider_ui);
-    initWiFiItemStyle();
 
     xTaskCreate([](void *ptr) {
         while (true) {

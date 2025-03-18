@@ -13,8 +13,6 @@
 extern "C" {
 #endif
 
-#include <esp32-hal-psram.h>
-
 #include "lvgl.h"
 
 typedef struct {

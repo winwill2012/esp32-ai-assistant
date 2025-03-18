@@ -26,10 +26,6 @@ public:
 
     static void updateRecordingButtonImage(bool isPlaying);
 
-    static void initMessageStyle();
-
-    static void initWiFiItemStyle();
-
     static void loadSpeakerSettingData();
 
     static void loadWifiList(bool forceRefresh);
