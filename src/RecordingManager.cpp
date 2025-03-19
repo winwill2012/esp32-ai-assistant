@@ -4,6 +4,8 @@
 #include "Utils.h"
 #include "GlobalState.h"
 
+RingbufHandle_t RecordingManager::_buffer = xRingbufferCreate(1024 * 32, RINGBUF_TYPE_BYTEBUF);
+
 RecordingManager::RecordingManager(DoubaoSTT &sttClient) : _sttClient(sttClient) {
     constexpr i2s_config_t i2s_config = {
         .mode = static_cast<i2s_mode_t>(I2S_MODE_MASTER | I2S_MODE_RX),
@@ -26,44 +28,28 @@ RecordingManager::RecordingManager(DoubaoSTT &sttClient) : _sttClient(sttClient)
     i2s_driver_install(MICROPHONE_I2S_NUM, &i2s_config, 0, nullptr);
     i2s_set_pin(MICROPHONE_I2S_NUM, &pin_config);
     i2s_zero_dma_buffer(MICROPHONE_I2S_NUM);
+}
 
-    _recordingBuffer = std::vector<uint8_t>(AUDIO_RECORDING_BUFFER_SIZE);
-    _lastRecordingBuffer = std::vector<uint8_t>(AUDIO_RECORDING_BUFFER_SIZE);
+void consumeBufferedData(void *arg) {
+    RecordingManager *instance = static_cast<RecordingManager *>(arg);
+    instance->begin();
 }
 
 [[noreturn]] void RecordingManager::begin() {
     size_t bytesRead;
-    bool hasSoundFlag = false;
-    unsigned long idleBeginTime = 0;
-    bool firstPacket = true;
+    xTaskCreate(consumeBufferedData, "consumeBufferTask", 2048, this, 5, nullptr);
     GlobalState::setState(Listening);
+    const auto dmaBuffer = static_cast<uint8_t *>(heap_caps_calloc(
+        AUDIO_RECORDING_BUFFER_SIZE, sizeof(uint8_t), MALLOC_CAP_DMA));
     while (true) {
-        xEventGroupWaitBits(GlobalState::getEventGroup(), GlobalState::getEventBits(Listening), false, false,
-                            portMAX_DELAY);
-        const esp_err_t err = i2s_read(MICROPHONE_I2S_NUM, _recordingBuffer.data(), AUDIO_RECORDING_BUFFER_SIZE,
+        xEventGroupWaitBits(GlobalState::getEventGroup(), GlobalState::getEventBits(Listening),
+                            false, false, portMAX_DELAY);
+        const esp_err_t err = i2s_read(MICROPHONE_I2S_NUM, dmaBuffer, AUDIO_RECORDING_BUFFER_SIZE,
                                        &bytesRead, portMAX_DELAY);
         if (err == ESP_OK) {
-            // 如有有声音
-            if (calculateSoundRMS(_recordingBuffer.data(), bytesRead) > Settings::getRecordingRmsThreshold()) {
-                hasSoundFlag = true;
-                if (firstPacket) {
-                    // 发送第一个数据包时，先发送能够检测到声音的前一帧数据(因为识别有误差，不发前一帧数据，语音识别会丢失一开始的数据)
-                    _sttClient.recognize(_lastRecordingBuffer.data(), bytesRead, firstPacket, false);
-                    firstPacket = false;
-                }
-                _sttClient.recognize(_recordingBuffer.data(), bytesRead, firstPacket, false);
-                idleBeginTime = 0;
-            } else if (hasSoundFlag) {
-                // 如果之前有声音，本次没有声音
-                if (idleBeginTime == 0) {
-                    idleBeginTime = millis();
-                } else if (millis() - idleBeginTime > Settings::getSpeakPauseDuration()) {
-                    _sttClient.recognize(_recordingBuffer.data(), bytesRead, firstPacket, true);
-                    hasSoundFlag = false;
-                    firstPacket = true;
-                }
+            if (calculateSoundRMS(dmaBuffer, bytesRead) > Settings::getRecordingRmsThreshold()) {
+                xRingbufferSend(_buffer, dmaBuffer, bytesRead, portMAX_DELAY);
             }
-            _lastRecordingBuffer = _recordingBuffer;
         }
     }
 }
