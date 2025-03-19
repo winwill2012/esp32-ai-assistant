@@ -16,6 +16,8 @@ std::map<std::string, std::string> Settings::personaMap = std::map<std::string, 
 std::string Settings::doubaoAppId;
 std::string Settings::doubaoAccessToken;
 std::string Settings::cozeToken;
+std::string Settings::wifiSsid;
+std::string Settings::wifiPassword;
 std::vector<WifiInfo> Settings::scannedWifiList = std::vector<WifiInfo>();
 
 void Settings::begin() {
@@ -45,6 +47,8 @@ void Settings::begin() {
                                                   doc["system"]["recordingRmsThreshold"].as<double>());
     speakPauseDuration = preferences.getInt(SETTING_SPEAK_PAUSE_DURATION,
                                             doc["system"]["speakPauseDuration"].as<int>());
+    wifiSsid = preferences.getString(SETTING_WIFI_SSID, "").c_str();
+    wifiPassword = preferences.getString(SETTING_WIFI_PASSWORD, "").c_str();
     preferences.end();
 
     doubaoAppId = doc["doubao"]["appId"].as<std::string>();
@@ -97,6 +101,8 @@ void Settings::show() {
     log_i("            doubaoAppId: %s", doubaoAppId.c_str());
     log_i("      doubaoAccessToken: %s", doubaoAccessToken.c_str());
     log_i("              cozeToken: %s", cozeToken.c_str());
+    log_i("               wifiSsid: %s", wifiSsid.c_str());
+    log_i("           wifiPassword: %s", wifiPassword.c_str());
     log_i("         all voice list: ");
     for (const auto &pair: voiceMap) {
         log_i("%s [%s]", pair.first.c_str(), pair.second.c_str());
@@ -192,6 +198,19 @@ void Settings::setRecordingRmsThreshold(double rmsThreshold) {
     preferences.begin(SETTINGS_NAMESPACE);
     preferences.putDouble(SETTING_RECORDING_RMS_THRESHOLD, rmsThreshold);
     preferences.end();
+}
+
+void Settings::setWifiInfo(const std::string &ssid, const std::string &password) {
+    wifiSsid = ssid;
+    wifiPassword = password;
+    preferences.begin(SETTINGS_NAMESPACE);
+    preferences.putString(SETTING_WIFI_SSID, ssid.c_str());
+    preferences.putString(SETTING_WIFI_PASSWORD, password.c_str());
+    preferences.end();
+}
+
+std::pair<std::string, std::string> Settings::getWifiInfo() {
+    return std::make_pair(wifiSsid, wifiPassword);
 }
 
 std::map<std::string, std::string> Settings::getVoiceMap() {

@@ -21,7 +21,7 @@ double calculateSoundRMS(const uint8_t *buffer, size_t bufferSize);
 
 std::pair<int, size_t> findMinIndexOfDelimiter(const String &input);
 
-bool connectWifi(const String &ssid, const String &password, int maxRetries);
+bool connectWifi(const char *ssid, const char *password, int maxRetries);
 
 std::vector<uint8_t> int16ToUint8BigEndian(const std::vector<int16_t> &input);
 

@@ -9,7 +9,7 @@ void playAudio(void *ptr) {
     size_t bytes_written;
     while (true) {
         if (xQueueReceive(AudioPlayer::getTaskQueue(), &task, portMAX_DELAY) == pdPASS) {
-            GlobalState::setState(Playing);
+            GlobalState::setState(Speaking);
             const esp_err_t result = i2s_write(MAX98357_I2S_NUM, task.data, task.length, &bytes_written, portMAX_DELAY);
             if (result != ESP_OK) {
                 log_e("Play audio failed, errorCode: %d", result);

@@ -4,19 +4,15 @@
 #include <Arduino.h>
 #include <map>
 
-#define EVENT_TTS_WS_TASK_FINISHED (1<<2)
-#define EVENT_STT_WS_TASK_FINISHED (1<<4)
-#define EVENT_LISTENING        (1<<5)
-#define EVENT_PLAYING_AUDIO    (1<<6)
-
 enum MachineState {
     Sleep,
+    NetworkConfigurationNotFound,
     NetworkConnecting,
     NetworkConnected,
     NetworkConnectFailed,
     Listening,
     Thinking,
-    Playing
+    Speaking
 };
 
 enum MachineEvent {
@@ -30,13 +26,17 @@ public:
     std::map<std::pair<MachineState, MachineEvent>, MachineState> machineStateTransferRouter = {
         {{Sleep, StartListen}, Listening},
         {{Listening, StopListening}, Sleep},
-        {{Playing, InterruptPlaying}, Listening},
-        {{Playing, StopListening}, Sleep}
+        {{Speaking, InterruptPlaying}, Listening},
+        {{Speaking, StopListening}, Sleep}
     };
 
     static void setConversationId(String conversationId);
 
+    static EventGroupHandle_t GlobalState::getEventGroup();
+
     static String getConversationId();
+
+    static EventBits_t getEventBits(MachineState state);
 
     static MachineState getState();
 
@@ -45,6 +45,7 @@ public:
 private:
     static String conversationId;
     static MachineState machineState;
+    static EventGroupHandle_t eventGroup;
 };
 
 

@@ -1,6 +1,7 @@
 #include "lvgl_interface.h"
 #include "Settings.h"
 #include "LvglDisplay.h"
+#include "Utils.h"
 
 void set_current_voice(const char *voice) {
     Settings::setCurrentVoice(voice);
@@ -42,4 +43,5 @@ void load_wifi_list(void *refresh) {
 
 void connect_wifi(const char *ssid, const char *password) {
     log_d("连接网络: %s, %s", ssid, password);
+    connectWifi(ssid, password, 20);
 }

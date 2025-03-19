@@ -25,12 +25,19 @@ void setup() {
     DoubaoSTT sttClient(llmAgent);
 
     RecordingManager recordingManager(sttClient);
-    if (connectWifi("Xiaomi_E15A", "19910226", 10)) {
-        TimeUpdater::begin();
-        AudioPlayer::begin();
-        recordingManager.begin();
+    auto wifiInfo = Settings::getWifiInfo();
+    if (wifiInfo.first.empty() || wifiInfo.second.empty()) {
+        log_e("No wifi configuration found");
+        GlobalState::setState(NetworkConfigurationNotFound);
+    } else {
+        connectWifi(wifiInfo.first.c_str(), wifiInfo.second.c_str(), 20);
     }
-
+    // 等待网络连接成功
+    xEventGroupWaitBits(GlobalState::getEventGroup(), GlobalState::getEventBits(NetworkConnected),
+                        false, true, portMAX_DELAY);
+    TimeUpdater::begin();
+    AudioPlayer::begin();
+    recordingManager.begin();
 }
 
 void loop() {

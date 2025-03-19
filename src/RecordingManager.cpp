@@ -6,21 +6,21 @@
 
 RecordingManager::RecordingManager(DoubaoSTT &sttClient) : _sttClient(sttClient) {
     constexpr i2s_config_t i2s_config = {
-            .mode = static_cast<i2s_mode_t>(I2S_MODE_MASTER | I2S_MODE_RX),
-            .sample_rate = AUDIO_SAMPLE_RATE,
-            .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
-            .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT, // 这里的左右声道要和电路保持一致
-            .communication_format = I2S_COMM_FORMAT_STAND_I2S,
-            .intr_alloc_flags = ESP_INTR_FLAG_LEVEL6,
-            .dma_buf_count = 4,
-            .dma_buf_len = 1024,
-            .use_apll = false
+        .mode = static_cast<i2s_mode_t>(I2S_MODE_MASTER | I2S_MODE_RX),
+        .sample_rate = AUDIO_SAMPLE_RATE,
+        .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
+        .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT, // 这里的左右声道要和电路保持一致
+        .communication_format = I2S_COMM_FORMAT_STAND_I2S,
+        .intr_alloc_flags = ESP_INTR_FLAG_LEVEL6,
+        .dma_buf_count = 4,
+        .dma_buf_len = 1024,
+        .use_apll = false
     };
     constexpr i2s_pin_config_t pin_config = {
-            .bck_io_num = MICROPHONE_I2S_BCLK,
-            .ws_io_num = MICROPHONE_I2S_LRC,
-            .data_out_num = -1,
-            .data_in_num = MICROPHONE_I2S_DOUT
+        .bck_io_num = MICROPHONE_I2S_BCLK,
+        .ws_io_num = MICROPHONE_I2S_LRC,
+        .data_out_num = -1,
+        .data_in_num = MICROPHONE_I2S_DOUT
     };
 
     i2s_driver_install(MICROPHONE_I2S_NUM, &i2s_config, 0, nullptr);
@@ -38,9 +38,8 @@ RecordingManager::RecordingManager(DoubaoSTT &sttClient) : _sttClient(sttClient)
     bool firstPacket = true;
     GlobalState::setState(Listening);
     while (true) {
-        if (GlobalState::getState() != Listening) {
-            continue;
-        }
+        xEventGroupWaitBits(GlobalState::getEventGroup(), GlobalState::getEventBits(Listening), false, false,
+                            portMAX_DELAY);
         const esp_err_t err = i2s_read(MICROPHONE_I2S_NUM, _recordingBuffer.data(), AUDIO_RECORDING_BUFFER_SIZE,
                                        &bytesRead, portMAX_DELAY);
         if (err == ESP_OK) {

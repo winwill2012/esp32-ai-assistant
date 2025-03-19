@@ -51,7 +51,7 @@ void confirm_btn_event_cb(lv_event_t *e) {
     connect_wifi(guider_ui.clicked_wifi_ssid, guider_ui.input_wifi_password);
 }
 
-void keyboad_ready_event_cb(lv_event_t *e) {
+void keyboard_ready_event_cb(lv_event_t *e) {
     guider_ui.input_wifi_password = strdup(lv_textarea_get_text(guider_ui.network_setting_wifi_password_textarea));
     lv_obj_add_flag(guider_ui.network_setting_keyboard, LV_OBJ_FLAG_HIDDEN);
 }
@@ -85,7 +85,7 @@ void network_setting_custom_init(lv_ui *ui) {
     ui->network_setting_keyboard = lv_keyboard_create(lv_layer_top());
     lv_obj_align(ui->network_setting_keyboard, LV_ALIGN_BOTTOM_MID, 0, 0);
     lv_keyboard_set_textarea(ui->network_setting_keyboard, ui->network_setting_wifi_password_textarea);
-    lv_obj_add_event_cb(ui->network_setting_keyboard, keyboad_ready_event_cb, LV_EVENT_READY, 0);
+    lv_obj_add_event_cb(ui->network_setting_keyboard, keyboard_ready_event_cb, LV_EVENT_READY, 0);
     lv_obj_add_flag(ui->network_setting_keyboard, LV_OBJ_FLAG_HIDDEN);
 
     // 创建确认按钮
