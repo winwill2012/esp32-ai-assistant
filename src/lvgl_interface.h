@@ -18,13 +18,15 @@ void set_volume_ratio(float volume);
 
 void set_speak_speed(float speed);
 
+void set_screen_brightness(int brightness);
+
 void set_speak_pause_duration(int duration);
 
-void load_speaker_setting_data();
+void load_system_setting_data();
 
 void load_wifi_list(void *refresh);
 
-void connect_wifi(const char *ssid, const char *password);
+bool connect_wifi(const char *ssid, const char *password);
 
 #ifdef __cplusplus
 }

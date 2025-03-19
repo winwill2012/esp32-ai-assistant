@@ -18,6 +18,7 @@ void setup() {
     Serial.begin(115200);
     Settings::begin();
     LvglDisplay::begin();
+    analogWrite(8, (int) (Settings::getScreenBrightness() * 2.55));  // 设置屏幕亮度
 
     DoubaoTTS ttsClient;
     CozeLLMAgent llmAgent(ttsClient);

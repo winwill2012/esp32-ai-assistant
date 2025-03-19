@@ -27,16 +27,15 @@ void clock_count(int *hour, int *min, int *sec);
 extern lv_obj_t *speaker_setting_speed;
 extern const lv_img_dsc_t *network_setting_animimg_refresh_imgs[3];
 
-void lv_speaker_setting_speed_increment_event_cb(lv_event_t *event);
+void lv_system_setting_speed_increment_event_cb(lv_event_t *event);
 
-void lv_speaker_setting_speed_decrement_event_cb(lv_event_t *event);
+void lv_system_setting_speed_decrement_event_cb(lv_event_t *event);
 
-extern lv_obj_t *speaker_setting_recording_pause;
+extern lv_obj_t *system_setting_recording_pause;
 
-void lv_speaker_setting_recording_pause_increment_event_cb(lv_event_t *event);
+void lv_system_setting_recording_pause_increment_event_cb(lv_event_t *event);
 
-void lv_speaker_setting_recording_pause_decrement_event_cb(lv_event_t *event);
-
+void lv_system_setting_recording_pause_decrement_event_cb(lv_event_t *event);
 
 #ifdef __cplusplus
 }

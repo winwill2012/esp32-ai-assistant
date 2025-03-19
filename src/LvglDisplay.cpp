@@ -44,10 +44,10 @@ void my_touchpad_read(lv_indev_drv_t *indev, lv_indev_data_t *data) {
 lv_ui guider_ui;
 lv_obj_t *LvglDisplay::last_message;
 int LvglDisplay::current_message_number = 0;
-SemaphoreHandle_t LvglDisplay::lvglUpdateLock = xSemaphoreCreateMutex();
+SemaphoreHandle_t LvglDisplay::lvglUpdateLock = xSemaphoreCreateRecursiveMutex();
 
 // 这个函数是在lvgl线程中调用的，无需加锁
-void LvglDisplay::loadSpeakerSettingData() {
+void LvglDisplay::loadSystemSettingData() {
     const std::map<std::string, std::string> &voiceMap = Settings::getVoiceMap();
     const std::map<std::string, std::string> &personaMap = Settings::getPersonaMap();
     std::string voiceList;
@@ -71,28 +71,29 @@ void LvglDisplay::loadSpeakerSettingData() {
         j++;
     }
     personaList.pop_back();
-    lv_dropdown_set_options(guider_ui.speaker_setting_voice_type, voiceList.c_str());
-    lv_dropdown_set_symbol(guider_ui.speaker_setting_voice_type, LV_SYMBOL_DOWN);
-    lv_dropdown_set_selected(guider_ui.speaker_setting_voice_type, selectedVoiceIndex);
+    lv_dropdown_set_options(guider_ui.system_setting_voice_type, voiceList.c_str());
+    lv_dropdown_set_symbol(guider_ui.system_setting_voice_type, LV_SYMBOL_DOWN);
+    lv_dropdown_set_selected(guider_ui.system_setting_voice_type, selectedVoiceIndex);
 
-    lv_dropdown_set_options(guider_ui.speaker_setting_persona, personaList.c_str());
-    lv_dropdown_set_symbol(guider_ui.speaker_setting_persona, LV_SYMBOL_DOWN);
-    lv_dropdown_set_selected(guider_ui.speaker_setting_persona, selectedPersonaIndex);
+    lv_dropdown_set_options(guider_ui.system_setting_persona, personaList.c_str());
+    lv_dropdown_set_symbol(guider_ui.system_setting_persona, LV_SYMBOL_DOWN);
+    lv_dropdown_set_selected(guider_ui.system_setting_persona, selectedPersonaIndex);
 
-    lv_dropdown_set_options(guider_ui.speaker_setting_environment_noise, "安静\n一般\n嘈杂");
-    lv_dropdown_set_symbol(guider_ui.speaker_setting_environment_noise, LV_SYMBOL_DOWN);
+    lv_dropdown_set_options(guider_ui.system_setting_environment_noise, "安静\n一般\n嘈杂");
+    lv_dropdown_set_symbol(guider_ui.system_setting_environment_noise, LV_SYMBOL_DOWN);
     if (Settings::getRecordingRmsThreshold() == ENV_QUIET) {
-        lv_dropdown_set_selected(guider_ui.speaker_setting_environment_noise, 0);
+        lv_dropdown_set_selected(guider_ui.system_setting_environment_noise, 0);
     } else if (Settings::getRecordingRmsThreshold() == ENV_GENERAL) {
-        lv_dropdown_set_selected(guider_ui.speaker_setting_environment_noise, 1);
+        lv_dropdown_set_selected(guider_ui.system_setting_environment_noise, 1);
     } else {
-        lv_dropdown_set_selected(guider_ui.speaker_setting_environment_noise, 2);
+        lv_dropdown_set_selected(guider_ui.system_setting_environment_noise, 2);
     }
-    lv_spinbox_set_value(guider_ui.speaker_setting_speed,
+    lv_spinbox_set_value(guider_ui.system_setting_speed,
                          static_cast<int32_t>(Settings::getCurrentSpeakSpeedRatio() * 10));
-    lv_spinbox_set_value(guider_ui.speaker_setting_recording_pause, Settings::getSpeakPauseDuration() / 100);
-    lv_slider_set_value(guider_ui.speaker_setting_volume,
+    lv_spinbox_set_value(guider_ui.system_setting_recording_pause, Settings::getSpeakPauseDuration() / 100);
+    lv_slider_set_value(guider_ui.system_setting_slider_volume,
                         static_cast<int32_t>(Settings::getCurrentSpeakVolumeRatio() * 100), LV_ANIM_OFF);
+    lv_slider_set_value(guider_ui.system_setting_slider_brightness, Settings::getScreenBrightness(), LV_ANIM_ON);
 }
 
 void LvglDisplay::begin() {
@@ -127,9 +128,9 @@ void LvglDisplay::begin() {
 
     xTaskCreate([](void *ptr) {
         while (true) {
-            if (xSemaphoreTake(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
+            if (xSemaphoreTakeRecursive(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
                 lv_timer_handler();
-                xSemaphoreGive(lvglUpdateLock);
+                xSemaphoreGiveRecursive(lvglUpdateLock);
             }
             vTaskDelay(5);
         }
@@ -138,11 +139,11 @@ void LvglDisplay::begin() {
 
 // 更新首页聊天列表
 void LvglDisplay::updateChatText(const MessageRole messageRole, const bool newLine, const std::string &text) {
-    if (xSemaphoreTake(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
+    if (xSemaphoreTakeRecursive(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
         if (!newLine && last_message != nullptr) {
             lv_label_set_text(last_message, text.c_str());
             lv_obj_scroll_to_y(guider_ui.home_page_message_list, LV_COORD_MAX, LV_ANIM_ON);
-            xSemaphoreGive(lvglUpdateLock);
+            xSemaphoreGiveRecursive(lvglUpdateLock);
             return;
         }
         last_message = lv_list_add_text(guider_ui.home_page_message_list, text.c_str());
@@ -165,55 +166,55 @@ void LvglDisplay::updateChatText(const MessageRole messageRole, const bool newLi
             }
         }
         lv_obj_scroll_to_y(guider_ui.home_page_message_list, LV_COORD_MAX, LV_ANIM_ON);
-        xSemaphoreGive(lvglUpdateLock);
+        xSemaphoreGiveRecursive(lvglUpdateLock);
     }
 }
 
 void LvglDisplay::updateState(const std::string &state) {
-    if (xSemaphoreTake(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
+    if (xSemaphoreTakeRecursive(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
         lv_label_set_text(guider_ui.home_page_header_state, state.c_str());
-        xSemaphoreGive(lvglUpdateLock);
+        xSemaphoreGiveRecursive(lvglUpdateLock);
     }
 }
 
 void LvglDisplay::updateTime(const std::string &time) {
-    if (xSemaphoreTake(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
+    if (xSemaphoreTakeRecursive(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
         lv_label_set_text(guider_ui.home_page_header_time, time.c_str());
-        xSemaphoreGive(lvglUpdateLock);
+        xSemaphoreGiveRecursive(lvglUpdateLock);
     }
 }
 
 void LvglDisplay::updateWifiState(bool success) {
-    if (xSemaphoreTake(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
+    if (xSemaphoreTakeRecursive(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
         if (success) {
             lv_obj_add_flag(guider_ui.home_page_header_wifi_no, LV_OBJ_FLAG_HIDDEN);
         } else {
             lv_obj_clear_flag(guider_ui.home_page_header_wifi_no, LV_OBJ_FLAG_HIDDEN);
         }
-        xSemaphoreGive(lvglUpdateLock);
+        xSemaphoreGiveRecursive(lvglUpdateLock);
     }
 }
 
 void LvglDisplay::updateRecordingButtonState(bool recordingAllowed) {
-    if (xSemaphoreTake(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
+    if (xSemaphoreTakeRecursive(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
         if (recordingAllowed) {
             lv_obj_add_flag(guider_ui.home_page_line_stop_recording, LV_OBJ_FLAG_HIDDEN);
         } else {
             lv_obj_clear_flag(guider_ui.home_page_line_stop_recording, LV_OBJ_FLAG_HIDDEN);
         }
-        xSemaphoreGive(lvglUpdateLock);
+        xSemaphoreGiveRecursive(lvglUpdateLock);
     }
 }
 
 void LvglDisplay::updateRecordingButtonImage(bool isPlaying) {
-    if (xSemaphoreTake(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
+    if (xSemaphoreTakeRecursive(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
         if (isPlaying) {
             lv_img_set_src(guider_ui.home_page_microphone, &_stop_alpha_40x40);
             lv_obj_add_flag(guider_ui.home_page_line_stop_recording, LV_OBJ_FLAG_HIDDEN);
         } else {
             lv_img_set_src(guider_ui.home_page_microphone, &_micphone_alpha_40x40);
         }
-        xSemaphoreGive(lvglUpdateLock);
+        xSemaphoreGiveRecursive(lvglUpdateLock);
     }
 }
 
@@ -224,6 +225,8 @@ static void click_wifi_item_event_callback(lv_event_t *e) {
     if (user_data != nullptr) {
         guider_ui.clicked_wifi_ssid = (char *) user_data;
         lv_label_set_text(guider_ui.network_setting_connect_wifi_window_title, (char *) user_data);
+        lv_textarea_set_text(guider_ui.network_setting_wifi_password_textarea, "");
+        lv_obj_clear_flag(guider_ui.network_setting_overlay, LV_OBJ_FLAG_HIDDEN);
         lv_obj_clear_flag(guider_ui.network_setting_connect_wifi_window, LV_OBJ_FLAG_HIDDEN);
     }
 }
@@ -232,6 +235,9 @@ static void click_wifi_item_event_callback(lv_event_t *e) {
 void add_wifi_item(const WifiInfo &wifi) {
     lv_obj_t *wifi_item = lv_list_add_btn(guider_ui.network_setting_wifi_list, LV_SYMBOL_WIFI, wifi._ssid.c_str());
     lv_obj_set_style_text_font(wifi_item, &lv_customer_font_Siyuan_Regular_16, 0);
+    if (wifi._ssid.compareTo(Settings::getWifiInfo().first.c_str()) == 0) {
+        lv_obj_set_style_text_color(wifi_item, lv_color_make(0, 128, 0), 0);
+    }
     char *ssid_copy = strdup(wifi._ssid.c_str());
     if (ssid_copy != nullptr) {
         lv_obj_add_event_cb(wifi_item, click_wifi_item_event_callback, LV_EVENT_CLICKED, ssid_copy);
@@ -244,11 +250,11 @@ void LvglDisplay::loadWifiList(const bool forceRefresh) {
         if (forceRefresh) {
             // 强制刷新的时候，是点击了UI上的刷新按钮，那里会创建一个新的task来加载wifi，
             // 所以本段逻辑不在lv_timer_handler中执行，需要加锁
-            if (xSemaphoreTake(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
+            if (xSemaphoreTakeRecursive(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
                 add_wifi_item(wifi);
                 // wifi列表加载完毕，停止播放动画
                 lv_anim_del(guider_ui.network_setting_animimg_refresh, nullptr);
-                xSemaphoreGive(lvglUpdateLock);
+                xSemaphoreGiveRecursive(lvglUpdateLock);
             }
         } else {
             add_wifi_item(wifi);

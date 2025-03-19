@@ -29,7 +29,7 @@ void setup_scr_home_page(lv_ui *ui) {
     lv_obj_set_style_bg_grad_stop(ui->home_page, 77, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     //Write codes home_page_container_top
-    ui->home_page_container_top = lv_obj_create(ui->home_page);
+    ui->home_page_container_top = lv_obj_create(lv_layer_top());
     lv_obj_set_pos(ui->home_page_container_top, 0, 0);
     lv_obj_set_size(ui->home_page_container_top, 320, 30);
     lv_obj_set_scrollbar_mode(ui->home_page_container_top, LV_SCROLLBAR_MODE_OFF);

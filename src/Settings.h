@@ -15,6 +15,7 @@
 #define SETTING_RECORDING_RMS_THRESHOLD     "rmsThreshold"
 #define SETTING_WIFI_SSID                   "wifiSsid"
 #define SETTING_WIFI_PASSWORD               "wifiPassword"
+#define SETTING_SCREEN_BRIGHTNESS           "brightness"
 
 struct WifiInfo {
     WifiInfo(String ssid, const int rssi, const bool encrypted) : _ssid(std::move(ssid)),
@@ -36,6 +37,10 @@ public:
     static std::vector<WifiInfo> getWifiList(bool refresh);
 
     static String getCurrentVoice();
+
+    static int getScreenBrightness();
+
+    static void setScreenBrightness(int brightness);
 
     static void setCurrentVoice(const String &voice);
 
@@ -76,6 +81,7 @@ public:
 private:
     static String currentVoice; // 当前设置的发音人
     static String currentPersona; // 当前设置的人设
+    static int currentScreenBrightness; // 当前屏幕亮度 [30, 100]
     static float currentSpeakVolumeRatio; // 当前设置的音量
     static float currentSpeakSpeedRatio; // 当前设置的说话语速
 

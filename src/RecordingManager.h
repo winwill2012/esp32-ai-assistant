@@ -1,8 +1,7 @@
 #ifndef IOT_AI_CONTROLLER_RECORDING_H
 #define IOT_AI_CONTROLLER_RECORDING_H
 
-#include <RTOS.h>
-
+#include <freertos/ringbuf.h>
 #include "DoubaoSTT.h"
 
 #define MICROPHONE_I2S_NUM          I2S_NUM_1
@@ -18,9 +17,13 @@ public:
 
     [[noreturn]] void begin();
 
+    DoubaoSTT getSttClient();
+
+    RingbufHandle_t getRingBuffer();
+
 private:
     DoubaoSTT _sttClient;
-    static RingbufHandle_t _buffer;
+    RingbufHandle_t _ringBuffer;
 };
 
 #endif //IOT_AI_CONTROLLER_RECORDING_H

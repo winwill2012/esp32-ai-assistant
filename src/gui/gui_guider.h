@@ -38,43 +38,47 @@ typedef struct {
     lv_obj_t *settings_page_btn_voice_setting;
     lv_obj_t *settings_page_btn_voice_setting_label;
     lv_obj_t *settings_page_cont_1;
+
     lv_obj_t *network_setting;
     lv_obj_t *network_setting_label_1;
     lv_obj_t *network_setting_wifi_list;
     lv_obj_t *network_setting_animimg_refresh;
     lv_obj_t *network_setting_connect_wifi_window;     // 连接wifi弹框
+    lv_obj_t *network_setting_overlay;                 // 连接wifi弹框背后的遮罩层
     lv_obj_t *network_setting_connect_wifi_window_title;     // 连接wifi弹框
     lv_obj_t *network_setting_wifi_password_textarea;  // wifi密码输入框
     lv_obj_t *network_setting_keyboard;                // wifi密码输入框绑定键盘
     lv_obj_t *network_setting_confirm_btn;             // 确认联网按钮
     char *clicked_wifi_ssid;                           // 当前点击了那个wifi
     char *input_wifi_password;                         // 当前输入的wifi密码
-
     bool network_setting_del;
     lv_obj_t *network_setting_imgbtn_back;
     lv_obj_t *network_setting_imgbtn_back_label;
     lv_obj_t *network_setting_label_title;
-    lv_obj_t *speaker_setting;
-    bool speaker_setting_del;
-    lv_obj_t *speaker_setting_imgbtn_back;
-    lv_obj_t *speaker_setting_imgbtn_back_label;
-    lv_obj_t *speaker_setting_label_title;
-    lv_obj_t *speaker_setting_speed;
-    lv_obj_t *speaker_setting_speed_btn_plus;
-    lv_obj_t *speaker_setting_speed_btn_minus;
-    lv_obj_t *speaker_setting_voice_type;
-    lv_obj_t *speaker_setting_persona;
-    lv_obj_t *speaker_setting_volume;
-    lv_obj_t *speaker_setting_environment_noise;
-    lv_obj_t *speaker_setting_recording_pause;
-    lv_obj_t *speaker_setting_recording_pause_btn_plus;
-    lv_obj_t *speaker_setting_recording_pause_btn_minus;
-    lv_obj_t *speaker_setting_label_1;
-    lv_obj_t *speaker_setting_label_2;
-    lv_obj_t *speaker_setting_label_3;
-    lv_obj_t *speaker_setting_label_4;
-    lv_obj_t *speaker_setting_label_5;
-    lv_obj_t *speaker_setting_label_6;
+    lv_obj_t *system_setting;
+
+    bool system_setting_del;
+    lv_obj_t *system_setting_imgbtn_back;
+    lv_obj_t *system_setting_imgbtn_back_label;
+    lv_obj_t *system_setting_label_title;
+    lv_obj_t *system_setting_speed;
+    lv_obj_t *system_setting_speed_btn_plus;
+    lv_obj_t *system_setting_speed_btn_minus;
+    lv_obj_t *system_setting_voice_type;
+    lv_obj_t *system_setting_persona;
+    lv_obj_t *system_setting_slider_brightness;
+    lv_obj_t *system_setting_slider_volume;
+    lv_obj_t *system_setting_environment_noise;
+    lv_obj_t *system_setting_recording_pause;
+    lv_obj_t *system_setting_recording_pause_btn_plus;
+    lv_obj_t *system_setting_recording_pause_btn_minus;
+    lv_obj_t *system_setting_label_1;
+    lv_obj_t *system_setting_label_2;
+    lv_obj_t *system_setting_label_3;
+    lv_obj_t *system_setting_label_4;
+    lv_obj_t *system_setting_label_5;
+    lv_obj_t *system_setting_label_6;
+    lv_obj_t *system_setting_label_9;
 } lv_ui;
 
 typedef void (*ui_setup_scr_t)(lv_ui *ui);
@@ -105,14 +109,12 @@ void setup_scr_settings_page(lv_ui *ui);
 
 void setup_scr_network_setting(lv_ui *ui);
 
-void setup_scr_speaker_setting(lv_ui *ui);
+void setup_scr_system_setting(lv_ui *ui);
 
 LV_IMG_DECLARE(_WIFI_alpha_26x26);
 LV_IMG_DECLARE(_micphone_alpha_40x40);
 LV_IMG_DECLARE(_stop_alpha_40x40);
-LV_IMG_DECLARE(_retrun_alpha_33x33);
-LV_IMG_DECLARE(_retrun_alpha_33x33);
-LV_IMG_DECLARE(_retrun_alpha_33x33);
+LV_IMG_DECLARE(_retrun_alpha_30x30);
 LV_IMG_DECLARE(_backgroud_320x480);
 
 #include "extra/widgets/animimg/lv_animimg.h"
@@ -120,7 +122,6 @@ LV_IMG_DECLARE(_backgroud_320x480);
 LV_IMG_DECLARE(network_setting_animimg_refreshrefresh_1);
 LV_IMG_DECLARE(network_setting_animimg_refreshrefresh_2);
 LV_IMG_DECLARE(network_setting_animimg_refreshrefresh_3);
-LV_IMG_DECLARE(_retrun_alpha_33x33);
 
 LV_FONT_DECLARE(lv_font_montserratMedium_16)
 LV_FONT_DECLARE(lv_font_montserratMedium_21)

@@ -32,7 +32,7 @@ public:
 
     static void setConversationId(String conversationId);
 
-    static EventGroupHandle_t GlobalState::getEventGroup();
+    static EventGroupHandle_t getEventGroup();
 
     static String getConversationId();
 

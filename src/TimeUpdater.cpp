@@ -18,11 +18,11 @@ void TimeUpdater::begin() {
             const unsigned long currentMinute = (localEpochTime % 3600) / 60;
             if (currentMinute != lastMinute) {
                 char timeStr[6];
-                snprintf(timeStr, sizeof(timeStr), "%02d:%02d", currentHour, currentMinute);
+                snprintf(timeStr, sizeof(timeStr), "%02lu:%02lu", currentHour, currentMinute);
                 LvglDisplay::updateTime(timeStr);
                 lastMinute = currentMinute;
             }
             vTaskDelay(pdMS_TO_TICKS(1000));
         }
-    }, "timeUpdater", 2048, nullptr, 1, nullptr);
+    }, "timeUpdater", 1024 * 4, nullptr, 1, nullptr);
 }

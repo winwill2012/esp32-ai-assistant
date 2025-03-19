@@ -16,6 +16,7 @@ DoubaoSTT::DoubaoSTT(const CozeLLMAgent &llmAgent)
 }
 
 void DoubaoSTT::eventCallback(WStype_t type, uint8_t *payload, size_t length) {
+    log_d("收到websocket消息: %d, %d", type, length);
     switch (type) {
         case WStype_PING:
         case WStype_ERROR:
@@ -100,6 +101,7 @@ void DoubaoSTT::buildAudioOnlyRequest(uint8_t *audio, const size_t size, const b
 }
 
 void DoubaoSTT::recognize(uint8_t *audio, const size_t size, const bool firstPacket, const bool lastPacket) {
+    log_d("语音识别: %d, %d, %d", size, firstPacket, lastPacket);
     if (firstPacket) {
         while (!isConnected()) {
             loop();
@@ -113,11 +115,13 @@ void DoubaoSTT::recognize(uint8_t *audio, const size_t size, const bool firstPac
     sendBIN(_requestBuilder.data(), _requestBuilder.size());
     loop();
     if (lastPacket) {
+        log_d("等待语音合成完毕...");
         // 等待本次合成完毕
         while (xSemaphoreTake(_taskFinished, 0) == pdFALSE) {
             loop();
             vTaskDelay(1);
         }
+        log_d("语音合成完毕...");
         disconnect();
     }
 }
@@ -125,6 +129,7 @@ void DoubaoSTT::recognize(uint8_t *audio, const size_t size, const bool firstPac
 void DoubaoSTT::parseResponse(const uint8_t *response) {
     const uint8_t messageType = response[1] >> 4;
     const uint8_t *payload = response + 4;
+    log_d("messageType = %d", messageType);
     switch (messageType) {
         case 0b1001: {
             // 服务端下发包含识别结果的 full server response
@@ -158,6 +163,8 @@ void DoubaoSTT::parseResponse(const uint8_t *response) {
                         _firstPacket = true;
                     }
                 }
+            } else {
+                log_d("[语音识别]未识别到文字");
             }
             break;
         }

@@ -30,8 +30,8 @@ void setup_scr_settings_page(lv_ui *ui)
 
     //Write codes settings_page_cont_1
     ui->settings_page_cont_1 = lv_obj_create(ui->settings_page);
-    lv_obj_set_pos(ui->settings_page_cont_1, 10, 63);
-    lv_obj_set_size(ui->settings_page_cont_1, 300, 353);
+    lv_obj_set_pos(ui->settings_page_cont_1, 10, 80);
+    lv_obj_set_size(ui->settings_page_cont_1, 300, 350);
     lv_obj_set_scrollbar_mode(ui->settings_page_cont_1, LV_SCROLLBAR_MODE_OFF);
 
     //Write style for settings_page_cont_1, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
@@ -53,8 +53,8 @@ void setup_scr_settings_page(lv_ui *ui)
     ui->settings_page_label_setting_title = lv_label_create(ui->settings_page);
     lv_label_set_text(ui->settings_page_label_setting_title, "" LV_SYMBOL_SETTINGS " 系统设置");
     lv_label_set_long_mode(ui->settings_page_label_setting_title, LV_LABEL_LONG_WRAP);
-    lv_obj_set_pos(ui->settings_page_label_setting_title, 33, 15);
-    lv_obj_set_size(ui->settings_page_label_setting_title, 95, 22);
+    lv_obj_set_pos(ui->settings_page_label_setting_title, 39, 45);
+    lv_obj_set_size(ui->settings_page_label_setting_title, 95, 17);
 
     //Write style for settings_page_label_setting_title, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->settings_page_label_setting_title, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -75,14 +75,14 @@ void setup_scr_settings_page(lv_ui *ui)
     //Write codes settings_page_imgbtn_back
     ui->settings_page_imgbtn_back = lv_imgbtn_create(ui->settings_page);
     lv_obj_add_flag(ui->settings_page_imgbtn_back, LV_OBJ_FLAG_CHECKABLE);
-    lv_imgbtn_set_src(ui->settings_page_imgbtn_back, LV_IMGBTN_STATE_RELEASED, NULL, &_retrun_alpha_33x33, NULL);
+    lv_imgbtn_set_src(ui->settings_page_imgbtn_back, LV_IMGBTN_STATE_RELEASED, NULL, &_retrun_alpha_30x30, NULL);
     ui->settings_page_imgbtn_back_label = lv_label_create(ui->settings_page_imgbtn_back);
     lv_label_set_text(ui->settings_page_imgbtn_back_label, "");
     lv_label_set_long_mode(ui->settings_page_imgbtn_back_label, LV_LABEL_LONG_WRAP);
     lv_obj_align(ui->settings_page_imgbtn_back_label, LV_ALIGN_CENTER, 0, 0);
     lv_obj_set_style_pad_all(ui->settings_page_imgbtn_back, 0, LV_STATE_DEFAULT);
-    lv_obj_set_pos(ui->settings_page_imgbtn_back, 0, 7);
-    lv_obj_set_size(ui->settings_page_imgbtn_back, 33, 33);
+    lv_obj_set_pos(ui->settings_page_imgbtn_back, 0, 40);
+    lv_obj_set_size(ui->settings_page_imgbtn_back, 30, 30);
 
     //Write style for settings_page_imgbtn_back, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_text_color(ui->settings_page_imgbtn_back, lv_color_hex(0x000000), LV_PART_MAIN|LV_STATE_DEFAULT);
@@ -121,7 +121,7 @@ void setup_scr_settings_page(lv_ui *ui)
     lv_obj_align(ui->settings_page_btn_network_setting_label, LV_ALIGN_CENTER, 0, 0);
     lv_obj_set_style_pad_all(ui->settings_page_btn_network_setting, 0, LV_STATE_DEFAULT);
     lv_obj_set_width(ui->settings_page_btn_network_setting_label, LV_PCT(100));
-    lv_obj_set_pos(ui->settings_page_btn_network_setting, 26, 138);
+    lv_obj_set_pos(ui->settings_page_btn_network_setting, 26, 151);
     lv_obj_set_size(ui->settings_page_btn_network_setting, 266, 75);
 
     //Write style for settings_page_btn_network_setting, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
@@ -142,12 +142,12 @@ void setup_scr_settings_page(lv_ui *ui)
     //Write codes settings_page_btn_voice_setting
     ui->settings_page_btn_voice_setting = lv_btn_create(ui->settings_page);
     ui->settings_page_btn_voice_setting_label = lv_label_create(ui->settings_page_btn_voice_setting);
-    lv_label_set_text(ui->settings_page_btn_voice_setting_label, "" LV_SYMBOL_VOLUME_MAX "语音设置 ");
+    lv_label_set_text(ui->settings_page_btn_voice_setting_label, "" LV_SYMBOL_SETTINGS "系统设置 ");
     lv_label_set_long_mode(ui->settings_page_btn_voice_setting_label, LV_LABEL_LONG_WRAP);
     lv_obj_align(ui->settings_page_btn_voice_setting_label, LV_ALIGN_CENTER, 0, 0);
     lv_obj_set_style_pad_all(ui->settings_page_btn_voice_setting, 0, LV_STATE_DEFAULT);
     lv_obj_set_width(ui->settings_page_btn_voice_setting_label, LV_PCT(100));
-    lv_obj_set_pos(ui->settings_page_btn_voice_setting, 26, 249);
+    lv_obj_set_pos(ui->settings_page_btn_voice_setting, 26, 263);
     lv_obj_set_size(ui->settings_page_btn_voice_setting, 266, 75);
 
     //Write style for settings_page_btn_voice_setting, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.

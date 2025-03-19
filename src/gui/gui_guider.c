@@ -76,7 +76,7 @@ void init_scr_del_flag(lv_ui *ui) {
     ui->home_page_del = true;
     ui->settings_page_del = true;
     ui->network_setting_del = true;
-    ui->speaker_setting_del = true;
+    ui->system_setting_del = true;
 }
 
 void setup_ui(lv_ui *ui) {

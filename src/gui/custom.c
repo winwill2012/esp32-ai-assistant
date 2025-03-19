@@ -48,19 +48,37 @@ void textarea_blur_event_cb(lv_event_t *e) {
 }
 
 void confirm_btn_event_cb(lv_event_t *e) {
+    lv_obj_add_flag(guider_ui.network_setting_connect_wifi_window, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(guider_ui.network_setting_overlay, LV_OBJ_FLAG_HIDDEN);
     connect_wifi(guider_ui.clicked_wifi_ssid, guider_ui.input_wifi_password);
+}
+
+void overlay_event_cb(lv_event_t *e) {
+    // 如果当前键盘是显示状态，就关闭键盘
+    if (!lv_obj_has_flag(guider_ui.network_setting_keyboard, LV_OBJ_FLAG_HIDDEN)) {
+        lv_obj_add_flag(guider_ui.network_setting_keyboard, LV_OBJ_FLAG_HIDDEN);
+    } else {  // 如果键盘没有显示，就关闭联网窗口
+        lv_obj_add_flag(guider_ui.network_setting_connect_wifi_window, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_add_flag(guider_ui.network_setting_overlay, LV_OBJ_FLAG_HIDDEN);
+    }
 }
 
 void keyboard_ready_event_cb(lv_event_t *e) {
     guider_ui.input_wifi_password = strdup(lv_textarea_get_text(guider_ui.network_setting_wifi_password_textarea));
     lv_obj_add_flag(guider_ui.network_setting_keyboard, LV_OBJ_FLAG_HIDDEN);
-}
-
-void connect_wifi_window_blur_event_cb(lv_event_t *e) {
-    lv_obj_add_flag(guider_ui.network_setting_connect_wifi_window, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_clear_state(guider_ui.network_setting_wifi_password_textarea, LV_STATE_FOCUSED);
 }
 
 void network_setting_custom_init(lv_ui *ui) {
+    // 在屏幕上创建一个透明遮罩层
+    ui->network_setting_overlay = lv_obj_create(guider_ui.network_setting);
+    lv_obj_remove_style_all(ui->network_setting_overlay);
+    lv_obj_set_size(ui->network_setting_overlay, LV_PCT(100), LV_PCT(100));
+    lv_obj_set_style_bg_opa(ui->network_setting_overlay, LV_OPA_TRANSP, 0); // 完全透明
+    lv_obj_add_flag(ui->network_setting_overlay, LV_OBJ_FLAG_CLICKABLE); // 可点击
+    lv_obj_add_flag(ui->network_setting_overlay, LV_OBJ_FLAG_HIDDEN);  // 默认隐藏
+    lv_obj_add_event_cb(ui->network_setting_overlay, overlay_event_cb, LV_EVENT_CLICKED, NULL);
+
     ui->network_setting_connect_wifi_window = lv_win_create(guider_ui.network_setting, 30);
     lv_obj_set_style_pad_all(ui->network_setting_connect_wifi_window, 0, 0);
     lv_obj_set_size(ui->network_setting_connect_wifi_window, lv_pct(100), 110);
@@ -68,6 +86,7 @@ void network_setting_custom_init(lv_ui *ui) {
     lv_obj_align(ui->network_setting_connect_wifi_window, LV_ALIGN_CENTER, 0, -60);
     ui->network_setting_connect_wifi_window_title = lv_win_add_title(ui->network_setting_connect_wifi_window, "");
     lv_obj_set_style_text_font(ui->network_setting_connect_wifi_window_title, &lv_customer_font_Siyuan_Regular_16, 0);
+    lv_obj_move_foreground(ui->network_setting_connect_wifi_window); // 窗口放到透明遮罩层上方
 
     ui->network_setting_wifi_password_textarea = lv_textarea_create(ui->network_setting_connect_wifi_window);
     lv_textarea_set_password_mode(ui->network_setting_wifi_password_textarea, true);
@@ -99,7 +118,6 @@ void network_setting_custom_init(lv_ui *ui) {
     lv_obj_align(ui->network_setting_confirm_btn, LV_ALIGN_BOTTOM_MID, 0, -5);
     // 点击确认后的事件 -> 连接wifi
     lv_obj_add_event_cb(ui->network_setting_confirm_btn, confirm_btn_event_cb, LV_EVENT_CLICKED, NULL);
-    lv_obj_add_event_cb(ui->network_setting_connect_wifi_window, connect_wifi_window_blur_event_cb, LV_EVENT_DEFOCUSED,
-                        NULL);
+
     lv_obj_add_flag(ui->network_setting_connect_wifi_window, LV_OBJ_FLAG_HIDDEN);
 }

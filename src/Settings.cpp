@@ -7,6 +7,7 @@
 Preferences Settings::preferences;
 String Settings::currentVoice;
 String Settings::currentPersona;
+int Settings::currentScreenBrightness;
 float Settings::currentSpeakSpeedRatio;
 float Settings::currentSpeakVolumeRatio;
 double Settings::recordingRmsThreshold;
@@ -49,6 +50,7 @@ void Settings::begin() {
                                             doc["system"]["speakPauseDuration"].as<int>());
     wifiSsid = preferences.getString(SETTING_WIFI_SSID, "").c_str();
     wifiPassword = preferences.getString(SETTING_WIFI_PASSWORD, "").c_str();
+    currentScreenBrightness = preferences.getInt(SETTING_SCREEN_BRIGHTNESS, 80);
     preferences.end();
 
     doubaoAppId = doc["doubao"]["appId"].as<std::string>();
@@ -137,6 +139,7 @@ std::vector<WifiInfo> Settings::getWifiList(bool refresh) {
 String Settings::getCurrentVoice() {
     return currentVoice;
 }
+
 
 void Settings::setCurrentVoice(const String &voice) {
     currentVoice = voice;
@@ -231,4 +234,16 @@ std::string Settings::getDoubaoAccessToken() {
 
 std::string Settings::getCozeToken() {
     return cozeToken;
+}
+
+int Settings::getScreenBrightness() {
+    return currentScreenBrightness;
+}
+
+void Settings::setScreenBrightness(int brightness) {
+    currentScreenBrightness = brightness;
+    analogWrite(8, (int) (currentScreenBrightness * 2.55));
+    preferences.begin(SETTINGS_NAMESPACE);
+    preferences.putInt(SETTING_SCREEN_BRIGHTNESS, brightness);
+    preferences.end();
 }

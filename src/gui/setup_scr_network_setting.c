@@ -30,14 +30,14 @@ void setup_scr_network_setting(lv_ui *ui) {
     //Write codes network_setting_imgbtn_back
     ui->network_setting_imgbtn_back = lv_imgbtn_create(ui->network_setting);
     lv_obj_add_flag(ui->network_setting_imgbtn_back, LV_OBJ_FLAG_CHECKABLE);
-    lv_imgbtn_set_src(ui->network_setting_imgbtn_back, LV_IMGBTN_STATE_RELEASED, NULL, &_retrun_alpha_33x33, NULL);
+    lv_imgbtn_set_src(ui->network_setting_imgbtn_back, LV_IMGBTN_STATE_RELEASED, NULL, &_retrun_alpha_30x30, NULL);
     ui->network_setting_imgbtn_back_label = lv_label_create(ui->network_setting_imgbtn_back);
     lv_label_set_text(ui->network_setting_imgbtn_back_label, "");
     lv_label_set_long_mode(ui->network_setting_imgbtn_back_label, LV_LABEL_LONG_WRAP);
     lv_obj_align(ui->network_setting_imgbtn_back_label, LV_ALIGN_CENTER, 0, 0);
     lv_obj_set_style_pad_all(ui->network_setting_imgbtn_back, 0, LV_STATE_DEFAULT);
-    lv_obj_set_pos(ui->network_setting_imgbtn_back, 0, 6);
-    lv_obj_set_size(ui->network_setting_imgbtn_back, 33, 33);
+    lv_obj_set_pos(ui->network_setting_imgbtn_back, 0, 40);
+    lv_obj_set_size(ui->network_setting_imgbtn_back, 30, 30);
 
     //Write style for network_setting_imgbtn_back, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_text_color(ui->network_setting_imgbtn_back, lv_color_hex(0x000000),
@@ -78,8 +78,8 @@ void setup_scr_network_setting(lv_ui *ui) {
     ui->network_setting_label_title = lv_label_create(ui->network_setting);
     lv_label_set_text(ui->network_setting_label_title, "" LV_SYMBOL_WIFI " 网络设置 ");
     lv_label_set_long_mode(ui->network_setting_label_title, LV_LABEL_LONG_WRAP);
-    lv_obj_set_pos(ui->network_setting_label_title, 33, 15);
-    lv_obj_set_size(ui->network_setting_label_title, 100, 22);
+    lv_obj_set_pos(ui->network_setting_label_title, 33, 46);
+    lv_obj_set_size(ui->network_setting_label_title, 100, 17);
 
     //Write style for network_setting_label_title, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_border_width(ui->network_setting_label_title, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -101,8 +101,8 @@ void setup_scr_network_setting(lv_ui *ui) {
 
     //Write codes network_setting_list_1
     ui->network_setting_wifi_list = lv_list_create(ui->network_setting);
-    lv_obj_set_pos(ui->network_setting_wifi_list, 10, 85);
-    lv_obj_set_size(ui->network_setting_wifi_list, 300, 369);
+    lv_obj_set_pos(ui->network_setting_wifi_list, 10, 116);
+    lv_obj_set_size(ui->network_setting_wifi_list, 300, 338);
     lv_obj_set_scrollbar_mode(ui->network_setting_wifi_list, LV_SCROLLBAR_MODE_OFF);
 
     //Write style state: LV_STATE_DEFAULT for &style_network_setting_list_1_main_main_default
@@ -175,7 +175,7 @@ void setup_scr_network_setting(lv_ui *ui) {
     ui->network_setting_label_1 = lv_label_create(ui->network_setting);
     lv_label_set_text(ui->network_setting_label_1, "选取附近的WLAN");
     lv_label_set_long_mode(ui->network_setting_label_1, LV_LABEL_LONG_WRAP);
-    lv_obj_set_pos(ui->network_setting_label_1, 33, 55);
+    lv_obj_set_pos(ui->network_setting_label_1, 15, 87);
     lv_obj_set_size(ui->network_setting_label_1, 147, 18);
 
     //Write style for network_setting_label_1, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
@@ -201,7 +201,7 @@ void setup_scr_network_setting(lv_ui *ui) {
     lv_animimg_set_duration(ui->network_setting_animimg_refresh, 500 * 3);
     lv_animimg_set_repeat_count(ui->network_setting_animimg_refresh, LV_ANIM_REPEAT_INFINITE);
     lv_img_set_src(ui->network_setting_animimg_refresh, network_setting_animimg_refresh_imgs[0]);
-    lv_obj_set_pos(ui->network_setting_animimg_refresh, 235, 47);
+    lv_obj_set_pos(ui->network_setting_animimg_refresh, 215, 84);
     lv_obj_set_size(ui->network_setting_animimg_refresh, 25, 25);
     lv_obj_add_flag(ui->network_setting_animimg_refresh, LV_OBJ_FLAG_CLICKABLE);
 

@@ -35,7 +35,7 @@ void GlobalState::setState(const MachineState state) {
             LvglDisplay::updateState("待命中...");
             break;
         case NetworkConfigurationNotFound:
-            LvglDisplay::updateState("网络未连接");
+            LvglDisplay::updateState("等待配网...");
             break;
         case NetworkConnecting:
             LvglDisplay::updateState("正在连网...");

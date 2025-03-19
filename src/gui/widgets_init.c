@@ -80,31 +80,31 @@ const lv_img_dsc_t *network_setting_animimg_refresh_imgs[3] = {
         &network_setting_animimg_refreshrefresh_3,
 };
 
-void lv_speaker_setting_speed_increment_event_cb(lv_event_t *event) {
+
+void lv_system_setting_speed_increment_event_cb(lv_event_t *event) {
     lv_event_code_t code = lv_event_get_code(event);
     if (code == LV_EVENT_SHORT_CLICKED || code == LV_EVENT_LONG_PRESSED_REPEAT) {
-        lv_spinbox_increment(guider_ui.speaker_setting_speed);
+        lv_spinbox_increment(guider_ui.system_setting_speed);
     }
 }
 
-void lv_speaker_setting_speed_decrement_event_cb(lv_event_t *event) {
+void lv_system_setting_speed_decrement_event_cb(lv_event_t *event) {
     lv_event_code_t code = lv_event_get_code(event);
     if (code == LV_EVENT_SHORT_CLICKED || code == LV_EVENT_LONG_PRESSED_REPEAT) {
-        lv_spinbox_decrement(guider_ui.speaker_setting_speed);
+        lv_spinbox_decrement(guider_ui.system_setting_speed);
     }
 }
 
-void lv_speaker_setting_recording_pause_increment_event_cb(lv_event_t *event) {
+void lv_system_setting_recording_pause_increment_event_cb(lv_event_t *event) {
     lv_event_code_t code = lv_event_get_code(event);
     if (code == LV_EVENT_SHORT_CLICKED || code == LV_EVENT_LONG_PRESSED_REPEAT) {
-        lv_spinbox_increment(guider_ui.speaker_setting_recording_pause);
+        lv_spinbox_increment(guider_ui.system_setting_recording_pause);
     }
 }
 
-void lv_speaker_setting_recording_pause_decrement_event_cb(lv_event_t *event) {
+void lv_system_setting_recording_pause_decrement_event_cb(lv_event_t *event) {
     lv_event_code_t code = lv_event_get_code(event);
     if (code == LV_EVENT_SHORT_CLICKED || code == LV_EVENT_LONG_PRESSED_REPEAT) {
-        lv_spinbox_decrement(guider_ui.speaker_setting_recording_pause);
+        lv_spinbox_decrement(guider_ui.system_setting_recording_pause);
     }
 }
-

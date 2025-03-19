@@ -79,8 +79,8 @@ static void settings_page_btn_voice_setting_event_handler(lv_event_t *e) {
     lv_event_code_t code = lv_event_get_code(e);
     switch (code) {
         case LV_EVENT_CLICKED: {
-            ui_load_scr_animation(&guider_ui, &guider_ui.speaker_setting, guider_ui.speaker_setting_del,
-                                  &guider_ui.settings_page_del, setup_scr_speaker_setting, LV_SCR_LOAD_ANIM_MOVE_LEFT,
+            ui_load_scr_animation(&guider_ui, &guider_ui.system_setting, guider_ui.system_setting_del,
+                                  &guider_ui.settings_page_del, setup_scr_system_setting, LV_SCR_LOAD_ANIM_MOVE_LEFT,
                                   200, 200, false, false);
             break;
         }
@@ -135,12 +135,24 @@ void events_init_network_setting(lv_ui *ui) {
                         LV_EVENT_ALL, ui);
 }
 
+static void speak_brightness_event_cb(lv_event_t *e) {
+    lv_event_code_t code = lv_event_get_code(e);
+    switch (code) {
+        case LV_EVENT_VALUE_CHANGED: {
+            set_screen_brightness(lv_slider_get_value(lv_event_get_target(e)));
+            break;
+        }
+        default:
+            break;
+    }
+}
+
 static void speaker_setting_imgbtn_back_event_handler(lv_event_t *e) {
     lv_event_code_t code = lv_event_get_code(e);
     switch (code) {
         case LV_EVENT_CLICKED: {
             ui_load_scr_animation(&guider_ui, &guider_ui.settings_page, guider_ui.settings_page_del,
-                                  &guider_ui.speaker_setting_del, setup_scr_settings_page, LV_SCR_LOAD_ANIM_MOVE_RIGHT,
+                                  &guider_ui.system_setting_del, setup_scr_settings_page, LV_SCR_LOAD_ANIM_MOVE_RIGHT,
                                   200, 200, true, true);
             break;
         }
@@ -203,14 +215,15 @@ static void speak_volume_event_cb(lv_event_t *e) {
     }
 }
 
-void events_init_speaker_setting(lv_ui *ui) {
-    lv_obj_add_event_cb(ui->speaker_setting_imgbtn_back, speaker_setting_imgbtn_back_event_handler, LV_EVENT_ALL, ui);
-    lv_obj_add_event_cb(ui->speaker_setting_voice_type, voice_type_dropdown_event_cb, LV_EVENT_ALL, ui);
-    lv_obj_add_event_cb(ui->speaker_setting_persona, persona_dropdown_event_cb, LV_EVENT_ALL, ui);
-    lv_obj_add_event_cb(ui->speaker_setting_environment_noise, environment_noise_dropdown_event_cb, LV_EVENT_ALL, ui);
-    lv_obj_add_event_cb(ui->speaker_setting_speed, speak_speed_event_cb, LV_EVENT_ALL, ui);
-    lv_obj_add_event_cb(ui->speaker_setting_recording_pause, speak_pause_duration_event_cb, LV_EVENT_ALL, ui);
-    lv_obj_add_event_cb(ui->speaker_setting_volume, speak_volume_event_cb, LV_EVENT_ALL, ui);
+void events_init_system_setting(lv_ui *ui) {
+    lv_obj_add_event_cb(ui->system_setting_imgbtn_back, speaker_setting_imgbtn_back_event_handler, LV_EVENT_ALL, ui);
+    lv_obj_add_event_cb(ui->system_setting_slider_brightness, speak_brightness_event_cb, LV_EVENT_ALL, ui);
+    lv_obj_add_event_cb(ui->system_setting_voice_type, voice_type_dropdown_event_cb, LV_EVENT_ALL, ui);
+    lv_obj_add_event_cb(ui->system_setting_persona, persona_dropdown_event_cb, LV_EVENT_ALL, ui);
+    lv_obj_add_event_cb(ui->system_setting_environment_noise, environment_noise_dropdown_event_cb, LV_EVENT_ALL, ui);
+    lv_obj_add_event_cb(ui->system_setting_speed, speak_speed_event_cb, LV_EVENT_ALL, ui);
+    lv_obj_add_event_cb(ui->system_setting_recording_pause, speak_pause_duration_event_cb, LV_EVENT_ALL, ui);
+    lv_obj_add_event_cb(ui->system_setting_slider_volume, speak_volume_event_cb, LV_EVENT_ALL, ui);
 }
 
 

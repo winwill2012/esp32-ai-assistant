@@ -19,8 +19,8 @@ void set_speak_speed(float speed) {
     Settings::setCurrentSpeakSpeedRatio(speed);
 }
 
-void load_speaker_setting_data() {
-    LvglDisplay::loadSpeakerSettingData();
+void load_system_setting_data() {
+    LvglDisplay::loadSystemSettingData();
 }
 
 void set_environment_noise(const char *noise) {
@@ -41,7 +41,15 @@ void load_wifi_list(void *refresh) {
     LvglDisplay::loadWifiList((bool *) refresh);
 }
 
-void connect_wifi(const char *ssid, const char *password) {
+bool connect_wifi(const char *ssid, const char *password) {
     log_d("连接网络: %s, %s", ssid, password);
-    connectWifi(ssid, password, 20);
+    if (connectWifi(ssid, password, 20)) {
+        Settings::setWifiInfo(ssid, password);
+        return true;
+    }
+    return false;
+}
+
+void set_screen_brightness(int brightness) {
+    Settings::setScreenBrightness(brightness);
 }

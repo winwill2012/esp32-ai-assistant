@@ -26,7 +26,7 @@ public:
 
     static void updateRecordingButtonImage(bool isPlaying);
 
-    static void loadSpeakerSettingData();
+    static void loadSystemSettingData();
 
     static void loadWifiList(bool forceRefresh);
 

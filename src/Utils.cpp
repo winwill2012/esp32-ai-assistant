@@ -56,7 +56,7 @@ double calculateSoundRMS(const uint8_t *buffer, const size_t bufferSize) {
         sumSquares += (sample * sample);
     }
     double rms = sqrt(sumSquares * 2 / bufferSize);
-    //    log_d("rms = %f", rms);
+//    log_d("rms = %f", rms);
     return rms;
 }
 
@@ -78,9 +78,16 @@ std::pair<int, size_t> findMinIndexOfDelimiter(const String &input) {
 }
 
 bool connectWifi(const char *ssid, const char *password, const int maxRetries) {
+    // 如果当前已经连接成功，先断开网络
+    if (WiFi.isConnected()) {
+        log_e("关闭老wifi连接");
+        WiFi.disconnect(true, true);
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+    log_d("开始新连接");
     GlobalState::setState(NetworkConnecting);
-    WiFiClass::useStaticBuffers(true);
     WiFiClass::mode(WIFI_MODE_STA);
+    WiFiClass::useStaticBuffers(true);
     WiFi.begin(ssid, password);
     int retries = 0;
     while (!WiFi.isConnected() && retries < maxRetries) {
