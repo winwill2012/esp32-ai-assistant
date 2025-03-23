@@ -67,7 +67,7 @@ extern "C" {
  * @param reasonLen length of the disconnect reason message
  */
 void WebSockets::clientDisconnect(WSclient_t * client, uint16_t code, char * reason, size_t reasonLen) {
-    DEBUG_WEBSOCKETS("[WS][%d][handleWebsocket] clientDisconnect code: %u\n", client->num, code);
+    DEBUG_WEBSOCKETS("[WS][%d][handleWebsocket] clientDisconnect code: %u, %s\n", client->num, code, String(reason, reasonLen));
     if(client->status == WSC_CONNECTED && code) {
         if(reason) {
             sendFrame(client, WSop_close, (uint8_t *)reason, reasonLen);

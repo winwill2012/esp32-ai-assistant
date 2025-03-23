@@ -1,5 +1,6 @@
 #include "GlobalState.h"
 #include "LvglDisplay.h"
+#include "gui/gui_guider.h"
 #include <utility>
 
 String GlobalState::conversationId = "";
@@ -18,8 +19,12 @@ String GlobalState::getConversationId() {
     return conversationId;
 }
 
-EventBits_t GlobalState::getEventBits(const MachineState state) {
-    return 1 << state;
+EventBits_t GlobalState::getEventBits(std::vector<MachineState> states) {
+    EventBits_t result = 0;
+    for (int i = 0; i < states.size(); i++) {
+        result |= (1 << states[i]);
+    }
+    return result;
 }
 
 MachineState GlobalState::getState() {
@@ -33,6 +38,7 @@ void GlobalState::setState(const MachineState state) {
     switch (state) {
         case Sleep:
             LvglDisplay::updateState("待命中...");
+            LvglDisplay::updateRecordingButtonImage(&_mic_off_alpha_40x40);
             break;
         case NetworkConfigurationNotFound:
             LvglDisplay::updateState("等待配网...");
@@ -49,17 +55,15 @@ void GlobalState::setState(const MachineState state) {
             break;
         case Listening:
             LvglDisplay::updateState("正在聆听...");
-            LvglDisplay::updateRecordingButtonState(true);
-            LvglDisplay::updateRecordingButtonImage(false);
+            LvglDisplay::updateRecordingButtonImage(&_mic_on_alpha_40x40);
             break;
         case Thinking:
             LvglDisplay::updateState("正在思考...");
-            LvglDisplay::updateRecordingButtonState(false);
+            LvglDisplay::updateRecordingButtonImage(&_stop_alpha_40x40);
             break;
         case Speaking:
             LvglDisplay::updateState("正在说话...");
-            LvglDisplay::updateRecordingButtonState(false);
-            LvglDisplay::updateRecordingButtonImage(true);
+            LvglDisplay::updateRecordingButtonImage(&_stop_alpha_40x40);
             break;
     }
 }

@@ -9,30 +9,9 @@
 
 DoubaoSTT::DoubaoSTT(const CozeLLMAgent &llmAgent)
         : _llmAgent(llmAgent) {
+    _eventGroup = xEventGroupCreate();
     _requestBuilder = std::vector<uint8_t>();
-    _taskFinished = xSemaphoreCreateBinary();
     _firstPacket = true;
-    begin();
-}
-
-void DoubaoSTT::eventCallback(WStype_t type, uint8_t *payload, size_t length) {
-    log_d("收到websocket消息: %d, %d", type, length);
-    switch (type) {
-        case WStype_PING:
-        case WStype_ERROR:
-        case WStype_CONNECTED:
-        case WStype_DISCONNECTED:
-        case WStype_TEXT:
-            break;
-        case WStype_BIN:
-            parseResponse(payload);
-            break;
-        default:
-            break;
-    }
-}
-
-void DoubaoSTT::begin() {
     setExtraHeaders(("Authorization: Bearer; " + Settings::getDoubaoAccessToken()).c_str());
     beginSSL("openspeech.bytedance.com", 443, "/api/v2/asr");
     onEvent([this](WStype_t type, uint8_t *payload, size_t length) {
@@ -40,6 +19,33 @@ void DoubaoSTT::begin() {
     });
 }
 
+void DoubaoSTT::eventCallback(WStype_t type, uint8_t *payload, size_t length) {
+    switch (type) {
+        case WStype_PING:
+            break;
+        case WStype_ERROR:
+            break;
+        case WStype_CONNECTED:
+            log_d("websocket连接成功");
+            break;
+        case WStype_DISCONNECTED:
+            log_d("websocket断开连接");
+            break;
+        case WStype_TEXT: {
+            log_d("websocket收到text消息: %d", length);
+            for (int i = 0; i < length; i++) {
+                Serial.print(static_cast<char>(payload[i]));
+            }
+            Serial.println();
+            break;
+        }
+        case WStype_BIN:
+            parseResponse(payload);
+            break;
+        default:
+            break;
+    }
+}
 
 void DoubaoSTT::buildFullClientRequest() {
     JsonDocument doc;
@@ -63,13 +69,12 @@ void DoubaoSTT::buildFullClientRequest() {
     audio["rate"] = AUDIO_SAMPLE_RATE;
     String payloadStr;
     serializeJson(doc, payloadStr);
-    uint8_t payload[payloadStr.length()];
+    uint8_t payload[payloadStr.length() + 1];
     for (int i = 0; i < payloadStr.length(); i++) {
         payload[i] = static_cast<uint8_t>(payloadStr.charAt(i));
     }
     payload[payloadStr.length()] = '\0';
     std::vector<uint8_t> payloadSize = int2Array(payloadStr.length());
-
     _requestBuilder.clear();
     // 先写入报头（四字节）
     _requestBuilder.insert(_requestBuilder.end(), DoubaoTTSDefaultFullClientWsHeader,
@@ -103,25 +108,28 @@ void DoubaoSTT::buildAudioOnlyRequest(uint8_t *audio, const size_t size, const b
 void DoubaoSTT::recognize(uint8_t *audio, const size_t size, const bool firstPacket, const bool lastPacket) {
     log_d("语音识别: %d, %d, %d", size, firstPacket, lastPacket);
     if (firstPacket) {
+        xEventGroupClearBits(_eventGroup, STT_TASK_COMPLETED_EVENT);
         while (!isConnected()) {
             loop();
             vTaskDelay(1);
         }
         buildFullClientRequest();
-        sendBIN(_requestBuilder.data(), _requestBuilder.size());
+        if (!sendBIN(_requestBuilder.data(), _requestBuilder.size())) {
+            log_d("sendBin失败");
+        }
         loop();
     }
     buildAudioOnlyRequest(audio, size, lastPacket);
-    sendBIN(_requestBuilder.data(), _requestBuilder.size());
+    if (!sendBIN(_requestBuilder.data(), _requestBuilder.size())) {
+        log_d("sendBin失败");
+    }
     loop();
     if (lastPacket) {
-        log_d("等待语音合成完毕...");
-        // 等待本次合成完毕
-        while (xSemaphoreTake(_taskFinished, 0) == pdFALSE) {
+        while ((xEventGroupWaitBits(_eventGroup, STT_TASK_COMPLETED_EVENT,
+                                    false, true, pdMS_TO_TICKS(1)) & STT_TASK_COMPLETED_EVENT) == 0) {
             loop();
             vTaskDelay(1);
         }
-        log_d("语音合成完毕...");
         disconnect();
     }
 }
@@ -129,7 +137,6 @@ void DoubaoSTT::recognize(uint8_t *audio, const size_t size, const bool firstPac
 void DoubaoSTT::parseResponse(const uint8_t *response) {
     const uint8_t messageType = response[1] >> 4;
     const uint8_t *payload = response + 4;
-    log_d("messageType = %d", messageType);
     switch (messageType) {
         case 0b1001: {
             // 服务端下发包含识别结果的 full server response
@@ -148,7 +155,7 @@ void DoubaoSTT::parseResponse(const uint8_t *response) {
             const int32_t sequence = jsonResult["sequence"];
             const JsonArray result = jsonResult["result"];
             if (sequence < 0) {
-                xSemaphoreGive(_taskFinished);
+                xEventGroupSetBits(_eventGroup, STT_TASK_COMPLETED_EVENT);
             }
             if (code == 1000 && result.size() > 0) {
                 for (const auto &item: result) {
@@ -159,12 +166,14 @@ void DoubaoSTT::parseResponse(const uint8_t *response) {
                     }
                     if (sequence < 0) {
                         log_i("[语音识别] 识别到文字: %s", text.c_str());
-                        _llmAgent.begin(text);
+                        LLMTask task{};
+                        task.message = static_cast<char *>(ps_malloc(sizeof(char) * text.length()));
+                        task.length = text.length();
+                        text.toCharArray(task.message, task.length);
+                        _llmAgent.publishTask(task);
                         _firstPacket = true;
                     }
                 }
-            } else {
-                log_d("[语音识别]未识别到文字");
             }
             break;
         }
@@ -178,7 +187,7 @@ void DoubaoSTT::parseResponse(const uint8_t *response) {
             Serial.println("语音识别失败: ");
             Serial.printf("   errorCode =  %u\n", errorCode);
             Serial.printf("errorMessage =  %s\n", errorMessage.c_str());
-            xSemaphoreGive(_taskFinished);
+            xEventGroupSetBits(_eventGroup, STT_TASK_COMPLETED_EVENT);
         }
         default: {
             break;

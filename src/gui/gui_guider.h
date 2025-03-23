@@ -23,10 +23,10 @@ typedef struct {
     lv_obj_t *home_page_header_time;
     lv_obj_t *home_page_header_wifi_no;
     lv_obj_t *home_page_header_state;
-    lv_obj_t *home_page_microphone;
-    lv_obj_t *home_page_line_stop_recording;
     lv_obj_t *home_page_message_list;
     lv_obj_t *home_page_btn_settings;
+    lv_obj_t *home_page_recording_state;
+    lv_obj_t *home_page_imgbtn_recording;
     lv_obj_t *home_page_btn_settings_label;
     lv_obj_t *settings_page;
     bool settings_page_del;
@@ -112,7 +112,8 @@ void setup_scr_network_setting(lv_ui *ui);
 void setup_scr_system_setting(lv_ui *ui);
 
 LV_IMG_DECLARE(_WIFI_alpha_26x26);
-LV_IMG_DECLARE(_micphone_alpha_40x40);
+LV_IMG_DECLARE(_mic_on_alpha_40x40);
+LV_IMG_DECLARE(_mic_off_alpha_40x40);
 LV_IMG_DECLARE(_stop_alpha_40x40);
 LV_IMG_DECLARE(_retrun_alpha_30x30);
 LV_IMG_DECLARE(_backgroud_320x480);

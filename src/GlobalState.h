@@ -2,7 +2,7 @@
 #define IOT_AI_CONTROLLER_GLOBALSTATE_H
 
 #include <Arduino.h>
-#include <map>
+#include <vector>
 
 enum MachineState {
     Sleep,
@@ -12,31 +12,19 @@ enum MachineState {
     NetworkConnectFailed,
     Listening,
     Thinking,
-    Speaking
-};
-
-enum MachineEvent {
-    StartListen, // 开始监听
-    StopListening, // 停止监听
-    InterruptPlaying, // 打断播放
+    Speaking,
+    ForceStop
 };
 
 class GlobalState {
 public:
-    std::map<std::pair<MachineState, MachineEvent>, MachineState> machineStateTransferRouter = {
-        {{Sleep, StartListen}, Listening},
-        {{Listening, StopListening}, Sleep},
-        {{Speaking, InterruptPlaying}, Listening},
-        {{Speaking, StopListening}, Sleep}
-    };
-
     static void setConversationId(String conversationId);
 
     static EventGroupHandle_t getEventGroup();
 
     static String getConversationId();
 
-    static EventBits_t getEventBits(MachineState state);
+    static EventBits_t getEventBits(std::vector<MachineState> states);
 
     static MachineState getState();
 

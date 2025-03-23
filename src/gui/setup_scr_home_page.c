@@ -124,36 +124,6 @@ void setup_scr_home_page(lv_ui *ui) {
     lv_obj_set_style_pad_left(ui->home_page_header_state, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->home_page_header_state, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    //Write codes home_page_microphone
-    ui->home_page_microphone = lv_img_create(ui->home_page);
-    lv_obj_add_flag(ui->home_page_microphone, LV_OBJ_FLAG_CLICKABLE);
-    lv_img_set_src(ui->home_page_microphone, &_micphone_alpha_40x40);
-    lv_img_set_pivot(ui->home_page_microphone, 50, 50);
-    lv_img_set_angle(ui->home_page_microphone, 0);
-    lv_obj_set_pos(ui->home_page_microphone, 140, 420);
-    lv_obj_set_size(ui->home_page_microphone, 40, 40);
-
-    //Write style for home_page_microphone, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_img_recolor_opa(ui->home_page_microphone, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_img_opa(ui->home_page_microphone, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(ui->home_page_microphone, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_clip_corner(ui->home_page_microphone, true, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    //Write codes home_page_line_stop_recording
-    ui->home_page_line_stop_recording = lv_line_create(ui->home_page);
-    static lv_point_t home_page_line_stop_recording[] = {{2,  3},
-                                                         {37, 42},};
-    lv_line_set_points(ui->home_page_line_stop_recording, home_page_line_stop_recording, 2);
-    lv_obj_set_pos(ui->home_page_line_stop_recording, 140, 420);
-    lv_obj_set_size(ui->home_page_line_stop_recording, 40, 40);
-
-    //Write style for home_page_line_stop_recording, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_line_width(ui->home_page_line_stop_recording, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_line_color(ui->home_page_line_stop_recording, lv_color_hex(0xff0000),
-                                LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_line_opa(ui->home_page_line_stop_recording, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_line_rounded(ui->home_page_line_stop_recording, true, LV_PART_MAIN | LV_STATE_DEFAULT);
-
     //Write codes home_page_message_list
     ui->home_page_message_list = lv_list_create(ui->home_page);
     lv_obj_set_pos(ui->home_page_message_list, 5, 75);
@@ -245,6 +215,57 @@ void setup_scr_home_page(lv_ui *ui) {
     lv_obj_set_style_text_opa(ui->home_page_btn_settings, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui->home_page_btn_settings, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    //Write codes home_page_recording_state
+    ui->home_page_recording_state = lv_btn_create(ui->home_page_container_top);
+    lv_obj_set_style_pad_all(ui->home_page_recording_state, 0, LV_STATE_DEFAULT);
+    lv_obj_set_pos(ui->home_page_recording_state, 110, 9);
+    lv_obj_set_size(ui->home_page_recording_state, 10, 10);
+
+    //Write style for home_page_recording_state, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
+    lv_obj_set_style_bg_opa(ui->home_page_recording_state, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->home_page_recording_state, lv_color_make(153, 153, 153), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_grad_dir(ui->home_page_recording_state, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(ui->home_page_recording_state, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->home_page_recording_state, 5, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_width(ui->home_page_recording_state, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(ui->home_page_recording_state, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui->home_page_recording_state, &lv_font_montserratMedium_16, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui->home_page_recording_state, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_align(ui->home_page_recording_state, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
+
+    //Write codes home_page_imgbtn_recording
+    ui->home_page_imgbtn_recording = lv_imgbtn_create(ui->home_page);
+    lv_obj_add_flag(ui->home_page_imgbtn_recording, LV_OBJ_FLAG_CHECKABLE);
+    lv_imgbtn_set_src(ui->home_page_imgbtn_recording, LV_IMGBTN_STATE_RELEASED, NULL, &_mic_off_alpha_40x40, NULL);
+    lv_obj_set_style_pad_all(ui->home_page_imgbtn_recording, 0, LV_STATE_DEFAULT);
+    lv_obj_set_pos(ui->home_page_imgbtn_recording, 140, 420);
+    lv_obj_set_size(ui->home_page_imgbtn_recording, 40, 40);
+
+    //Write style for home_page_imgbtn_recording, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
+    lv_obj_set_style_text_color(ui->home_page_imgbtn_recording, lv_color_hex(0x000000), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(ui->home_page_imgbtn_recording, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_text_align(ui->home_page_imgbtn_recording, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_radius(ui->home_page_imgbtn_recording, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_clip_corner(ui->home_page_imgbtn_recording, true, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_width(ui->home_page_imgbtn_recording, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+
+    //Write style for home_page_imgbtn_recording, Part: LV_PART_MAIN, State: LV_STATE_PRESSED.
+    lv_obj_set_style_img_recolor_opa(ui->home_page_imgbtn_recording, 0, LV_PART_MAIN|LV_STATE_PRESSED);
+    lv_obj_set_style_img_opa(ui->home_page_imgbtn_recording, 255, LV_PART_MAIN|LV_STATE_PRESSED);
+    lv_obj_set_style_text_color(ui->home_page_imgbtn_recording, lv_color_hex(0xFF33FF), LV_PART_MAIN|LV_STATE_PRESSED);
+    lv_obj_set_style_text_opa(ui->home_page_imgbtn_recording, 255, LV_PART_MAIN|LV_STATE_PRESSED);
+    lv_obj_set_style_shadow_width(ui->home_page_imgbtn_recording, 0, LV_PART_MAIN|LV_STATE_PRESSED);
+
+    //Write style for home_page_imgbtn_recording, Part: LV_PART_MAIN, State: LV_STATE_CHECKED.
+    lv_obj_set_style_img_recolor_opa(ui->home_page_imgbtn_recording, 0, LV_PART_MAIN|LV_STATE_CHECKED);
+    lv_obj_set_style_img_opa(ui->home_page_imgbtn_recording, 255, LV_PART_MAIN|LV_STATE_CHECKED);
+    lv_obj_set_style_text_color(ui->home_page_imgbtn_recording, lv_color_hex(0xFF33FF), LV_PART_MAIN|LV_STATE_CHECKED);
+    lv_obj_set_style_text_opa(ui->home_page_imgbtn_recording, 255, LV_PART_MAIN|LV_STATE_CHECKED);
+    lv_obj_set_style_shadow_width(ui->home_page_imgbtn_recording, 0, LV_PART_MAIN|LV_STATE_CHECKED);
+
+    //Write style for home_page_imgbtn_recording, Part: LV_PART_MAIN, State: LV_IMGBTN_STATE_RELEASED.
+    lv_obj_set_style_img_recolor_opa(ui->home_page_imgbtn_recording, 0, LV_PART_MAIN|LV_IMGBTN_STATE_RELEASED);
+    lv_obj_set_style_img_opa(ui->home_page_imgbtn_recording, 255, LV_PART_MAIN|LV_IMGBTN_STATE_RELEASED);
     //The custom code of home_page.
 
     //Update current screen layout.

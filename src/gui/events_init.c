@@ -17,10 +17,11 @@
 #include "freemaster_client.h"
 #endif
 
-static void home_page_microphone_event_handler(lv_event_t *e) {
+static void home_page_imgbtn_recording_event_handler(lv_event_t *e) {
     lv_event_code_t code = lv_event_get_code(e);
     switch (code) {
         case LV_EVENT_CLICKED: {
+            onMicrophoneClicked();
             break;
         }
         default:
@@ -43,7 +44,7 @@ static void home_page_btn_settings_event_handler(lv_event_t *e) {
 }
 
 void events_init_home_page(lv_ui *ui) {
-    lv_obj_add_event_cb(ui->home_page_microphone, home_page_microphone_event_handler, LV_EVENT_ALL, ui);
+    lv_obj_add_event_cb(ui->home_page_imgbtn_recording, home_page_imgbtn_recording_event_handler, LV_EVENT_ALL, ui);
     lv_obj_add_event_cb(ui->home_page_btn_settings, home_page_btn_settings_event_handler, LV_EVENT_ALL, ui);
 }
 
@@ -121,7 +122,7 @@ static void network_setting_animimg_refresh_event_handler(lv_event_t *e) {
     switch (code) {
         case LV_EVENT_CLICKED: {
             lv_animimg_start(lv_event_get_target(e));
-            xTaskCreate(load_wifi_list_task, "loadWifiTask", 4096, (void *) true, 0, NULL);
+            xTaskCreate(load_wifi_list_task, "loadWifiTask", 4096, (void *) true, 1, NULL);
             break;
         }
         default:

@@ -56,7 +56,6 @@ double calculateSoundRMS(const uint8_t *buffer, const size_t bufferSize) {
         sumSquares += (sample * sample);
     }
     double rms = sqrt(sumSquares * 2 / bufferSize);
-//    log_d("rms = %f", rms);
     return rms;
 }
 

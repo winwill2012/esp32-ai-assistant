@@ -2,11 +2,12 @@
 #define ESP32_AI_ASSISTANT_LVGL_INTERFACE_H
 
 #ifdef __cplusplus
+
 extern "C" {
 #endif
-#define ENV_QUIET   4500  // 安静
-#define ENV_GENERAL 6500  // 正常
-#define ENV_NOISY   8000  // 嘈杂
+#define ENV_QUIET   8000  // 安静
+#define ENV_GENERAL 11000  // 正常
+#define ENV_NOISY   15000  // 嘈杂
 
 void set_current_voice(const char *voice);
 
@@ -27,6 +28,8 @@ void load_system_setting_data();
 void load_wifi_list(void *refresh);
 
 bool connect_wifi(const char *ssid, const char *password);
+
+void onMicrophoneClicked();
 
 #ifdef __cplusplus
 }

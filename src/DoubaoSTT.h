@@ -7,6 +7,8 @@
 #include "driver/i2s.h"
 #include <vector>
 
+#define STT_TASK_COMPLETED_EVENT (1<<1)
+
 // 默认头部
 constexpr byte DoubaoTTSDefaultFullClientWsHeader[] = {0x11, 0x10, 0x10, 0x00};
 constexpr byte DoubaoTTSDefaultAudioOnlyWsHeader[] = {0x11, 0x20, 0x10, 0x00};
@@ -18,8 +20,6 @@ public:
 
     void eventCallback(WStype_t type, uint8_t *payload, size_t length);
 
-    void begin();
-
     void parseResponse(const uint8_t *response);
 
     void buildFullClientRequest();
@@ -29,9 +29,9 @@ public:
     void recognize(uint8_t *audio, size_t size, bool firstPacket, bool lastPacket);
 
 private:
+    EventGroupHandle_t _eventGroup;
     CozeLLMAgent _llmAgent;
     bool _firstPacket;
-    SemaphoreHandle_t _taskFinished;
     std::vector<uint8_t> _requestBuilder;
 };
 

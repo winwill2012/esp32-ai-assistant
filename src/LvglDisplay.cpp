@@ -195,25 +195,10 @@ void LvglDisplay::updateWifiState(bool success) {
     }
 }
 
-void LvglDisplay::updateRecordingButtonState(bool recordingAllowed) {
+void LvglDisplay::updateRecordingButtonImage(const void *img) {
     if (xSemaphoreTakeRecursive(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
-        if (recordingAllowed) {
-            lv_obj_add_flag(guider_ui.home_page_line_stop_recording, LV_OBJ_FLAG_HIDDEN);
-        } else {
-            lv_obj_clear_flag(guider_ui.home_page_line_stop_recording, LV_OBJ_FLAG_HIDDEN);
-        }
-        xSemaphoreGiveRecursive(lvglUpdateLock);
-    }
-}
-
-void LvglDisplay::updateRecordingButtonImage(bool isPlaying) {
-    if (xSemaphoreTakeRecursive(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
-        if (isPlaying) {
-            lv_img_set_src(guider_ui.home_page_microphone, &_stop_alpha_40x40);
-            lv_obj_add_flag(guider_ui.home_page_line_stop_recording, LV_OBJ_FLAG_HIDDEN);
-        } else {
-            lv_img_set_src(guider_ui.home_page_microphone, &_micphone_alpha_40x40);
-        }
+        lv_imgbtn_set_src(guider_ui.home_page_imgbtn_recording, LV_IMGBTN_STATE_RELEASED,
+                          NULL, img, NULL);
         xSemaphoreGiveRecursive(lvglUpdateLock);
     }
 }
@@ -259,5 +244,16 @@ void LvglDisplay::loadWifiList(const bool forceRefresh) {
         } else {
             add_wifi_item(wifi);
         }
+    }
+}
+
+void LvglDisplay::updateRecordingState(bool active) {
+    if (xSemaphoreTakeRecursive(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
+        if (active) {
+            lv_obj_set_style_bg_color(guider_ui.home_page_recording_state, lv_color_make(0, 255, 0), 0);
+        } else {
+            lv_obj_set_style_bg_color(guider_ui.home_page_recording_state, lv_color_make(153, 153, 153), 0);
+        }
+        xSemaphoreGiveRecursive(lvglUpdateLock);
     }
 }

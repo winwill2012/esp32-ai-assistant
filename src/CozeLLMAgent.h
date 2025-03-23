@@ -3,16 +3,22 @@
 
 #include <map>
 #include <ArduinoJson.h>
+#include "CozeLLMAgent.h"
 #include "DoubaoTTS.h"
+
+struct LLMTask {
+    char *message;
+    size_t length;
+};
 
 class CozeLLMAgent {
 public:
 
-    CozeLLMAgent(DoubaoTTS &tts);
+    explicit CozeLLMAgent(DoubaoTTS &tts);
 
-    ~CozeLLMAgent();
+    void publishTask(LLMTask task);
 
-    void begin(const String &input);
+    void chat(const String &input);
 
     void ProcessStreamOutput(String data);
 
@@ -27,6 +33,7 @@ private :
     String _content;
     String _ttsTextBuffer;
     bool _firstPacket;
+    QueueHandle_t _taskQueue;
 };
 
 

@@ -2,6 +2,7 @@
 #define ESP32_AI_ASSISTANT_AUDIOPLAYER_H
 
 #include "Arduino.h"
+#include <vector>
 
 #define MAX98357_I2S_NUM  I2S_NUM_0
 #define SAMPLE_RATE       16000
@@ -20,7 +21,11 @@ public:
 
     static void publishTask(PlayAudioTask task);
 
+    static void resetTaskQueue();
+
     static QueueHandle_t getTaskQueue();
+
+    static std::vector<int16_t> adjustVolume(PlayAudioTask task, float volumeRatio);
 
 private:
     static QueueHandle_t _taskQueue;

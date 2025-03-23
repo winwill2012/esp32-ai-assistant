@@ -24,5 +24,5 @@ void TimeUpdater::begin() {
             }
             vTaskDelay(pdMS_TO_TICKS(1000));
         }
-    }, "timeUpdater", 1024 * 4, nullptr, 1, nullptr);
+    }, "timeUpdater", 1024 * 4, nullptr, 0, nullptr);
 }

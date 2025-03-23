@@ -1,6 +1,7 @@
 #include "CozeLLMAgent.h"
 #include <HTTPClient.h>
 #include <utility>
+#include <Arduino.h>
 #include "Utils.h"
 #include "Settings.h"
 #include "GlobalState.h"
@@ -8,11 +9,21 @@
 
 CozeLLMAgent::CozeLLMAgent(DoubaoTTS &tts) : _tts(tts) {
     _firstPacket = true;
+    _taskQueue = xQueueCreate(5, sizeof(LLMTask));
+    xTaskCreate([](void *ptr) {
+        auto *instance = static_cast<CozeLLMAgent *>(ptr);
+        LLMTask task{};
+        while (true) {
+            if (xQueueReceive(instance->_taskQueue, &task, pdMS_TO_TICKS(1)) == pdTRUE) {
+                instance->chat(String(task.message, task.length));
+                free(task.message);
+            }
+            vTaskDelay(1);
+        }
+    }, "llmTaskLoop", 1024 * 8, this, 1, nullptr);
 }
 
-CozeLLMAgent::~CozeLLMAgent() = default;
-
-void CozeLLMAgent::begin(const String &input) {
+void CozeLLMAgent::chat(const String &input) {
     if (input == "") return;
     log_d("Ready to send query to coze agent: %s", input.c_str());
     GlobalState::setState(Thinking);
@@ -41,6 +52,7 @@ void CozeLLMAgent::begin(const String &input) {
         WiFiClient *stream = http.getStreamPtr();
         String line = "";
         while (stream->connected() || stream->available()) {
+            vTaskDelay(1);
             if (stream->available()) {
                 line = stream->readStringUntil('\n');
                 if (!line.isEmpty()) {
@@ -114,5 +126,12 @@ void CozeLLMAgent::ProcessContent(String &content) {
         } else {
             break;
         }
+    }
+}
+
+void CozeLLMAgent::publishTask(LLMTask task) {
+    if (xQueueSend(_taskQueue, &task, portMAX_DELAY) == pdFALSE) {
+        log_e("send llm task to queue failed");
+        free(task.message);
     }
 }

@@ -10,7 +10,8 @@ void playAudio(void *ptr) {
     while (true) {
         if (xQueueReceive(AudioPlayer::getTaskQueue(), &task, portMAX_DELAY) == pdPASS) {
             GlobalState::setState(Speaking);
-            const esp_err_t result = i2s_write(MAX98357_I2S_NUM, task.data, task.length, &bytes_written, portMAX_DELAY);
+            const esp_err_t result = i2s_write(MAX98357_I2S_NUM, task.data, task.length, &bytes_written,
+                                               portMAX_DELAY);
             if (result != ESP_OK) {
                 log_e("Play audio failed, errorCode: %d", result);
             }
@@ -32,22 +33,22 @@ QueueHandle_t AudioPlayer::getTaskQueue() {
 
 void AudioPlayer::begin() {
     constexpr i2s_config_t max98357_i2s_config = {
-        .mode = static_cast<i2s_mode_t>(I2S_MODE_MASTER | I2S_MODE_TX),
-        .sample_rate = SAMPLE_RATE,
-        .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
-        .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
-        .communication_format = I2S_COMM_FORMAT_STAND_I2S,
-        .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1, // 中断优先级，如果对实时性要求高，可以调高优先级
-        .dma_buf_count = 16,
-        .dma_buf_len = 1024,
-        .tx_desc_auto_clear = true
+            .mode = static_cast<i2s_mode_t>(I2S_MODE_MASTER | I2S_MODE_TX),
+            .sample_rate = SAMPLE_RATE,
+            .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
+            .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
+            .communication_format = I2S_COMM_FORMAT_STAND_I2S,
+            .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1, // 中断优先级，如果对实时性要求高，可以调高优先级
+            .dma_buf_count = 16,
+            .dma_buf_len = 1024,
+            .tx_desc_auto_clear = true
     };
 
     constexpr i2s_pin_config_t max98357_gpio_config = {
-        .bck_io_num = MAX98357_BCLK,
-        .ws_io_num = MAX98357_LRC,
-        .data_out_num = MAX98357_DOUT,
-        .data_in_num = -1
+            .bck_io_num = MAX98357_BCLK,
+            .ws_io_num = MAX98357_LRC,
+            .data_out_num = MAX98357_DOUT,
+            .data_in_num = -1
     };
 
     i2s_driver_install(MAX98357_I2S_NUM, &max98357_i2s_config, 0, nullptr);
@@ -63,3 +64,20 @@ void AudioPlayer::publishTask(const PlayAudioTask task) {
         free(task.data); // 发送到队列失败，则生产者负责将内存回收
     }
 }
+
+std::vector<int16_t> AudioPlayer::adjustVolume(PlayAudioTask task, float volumeRatio) {
+    std::vector<int16_t> result;
+    for (int i = 0; i < task.length / 2; i++) {
+//        int16_t raw = (((int16_t)(task.data[i])) << 8 | task.data[i + 1]) * volumeRatio;
+//        result.push_back(static_cast<uint8_t>(raw >> 8)); // 高字节
+//        result.push_back(static_cast<uint8_t>(raw & 0xFF)); // 低字节
+        result.push_back(static_cast<uint8_t>((task.data[i] << 8) | task.data[i + 1])); // 低字节
+    }
+    return result;
+}
+
+void AudioPlayer::resetTaskQueue() {
+    xQueueReset(_taskQueue);
+    i2s_start(MAX98357_I2S_NUM);
+}
+

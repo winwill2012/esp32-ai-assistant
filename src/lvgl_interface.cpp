@@ -2,6 +2,9 @@
 #include "Settings.h"
 #include "LvglDisplay.h"
 #include "Utils.h"
+#include "driver/i2s.h"
+#include "AudioPlayer.h"
+#include "GlobalState.h"
 
 void set_current_voice(const char *voice) {
     Settings::setCurrentVoice(voice);
@@ -52,4 +55,19 @@ bool connect_wifi(const char *ssid, const char *password) {
 
 void set_screen_brightness(int brightness) {
     Settings::setScreenBrightness(brightness);
+}
+
+void onMicrophoneClicked() {
+    // 正在说话或者思考，直接进入聆听模式
+    if (GlobalState::getState() == Speaking || GlobalState::getState() == Thinking) {
+        i2s_stop(MAX98357_I2S_NUM);
+        i2s_zero_dma_buffer(MAX98357_I2S_NUM);
+        AudioPlayer::resetTaskQueue();  // 清空当前音频播放队列
+        vTaskDelay(pdMS_TO_TICKS(500));
+        GlobalState::setState(Listening);
+    } else if (GlobalState::getState() == Listening) {  // 正在聆听，自己进入待机模式
+        GlobalState::setState(Sleep);
+    } else if (GlobalState::getState() == Sleep) {
+        GlobalState::setState(Listening);
+    }
 }

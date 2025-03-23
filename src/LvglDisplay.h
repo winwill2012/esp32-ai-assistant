@@ -22,13 +22,13 @@ public:
 
     static void updateWifiState(bool success);
 
-    static void updateRecordingButtonState(bool recordingAllowed);
-
-    static void updateRecordingButtonImage(bool isPlaying);
+    static void updateRecordingButtonImage(const void *img);
 
     static void loadSystemSettingData();
 
     static void loadWifiList(bool forceRefresh);
+
+    static void updateRecordingState(bool active);
 
 private:
     static lv_obj_t *last_message;

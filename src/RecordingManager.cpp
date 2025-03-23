@@ -2,6 +2,7 @@
 #include "RecordingManager.h"
 #include <Settings.h>
 #include "Utils.h"
+#include "LvglDisplay.h"
 #include "GlobalState.h"
 
 RecordingManager::RecordingManager(DoubaoSTT &sttClient) : _sttClient(sttClient) {
@@ -30,7 +31,6 @@ RecordingManager::RecordingManager(DoubaoSTT &sttClient) : _sttClient(sttClient)
 }
 
 void consumeBufferedData(void *arg) {
-    log_e("启动ringBuffer消费线程");
     auto *instance = static_cast<RecordingManager *>(arg);
     size_t bytes_read;
     bool firstPacket = true;
@@ -57,18 +57,19 @@ void consumeBufferedData(void *arg) {
 
 [[noreturn]] void RecordingManager::begin() {
     size_t bytesRead;
-    xTaskCreate(consumeBufferedData, "consumeBufferTask", 1024 * 8, this, 5, nullptr);
-    GlobalState::setState(Listening);
-    const auto dmaBuffer = static_cast<uint8_t *>(heap_caps_calloc(
-            AUDIO_RECORDING_BUFFER_SIZE, sizeof(uint8_t), MALLOC_CAP_DMA));
+    xTaskCreate(consumeBufferedData, "consumeBufferTask", 1024 * 8, this, 1, nullptr);
+    const auto buffer = static_cast<uint8_t *>(ps_malloc(AUDIO_RECORDING_BUFFER_SIZE));
     while (true) {
-        xEventGroupWaitBits(GlobalState::getEventGroup(), GlobalState::getEventBits(Listening),
+        xEventGroupWaitBits(GlobalState::getEventGroup(), GlobalState::getEventBits({Listening}),
                             false, false, portMAX_DELAY);
-        const esp_err_t err = i2s_read(MICROPHONE_I2S_NUM, dmaBuffer, AUDIO_RECORDING_BUFFER_SIZE,
+        const esp_err_t err = i2s_read(MICROPHONE_I2S_NUM, buffer, AUDIO_RECORDING_BUFFER_SIZE,
                                        &bytesRead, portMAX_DELAY);
         if (err == ESP_OK) {
-            if (calculateSoundRMS(dmaBuffer, bytesRead) > Settings::getRecordingRmsThreshold()) {
-                xRingbufferSend(_ringBuffer, dmaBuffer, bytesRead, portMAX_DELAY);
+            if (calculateSoundRMS(buffer, bytesRead) > Settings::getRecordingRmsThreshold()) {
+                LvglDisplay::updateRecordingState(true);
+                xRingbufferSend(_ringBuffer, buffer, bytesRead, portMAX_DELAY);
+            } else {
+                LvglDisplay::updateRecordingState(false);
             }
         }
         vTaskDelay(1);
@@ -79,6 +80,6 @@ RingbufHandle_t RecordingManager::getRingBuffer() {
     return _ringBuffer;
 }
 
-DoubaoSTT RecordingManager::getSttClient() {
+DoubaoSTT &RecordingManager::getSttClient() {
     return _sttClient;
 }
