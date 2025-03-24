@@ -16,7 +16,7 @@ constexpr byte DoubaoTTSDefaultLastAudioWsHeader[] = {0x11, 0x22, 0x10, 0x00};
 
 class DoubaoSTT : public WebSocketsClient {
 public:
-    DoubaoSTT(const CozeLLMAgent &llmAgent);
+    explicit DoubaoSTT(const CozeLLMAgent &llmAgent);
 
     void eventCallback(WStype_t type, uint8_t *payload, size_t length);
 
