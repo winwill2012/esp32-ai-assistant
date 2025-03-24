@@ -1,3 +1,4 @@
+#include <GlobalState.h>
 #include <vector>
 #include "utils.h"
 #include "arduinoFFT.h"

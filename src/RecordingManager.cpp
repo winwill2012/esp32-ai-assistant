@@ -78,10 +78,10 @@ RecordingManager::RecordingManager(DoubaoSTT sttClient) : _sttClient(std::move(s
     }
 }
 
-RingbufHandle_t RecordingManager::getRingBuffer() const {
+inline RingbufHandle_t RecordingManager::getRingBuffer() const {
     return _ringBuffer;
 }
 
-DoubaoSTT &RecordingManager::getSttClient() {
+inline DoubaoSTT &RecordingManager::getSttClient() {
     return _sttClient;
 }

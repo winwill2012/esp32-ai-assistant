@@ -27,7 +27,7 @@ void playAudio(void *ptr) {
     }
 }
 
-QueueHandle_t AudioPlayer::getTaskQueue() {
+inline QueueHandle_t AudioPlayer::getTaskQueue() {
     return _taskQueue;
 }
 
@@ -54,7 +54,6 @@ void AudioPlayer::begin() {
     i2s_driver_install(MAX98357_I2S_NUM, &max98357_i2s_config, 0, nullptr);
     i2s_set_pin(MAX98357_I2S_NUM, &max98357_gpio_config);
     i2s_zero_dma_buffer(MAX98357_I2S_NUM);
-
     xTaskCreate(playAudio, "playAudio", 4096, nullptr, 1, nullptr);
 }
 

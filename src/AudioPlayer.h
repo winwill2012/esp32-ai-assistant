@@ -23,7 +23,7 @@ public:
 
     static void resetTaskQueue();
 
-    static QueueHandle_t getTaskQueue();
+    static inline QueueHandle_t getTaskQueue();
 
     static std::vector<int16_t> adjustVolume(PlayAudioTask task, float volumeRatio);
 

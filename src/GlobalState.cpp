@@ -15,7 +15,7 @@ EventGroupHandle_t GlobalState::getEventGroup() {
     return eventGroup;
 }
 
-String GlobalState::getConversationId() {
+inline String GlobalState::getConversationId() {
     return conversationId;
 }
 
@@ -27,7 +27,7 @@ EventBits_t GlobalState::getEventBits(const std::vector<MachineState> &states) {
     return result;
 }
 
-MachineState GlobalState::getState() {
+inline MachineState GlobalState::getState() {
     return machineState;
 }
 

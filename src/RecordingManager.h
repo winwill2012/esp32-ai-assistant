@@ -17,9 +17,9 @@ public:
 
     [[noreturn]] void begin();
 
-    DoubaoSTT &getSttClient();
+    inline DoubaoSTT &getSttClient();
 
-    RingbufHandle_t getRingBuffer() const;
+    inline RingbufHandle_t getRingBuffer() const;
 
 private:
     DoubaoSTT _sttClient;
