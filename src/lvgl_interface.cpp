@@ -1,5 +1,6 @@
 #include "lvgl_interface.h"
 #include "Settings.h"
+#include "Application.h"
 #include "LvglDisplay.h"
 #include "Utils.h"
 #include "driver/i2s.h"
@@ -57,12 +58,12 @@ void set_screen_brightness(int brightness) {
     Settings::setScreenBrightness(brightness);
 }
 
-void onMicrophoneClicked() {
+void on_microphone_clicked() {
     // 正在说话或者思考，直接进入聆听模式
     if (GlobalState::getState() == Speaking || GlobalState::getState() == Thinking) {
-        i2s_stop(MAX98357_I2S_NUM);
-        i2s_zero_dma_buffer(MAX98357_I2S_NUM);
-        AudioPlayer::resetTaskQueue(); // 清空当前音频播放队列
+        Application::getInstance()->getLlmAgentInstance()->interrupt(true);
+        Application::getInstance()->getTTSInstance()->interrupt(true);
+        Application::getInstance()->getAudioPlayer()->interrupt(true);
         vTaskDelay(pdMS_TO_TICKS(500));
         GlobalState::setState(Listening);
     } else if (GlobalState::getState() == Listening) {

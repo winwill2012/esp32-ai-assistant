@@ -1,14 +1,18 @@
 #include "AudioPlayer.h"
 #include "GlobalState.h"
+#include "Application.h"
 #include "driver/i2s.h"
 
-QueueHandle_t AudioPlayer::_taskQueue = xQueueCreate(30, sizeof(PlayAudioTask));
+AudioPlayer::AudioPlayer() {
+    _taskQueue = xQueueCreate(30, sizeof(PlayAudioTask));
+}
 
 void playAudio(void *ptr) {
     PlayAudioTask task{};
     size_t bytes_written;
     while (true) {
-        if (xQueueReceive(AudioPlayer::getTaskQueue(), &task, portMAX_DELAY) == pdPASS) {
+        if (xQueueReceive(Application::getInstance()->getAudioPlayer()->getTaskQueue(), &task, portMAX_DELAY) ==
+            pdPASS) {
             GlobalState::setState(Speaking);
             const esp_err_t result = i2s_write(MAX98357_I2S_NUM, task.data, task.length, &bytes_written,
                                                portMAX_DELAY);
@@ -17,7 +21,7 @@ void playAudio(void *ptr) {
             }
             free(task.data);
             // 语音已经播放完成，并且队列里面没有数据，则进入监听模式
-            if (uxQueueMessagesWaiting(AudioPlayer::getTaskQueue()) == 0) {
+            if (uxQueueMessagesWaiting(Application::getInstance()->getAudioPlayer()->getTaskQueue()) == 0) {
                 // 此时可能i2s DMA缓冲区还有未播放的数据，延时1000ms，不然可能麦克风会监听到播放的语音
                 vTaskDelay(pdMS_TO_TICKS(1000));
                 GlobalState::setState(Listening);
@@ -25,10 +29,6 @@ void playAudio(void *ptr) {
         }
         vTaskDelay(1);
     }
-}
-
-inline QueueHandle_t AudioPlayer::getTaskQueue() {
-    return _taskQueue;
 }
 
 void AudioPlayer::begin() {
@@ -58,25 +58,25 @@ void AudioPlayer::begin() {
 }
 
 void AudioPlayer::publishTask(const PlayAudioTask task) {
+    if (_interrupted) {
+        free(task.data);
+        return;
+    }
     if (xQueueSend(_taskQueue, &task, portMAX_DELAY) != pdPASS) {
         log_e("发送音频播放任务到队列失败: %d", task.length);
         free(task.data); // 发送到队列失败，则生产者负责将内存回收
     }
 }
 
-std::vector<int16_t> AudioPlayer::adjustVolume(PlayAudioTask task, float volumeRatio) {
-    std::vector<int16_t> result;
-    for (int i = 0; i < task.length / 2; i++) {
-//        int16_t raw = (((int16_t)(task.data[i])) << 8 | task.data[i + 1]) * volumeRatio;
-//        result.push_back(static_cast<uint8_t>(raw >> 8)); // 高字节
-//        result.push_back(static_cast<uint8_t>(raw & 0xFF)); // 低字节
-        result.push_back(static_cast<uint8_t>((task.data[i] << 8) | task.data[i + 1])); // 低字节
+void AudioPlayer::interrupt(bool value) {
+    _interrupted = value;
+    if (_interrupted) {
+        xQueueReset(_taskQueue);
+        i2s_stop(MAX98357_I2S_NUM);
+        i2s_zero_dma_buffer(MAX98357_I2S_NUM);
+    } else {
+        i2s_start(MAX98357_I2S_NUM);
+        i2s_zero_dma_buffer(MAX98357_I2S_NUM);
     }
-    return result;
-}
-
-void AudioPlayer::resetTaskQueue() {
-    xQueueReset(_taskQueue);
-    i2s_start(MAX98357_I2S_NUM);
 }
 

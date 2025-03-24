@@ -111,7 +111,7 @@ std::vector<WifiInfo> Settings::getWifiList(const bool refresh) {
     return scannedWifiList;
 }
 
-inline String Settings::getCurrentVoice() {
+String Settings::getCurrentVoice() {
     return currentVoice;
 }
 
@@ -123,7 +123,7 @@ void Settings::setCurrentVoice(const String &voice) {
     preferences.end();
 }
 
-inline String Settings::getCurrentPersona() {
+String Settings::getCurrentPersona() {
     return currentPersona;
 }
 
@@ -134,7 +134,7 @@ void Settings::setCurrentPersona(const String &persona) {
     preferences.end();
 }
 
-inline float Settings::getCurrentSpeakVolumeRatio() {
+float Settings::getCurrentSpeakVolumeRatio() {
     return currentSpeakVolumeRatio;
 }
 
@@ -145,7 +145,7 @@ void Settings::setCurrentSpeakVolumeRatio(float speakVolumeRatio) {
     preferences.end();
 }
 
-inline float Settings::getCurrentSpeakSpeedRatio() {
+float Settings::getCurrentSpeakSpeedRatio() {
     return currentSpeakSpeedRatio;
 }
 
@@ -156,7 +156,7 @@ void Settings::setCurrentSpeakSpeedRatio(float speakSpeedRatio) {
     preferences.end();
 }
 
-inline int Settings::getSpeakPauseDuration() {
+int Settings::getSpeakPauseDuration() {
     return speakPauseDuration;
 }
 
@@ -167,7 +167,7 @@ void Settings::setSpeakPauseDuration(int pauseDuration) {
     preferences.end();
 }
 
-inline double Settings::getRecordingRmsThreshold() {
+double Settings::getRecordingRmsThreshold() {
     return recordingRmsThreshold;
 }
 
@@ -187,31 +187,31 @@ void Settings::setWifiInfo(const std::string &ssid, const std::string &password)
     preferences.end();
 }
 
-inline std::pair<std::string, std::string> Settings::getWifiInfo() {
+std::pair<std::string, std::string> Settings::getWifiInfo() {
     return std::make_pair(wifiSsid, wifiPassword);
 }
 
-inline std::map<std::string, std::string> Settings::getVoiceMap() {
+std::map<std::string, std::string> Settings::getVoiceMap() {
     return voiceMap;
 }
 
-inline std::map<std::string, std::string> Settings::getPersonaMap() {
+std::map<std::string, std::string> Settings::getPersonaMap() {
     return personaMap;
 }
 
-inline std::string Settings::getDoubaoAppId() {
+std::string Settings::getDoubaoAppId() {
     return doubaoAppId;
 }
 
-inline std::string Settings::getDoubaoAccessToken() {
+std::string Settings::getDoubaoAccessToken() {
     return doubaoAccessToken;
 }
 
-inline std::string Settings::getCozeToken() {
+std::string Settings::getCozeToken() {
     return cozeToken;
 }
 
-inline int Settings::getScreenBrightness() {
+int Settings::getScreenBrightness() {
     return currentScreenBrightness;
 }
 

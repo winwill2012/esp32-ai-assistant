@@ -36,47 +36,47 @@ public:
 
     static std::vector<WifiInfo> getWifiList(bool refresh);
 
-    static inline String getCurrentVoice();
+    static String getCurrentVoice();
 
-    static inline int getScreenBrightness();
+    static int getScreenBrightness();
 
     static void setScreenBrightness(int brightness);
 
     static void setCurrentVoice(const String &voice);
 
-    static inline String getCurrentPersona();
+    static String getCurrentPersona();
 
-    static inline std::map<std::string, std::string> getVoiceMap();
+    static std::map<std::string, std::string> getVoiceMap();
 
-    static inline std::map<std::string, std::string> getPersonaMap();
+    static std::map<std::string, std::string> getPersonaMap();
 
-    static inline std::string getDoubaoAppId();
+    static std::string getDoubaoAppId();
 
-    static inline std::string getDoubaoAccessToken();
+    static std::string getDoubaoAccessToken();
 
-    static inline std::string getCozeToken();
+    static std::string getCozeToken();
 
     static void setCurrentPersona(const String &persona);
 
-    static inline float getCurrentSpeakVolumeRatio();
+    static float getCurrentSpeakVolumeRatio();
 
     static void setCurrentSpeakVolumeRatio(float speakVolumeRatio);
 
-    static inline float getCurrentSpeakSpeedRatio();
+    static float getCurrentSpeakSpeedRatio();
 
     static void setCurrentSpeakSpeedRatio(float speakSpeedRatio);
 
-    static inline int getSpeakPauseDuration();
+    static int getSpeakPauseDuration();
 
     static void setSpeakPauseDuration(int pauseDuration);
 
-    static inline double getRecordingRmsThreshold();
+    static double getRecordingRmsThreshold();
 
     static void setRecordingRmsThreshold(double rmsThreshold);
 
     static void setWifiInfo(const std::string &ssid, const std::string &password);
 
-    static inline std::pair<std::string, std::string> getWifiInfo();
+    static std::pair<std::string, std::string> getWifiInfo();
 
 private:
     static String currentVoice; // 当前设置的发音人

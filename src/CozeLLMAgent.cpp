@@ -1,13 +1,15 @@
 #include "CozeLLMAgent.h"
 #include <HTTPClient.h>
 #include <utility>
+#include "ArduinoJson.h"
 #include <Arduino.h>
 #include "Utils.h"
 #include "Settings.h"
 #include "GlobalState.h"
 #include "LvglDisplay.h"
+#include "Application.h"
 
-CozeLLMAgent::CozeLLMAgent(const DoubaoTTS &tts) : _tts(tts) {
+CozeLLMAgent::CozeLLMAgent() {
     _firstPacket = true;
     _taskQueue = xQueueCreate(5, sizeof(LLMTask));
     xTaskCreate([](void *ptr) {
@@ -52,6 +54,10 @@ void CozeLLMAgent::chat(const String &input) {
         WiFiClient *stream = http.getStreamPtr();
         String line = "";
         while (stream->connected() || stream->available()) {
+            if (_interrupted) {
+                http.end();
+                return;
+            }
             vTaskDelay(1);
             if (stream->available()) {
                 line = stream->readStringUntil('\n');
@@ -59,9 +65,9 @@ void CozeLLMAgent::chat(const String &input) {
                     if (line.compareTo("event:conversation.message.completed") == 0
                         && lastEvent.compareTo("event:conversation.message.delta") == 0) {
                         if (_ttsTextBuffer != "") {
-                            _tts.synth(_ttsTextBuffer, true);
+                            Application::getInstance()->getTTSInstance()->synth(_ttsTextBuffer, true);
                         } else {
-                            _tts.disconnect();
+                            Application::getInstance()->getTTSInstance()->disconnect();
                         }
                         break;
                     }
@@ -79,6 +85,9 @@ void CozeLLMAgent::chat(const String &input) {
 }
 
 void CozeLLMAgent::ProcessStreamOutput(String data) {
+    if (_interrupted) {
+        return;
+    }
     log_v("Process coze agent response fragment: %s", data.c_str());
     // 只处理data开头，并且是助手回答的数据类型
     if (!data.startsWith("data:") || data.indexOf(R"("role":"assistant","type":"answer")") < 0) {
@@ -107,6 +116,9 @@ void CozeLLMAgent::reset() {
 }
 
 void CozeLLMAgent::ProcessContent(String &content) {
+    if (_interrupted) {
+        return;
+    }
     content.trim();
     if (content.isEmpty()) {
         return;
@@ -121,7 +133,8 @@ void CozeLLMAgent::ProcessContent(String &content) {
     while (true) {
         const std::pair<int, size_t> delimiterIndex = findMinIndexOfDelimiter(_ttsTextBuffer);
         if (delimiterIndex.first >= 0) {
-            _tts.synth(_ttsTextBuffer.substring(0, delimiterIndex.first), false);
+            Application::getInstance()->getTTSInstance()->synth(_ttsTextBuffer.substring(0, delimiterIndex.first),
+                                                                false);
             _ttsTextBuffer = _ttsTextBuffer.substring(delimiterIndex.first + delimiterIndex.second);
         } else {
             break;
@@ -134,4 +147,8 @@ void CozeLLMAgent::publishTask(LLMTask task) {
         log_e("send llm task to queue failed");
         free(task.message);
     }
+}
+
+void CozeLLMAgent::interrupt(bool value) {
+    _interrupted = value;
 }

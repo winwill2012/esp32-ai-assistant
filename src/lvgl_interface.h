@@ -29,7 +29,7 @@ void load_wifi_list(const void *refresh);
 
 bool connect_wifi(const char *ssid, const char *password);
 
-void onMicrophoneClicked();
+void on_microphone_clicked();
 
 #ifdef __cplusplus
 }

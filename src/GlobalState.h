@@ -22,11 +22,11 @@ public:
 
     static EventGroupHandle_t getEventGroup();
 
-    static inline String getConversationId();
+    static String getConversationId();
 
     static EventBits_t getEventBits(const std::vector<MachineState> &states);
 
-    static inline MachineState getState();
+    static MachineState getState();
 
     static void setState(MachineState state);
 

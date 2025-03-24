@@ -1,7 +1,6 @@
 #include <GlobalState.h>
 #include <vector>
 #include "utils.h"
-#include "arduinoFFT.h"
 
 auto charset = "0123456789abcdef";
 

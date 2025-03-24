@@ -11,7 +11,7 @@ struct LLMTask {
 
 class CozeLLMAgent {
 public:
-    explicit CozeLLMAgent(const DoubaoTTS &tts);
+    CozeLLMAgent();
 
     void publishTask(LLMTask task);
 
@@ -23,8 +23,10 @@ public:
 
     void reset();
 
-private :
-    DoubaoTTS _tts;
+    void interrupt(bool value);
+
+private:
+    bool _interrupted = false;
     String _response;
     String _cmd;
     String _content;

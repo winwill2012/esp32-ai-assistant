@@ -21,7 +21,7 @@ static void home_page_imgbtn_recording_event_handler(lv_event_t *e) {
     lv_event_code_t code = lv_event_get_code(e);
     switch (code) {
         case LV_EVENT_CLICKED: {
-            onMicrophoneClicked();
+            on_microphone_clicked();
             break;
         }
         default:

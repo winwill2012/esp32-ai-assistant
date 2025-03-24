@@ -17,18 +17,19 @@ struct PlayAudioTask {
 
 class AudioPlayer {
 public:
-    static void begin();
+    AudioPlayer();
 
-    static void publishTask(PlayAudioTask task);
+    void begin();
 
-    static void resetTaskQueue();
+    void publishTask(PlayAudioTask task);
 
-    static inline QueueHandle_t getTaskQueue();
+    inline QueueHandle_t getTaskQueue() const { return _taskQueue; };
 
-    static std::vector<int16_t> adjustVolume(PlayAudioTask task, float volumeRatio);
+    void interrupt(bool value);
 
 private:
-    static QueueHandle_t _taskQueue;
+    bool _interrupted = false;
+    QueueHandle_t _taskQueue;
 };
 
 

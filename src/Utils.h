@@ -24,4 +24,5 @@ bool connectWifi(const char *ssid, const char *password, int maxRetries);
 std::vector<uint8_t> int16ToUint8BigEndian(const std::vector<int16_t> &input);
 
 std::vector<int16_t> uint8ToInt16BigEndian(const std::vector<uint8_t> &input);
+
 #endif

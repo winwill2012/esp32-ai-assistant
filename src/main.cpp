@@ -1,13 +1,9 @@
-#include <CozeLLMAgent.h>
 #include <Settings.h>
 #include <utils.h>
+#include "GlobalState.h"
 #include "Arduino.h"
-#include "DoubaoTTS.h"
-#include "DoubaoSTT.h"
-#include "RecordingManager.h"
 #include "LvglDisplay.h"
-#include "TimeUpdater.h"
-#include "AudioPlayer.h"
+#include "Application.h"
 
 /**
  *  一定要记得修改WebSockets.h中的如下定义：
@@ -33,14 +29,8 @@ void setup() {
                         false, true, portMAX_DELAY);
     log_d("network connect successfully");
     GlobalState::setState(Sleep);
-    const DoubaoTTS ttsClient;
-    const CozeLLMAgent llmAgent(ttsClient);
-    DoubaoSTT sttClient(llmAgent);
 
-    RecordingManager recordingManager(sttClient);
-    TimeUpdater::begin();
-    AudioPlayer::begin();
-    recordingManager.begin();
+    Application::getInstance()->begin();
 }
 
 void loop() {

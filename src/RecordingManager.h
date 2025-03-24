@@ -13,16 +13,13 @@
 
 class RecordingManager {
 public:
-    explicit RecordingManager(DoubaoSTT sttClient);
+    RecordingManager();
 
     [[noreturn]] void begin();
 
-    inline DoubaoSTT &getSttClient();
-
-    inline RingbufHandle_t getRingBuffer() const;
+    inline RingbufHandle_t getRingBuffer() const { return _ringBuffer; };
 
 private:
-    DoubaoSTT _sttClient;
     RingbufHandle_t _ringBuffer;
 };
 

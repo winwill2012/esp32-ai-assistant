@@ -3,11 +3,11 @@
 #include <WiFiUdp.h>
 #include "LvglDisplay.h"
 
-WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP, "time1.aliyun.com");
-unsigned long lastMinute = -1;
+unsigned long TimeUpdater::_lastMinute = -1;
+WiFiUDP udp;
+NTPClient timeClient = NTPClient(udp, "time1.aliyun.com");
 
-[[noreturn]] void TimeUpdater::begin() {
+void TimeUpdater::begin() {
     timeClient.begin();
     timeClient.setTimeOffset(28800); // 设置时区，这里是北京时间（UTC+8），8 * 60 * 60 = 28800
     xTaskCreate([](void *ptr) {
@@ -16,13 +16,13 @@ unsigned long lastMinute = -1;
             const unsigned long localEpochTime = timeClient.getEpochTime();
             const unsigned long currentHour = (localEpochTime % 86400) / 3600;
             const unsigned long currentMinute = (localEpochTime % 3600) / 60;
-            if (currentMinute != lastMinute) {
+            if (currentMinute != _lastMinute) {
                 char timeStr[6];
                 snprintf(timeStr, sizeof(timeStr), "%02lu:%02lu", currentHour, currentMinute);
                 LvglDisplay::updateTime(timeStr);
-                lastMinute = currentMinute;
+                _lastMinute = currentMinute;
             }
             vTaskDelay(pdMS_TO_TICKS(1000));
         }
-    }, "timeUpdater", 1024 * 4, nullptr, 0, nullptr);
+    }, "timeUpdater", 1024 * 4, nullptr, 1, nullptr);
 }

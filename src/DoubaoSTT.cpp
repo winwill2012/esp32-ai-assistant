@@ -7,10 +7,10 @@
 #include <utility>
 #include <vector>
 #include "LvglDisplay.h"
+#include "Application.h"
 #include "ArduinoJson.h"
 
-DoubaoSTT::DoubaoSTT(CozeLLMAgent llmAgent)
-    : _llmAgent(std::move(llmAgent)) {
+DoubaoSTT::DoubaoSTT() {
     _eventGroup = xEventGroupCreate();
     _requestBuilder = std::vector<uint8_t>();
     _firstPacket = true;
@@ -166,7 +166,7 @@ void DoubaoSTT::parseResponse(const uint8_t *response) {
                         task.message = static_cast<char *>(ps_malloc(sizeof(char) * text.length()));
                         task.length = text.length();
                         text.toCharArray(task.message, task.length);
-                        _llmAgent.publishTask(task);
+                        Application::getInstance()->getLlmAgentInstance()->publishTask(task);
                         _firstPacket = true;
                     }
                 }
