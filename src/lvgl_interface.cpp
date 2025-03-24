@@ -40,8 +40,8 @@ void set_speak_pause_duration(int duration) {
     Settings::setSpeakPauseDuration(duration);
 }
 
-void load_wifi_list(void *refresh) {
-    LvglDisplay::loadWifiList((bool *) refresh);
+void load_wifi_list(const void *refresh) {
+    LvglDisplay::loadWifiList(refresh);
 }
 
 bool connect_wifi(const char *ssid, const char *password) {
@@ -62,10 +62,11 @@ void onMicrophoneClicked() {
     if (GlobalState::getState() == Speaking || GlobalState::getState() == Thinking) {
         i2s_stop(MAX98357_I2S_NUM);
         i2s_zero_dma_buffer(MAX98357_I2S_NUM);
-        AudioPlayer::resetTaskQueue();  // 清空当前音频播放队列
+        AudioPlayer::resetTaskQueue(); // 清空当前音频播放队列
         vTaskDelay(pdMS_TO_TICKS(500));
         GlobalState::setState(Listening);
-    } else if (GlobalState::getState() == Listening) {  // 正在聆听，自己进入待机模式
+    } else if (GlobalState::getState() == Listening) {
+        // 正在聆听，自己进入待机模式
         GlobalState::setState(Sleep);
     } else if (GlobalState::getState() == Sleep) {
         GlobalState::setState(Listening);

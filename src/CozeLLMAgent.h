@@ -1,8 +1,6 @@
 #ifndef COZE_LLMAGENT_H
 #define COZE_LLMAGENT_H
 
-#include <map>
-#include <ArduinoJson.h>
 #include "CozeLLMAgent.h"
 #include "DoubaoTTS.h"
 
@@ -13,8 +11,7 @@ struct LLMTask {
 
 class CozeLLMAgent {
 public:
-
-    explicit CozeLLMAgent(DoubaoTTS &tts);
+    explicit CozeLLMAgent(const DoubaoTTS &tts);
 
     void publishTask(LLMTask task);
 

@@ -4,9 +4,8 @@
 #include <Arduino.h>
 #include <WebSocketsClient.h>
 #include "driver/i2s.h"
-#include "vector"
 
-class DoubaoTTS : public WebSocketsClient {
+class DoubaoTTS final : public WebSocketsClient {
 public:
     DoubaoTTS();
 

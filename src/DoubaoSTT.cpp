@@ -4,11 +4,13 @@
 #include <Arduino.h>
 #include <CozeLLMAgent.h>
 #include <RecordingManager.h>
+#include <utility>
 #include <vector>
 #include "LvglDisplay.h"
+#include "ArduinoJson.h"
 
-DoubaoSTT::DoubaoSTT(const CozeLLMAgent &llmAgent)
-        : _llmAgent(llmAgent) {
+DoubaoSTT::DoubaoSTT(CozeLLMAgent llmAgent)
+    : _llmAgent(std::move(llmAgent)) {
     _eventGroup = xEventGroupCreate();
     _requestBuilder = std::vector<uint8_t>();
     _firstPacket = true;
@@ -22,7 +24,6 @@ DoubaoSTT::DoubaoSTT(const CozeLLMAgent &llmAgent)
 void DoubaoSTT::eventCallback(WStype_t type, uint8_t *payload, size_t length) {
     switch (type) {
         case WStype_PING:
-            break;
         case WStype_ERROR:
             break;
         case WStype_CONNECTED:
@@ -32,11 +33,6 @@ void DoubaoSTT::eventCallback(WStype_t type, uint8_t *payload, size_t length) {
             log_d("websocket断开连接");
             break;
         case WStype_TEXT: {
-            log_d("websocket收到text消息: %d", length);
-            for (int i = 0; i < length; i++) {
-                Serial.print(static_cast<char>(payload[i]));
-            }
-            Serial.println();
             break;
         }
         case WStype_BIN:
@@ -106,7 +102,7 @@ void DoubaoSTT::buildAudioOnlyRequest(uint8_t *audio, const size_t size, const b
 }
 
 void DoubaoSTT::recognize(uint8_t *audio, const size_t size, const bool firstPacket, const bool lastPacket) {
-    log_d("语音识别: %d, %d, %d", size, firstPacket, lastPacket);
+    log_d("speech recognize request: %d, %d, %d", size, firstPacket, lastPacket);
     if (firstPacket) {
         xEventGroupClearBits(_eventGroup, STT_TASK_COMPLETED_EVENT);
         while (!isConnected()) {
@@ -115,13 +111,13 @@ void DoubaoSTT::recognize(uint8_t *audio, const size_t size, const bool firstPac
         }
         buildFullClientRequest();
         if (!sendBIN(_requestBuilder.data(), _requestBuilder.size())) {
-            log_d("sendBin失败");
+            log_e("send speech recognize full client request packet failed");
         }
         loop();
     }
     buildAudioOnlyRequest(audio, size, lastPacket);
     if (!sendBIN(_requestBuilder.data(), _requestBuilder.size())) {
-        log_d("sendBin失败");
+        log_e("send speech recognize audio only packet failed");
     }
     loop();
     if (lastPacket) {
@@ -146,7 +142,7 @@ void DoubaoSTT::parseResponse(const uint8_t *response) {
             JsonDocument jsonResult;
             const DeserializationError err = deserializeJson(jsonResult, recognizeResult);
             if (err) {
-                log_e("解析语音识别结果失败");
+                log_e("parse speech recognize result failed");
                 return;
             }
             const String reqId = jsonResult["reqid"];
@@ -165,7 +161,7 @@ void DoubaoSTT::parseResponse(const uint8_t *response) {
                         _firstPacket = false;
                     }
                     if (sequence < 0) {
-                        log_i("[语音识别] 识别到文字: %s", text.c_str());
+                        log_i("speech recognize result: %s", text.c_str());
                         LLMTask task{};
                         task.message = static_cast<char *>(ps_malloc(sizeof(char) * text.length()));
                         task.length = text.length();
@@ -184,9 +180,9 @@ void DoubaoSTT::parseResponse(const uint8_t *response) {
             const uint32_t messageLength = parseInt32(payload);
             payload += 4;
             const std::string errorMessage = parseString(payload, messageLength);
-            Serial.println("语音识别失败: ");
-            Serial.printf("   errorCode =  %u\n", errorCode);
-            Serial.printf("errorMessage =  %s\n", errorMessage.c_str());
+            log_e("speech recognize failed: ");
+            log_e("   errorCode =  %u\n", errorCode);
+            log_e("errorMessage =  %s\n", errorMessage.c_str());
             xEventGroupSetBits(_eventGroup, STT_TASK_COMPLETED_EVENT);
         }
         default: {

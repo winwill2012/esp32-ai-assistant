@@ -7,7 +7,7 @@
 #include "GlobalState.h"
 #include "LvglDisplay.h"
 
-CozeLLMAgent::CozeLLMAgent(DoubaoTTS &tts) : _tts(tts) {
+CozeLLMAgent::CozeLLMAgent(const DoubaoTTS &tts) : _tts(tts) {
     _firstPacket = true;
     _taskQueue = xQueueCreate(5, sizeof(LLMTask));
     xTaskCreate([](void *ptr) {

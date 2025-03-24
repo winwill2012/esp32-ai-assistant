@@ -7,7 +7,7 @@ WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "time1.aliyun.com");
 unsigned long lastMinute = -1;
 
-void TimeUpdater::begin() {
+[[noreturn]] void TimeUpdater::begin() {
     timeClient.begin();
     timeClient.setTimeOffset(28800); // 设置时区，这里是北京时间（UTC+8），8 * 60 * 60 = 28800
     xTaskCreate([](void *ptr) {

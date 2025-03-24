@@ -79,11 +79,10 @@ std::pair<int, size_t> findMinIndexOfDelimiter(const String &input) {
 bool connectWifi(const char *ssid, const char *password, const int maxRetries) {
     // 如果当前已经连接成功，先断开网络
     if (WiFi.isConnected()) {
-        log_e("关闭老wifi连接");
         WiFi.disconnect(true, true);
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
-    log_d("开始新连接");
+    log_d("connect wifi with config: [%s, %s]", ssid, password);
     GlobalState::setState(NetworkConnecting);
     WiFiClass::mode(WIFI_MODE_STA);
     WiFiClass::useStaticBuffers(true);
@@ -96,11 +95,11 @@ bool connectWifi(const char *ssid, const char *password, const int maxRetries) {
     }
     if (WiFi.isConnected()) {
         GlobalState::setState(NetworkConnected);
-        log_i("Network connect successfully!");
+        log_i("network connect successfully!");
         return true;
     }
     GlobalState::setState(NetworkConnectFailed);
-    log_e("Network connect failed!");
+    log_e("network connect failed!");
     return false;
 }
 

@@ -18,23 +18,23 @@ void setup() {
     Serial.begin(115200);
     Settings::begin();
     LvglDisplay::begin();
-    analogWrite(8, (int) (Settings::getScreenBrightness() * 2.55));  // 设置屏幕亮度
+    analogWrite(8, static_cast<int>(Settings::getScreenBrightness() * 2.55)); // 设置屏幕亮度
 
-    auto wifiInfo = Settings::getWifiInfo();
+    const auto wifiInfo = Settings::getWifiInfo();
     if (wifiInfo.first.empty() || wifiInfo.second.empty()) {
-        log_e("No wifi configuration found");
+        log_e("no wifi configuration found");
         GlobalState::setState(NetworkConfigurationNotFound);
     } else {
         connectWifi(wifiInfo.first.c_str(), wifiInfo.second.c_str(), 20);
     }
-    log_d("等待网络连接...");
+    log_d("waiting for network connected...");
     // 等待网络连接成功
     xEventGroupWaitBits(GlobalState::getEventGroup(), GlobalState::getEventBits({NetworkConnected}),
                         false, true, portMAX_DELAY);
-    log_d("网络连接成功");
+    log_d("network connect successfully");
     GlobalState::setState(Sleep);
-    DoubaoTTS ttsClient;
-    CozeLLMAgent llmAgent(ttsClient);
+    const DoubaoTTS ttsClient;
+    const CozeLLMAgent llmAgent(ttsClient);
     DoubaoSTT sttClient(llmAgent);
 
     RecordingManager recordingManager(sttClient);
@@ -44,5 +44,4 @@ void setup() {
 }
 
 void loop() {
-
 }

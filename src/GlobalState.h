@@ -24,7 +24,7 @@ public:
 
     static String getConversationId();
 
-    static EventBits_t getEventBits(std::vector<MachineState> states);
+    static EventBits_t getEventBits(const std::vector<MachineState> &states);
 
     static MachineState getState();
 

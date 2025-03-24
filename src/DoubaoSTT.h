@@ -4,7 +4,6 @@
 #include <Arduino.h>
 #include <CozeLLMAgent.h>
 #include <WebSocketsClient.h>
-#include "driver/i2s.h"
 #include <vector>
 
 #define STT_TASK_COMPLETED_EVENT (1<<1)
@@ -14,9 +13,9 @@ constexpr byte DoubaoTTSDefaultFullClientWsHeader[] = {0x11, 0x10, 0x10, 0x00};
 constexpr byte DoubaoTTSDefaultAudioOnlyWsHeader[] = {0x11, 0x20, 0x10, 0x00};
 constexpr byte DoubaoTTSDefaultLastAudioWsHeader[] = {0x11, 0x22, 0x10, 0x00};
 
-class DoubaoSTT : public WebSocketsClient {
+class DoubaoSTT final : public WebSocketsClient {
 public:
-    explicit DoubaoSTT(const CozeLLMAgent &llmAgent);
+    explicit DoubaoSTT(CozeLLMAgent llmAgent);
 
     void eventCallback(WStype_t type, uint8_t *payload, size_t length);
 

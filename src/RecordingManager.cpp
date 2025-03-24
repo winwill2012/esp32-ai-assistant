@@ -1,27 +1,29 @@
 #include <DoubaoSTT.h>
 #include "RecordingManager.h"
 #include <Settings.h>
+
+#include <utility>
 #include "Utils.h"
 #include "LvglDisplay.h"
 #include "GlobalState.h"
 
-RecordingManager::RecordingManager(DoubaoSTT &sttClient) : _sttClient(sttClient) {
+RecordingManager::RecordingManager(DoubaoSTT sttClient) : _sttClient(std::move(sttClient)) {
     constexpr i2s_config_t i2s_config = {
-            .mode = static_cast<i2s_mode_t>(I2S_MODE_MASTER | I2S_MODE_RX),
-            .sample_rate = AUDIO_SAMPLE_RATE,
-            .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
-            .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT, // 这里的左右声道要和电路保持一致
-            .communication_format = I2S_COMM_FORMAT_STAND_I2S,
-            .intr_alloc_flags = ESP_INTR_FLAG_LEVEL6,
-            .dma_buf_count = 4,
-            .dma_buf_len = 1024,
-            .use_apll = false
+        .mode = static_cast<i2s_mode_t>(I2S_MODE_MASTER | I2S_MODE_RX),
+        .sample_rate = AUDIO_SAMPLE_RATE,
+        .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
+        .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT, // 这里的左右声道要和电路保持一致
+        .communication_format = I2S_COMM_FORMAT_STAND_I2S,
+        .intr_alloc_flags = ESP_INTR_FLAG_LEVEL6,
+        .dma_buf_count = 4,
+        .dma_buf_len = 1024,
+        .use_apll = false
     };
     constexpr i2s_pin_config_t pin_config = {
-            .bck_io_num = MICROPHONE_I2S_BCLK,
-            .ws_io_num = MICROPHONE_I2S_LRC,
-            .data_out_num = -1,
-            .data_in_num = MICROPHONE_I2S_DOUT
+        .bck_io_num = MICROPHONE_I2S_BCLK,
+        .ws_io_num = MICROPHONE_I2S_LRC,
+        .data_out_num = -1,
+        .data_in_num = MICROPHONE_I2S_DOUT
     };
 
     i2s_driver_install(MICROPHONE_I2S_NUM, &i2s_config, 0, nullptr);
@@ -30,15 +32,15 @@ RecordingManager::RecordingManager(DoubaoSTT &sttClient) : _sttClient(sttClient)
     _ringBuffer = xRingbufferCreate(1024 * 32, RINGBUF_TYPE_BYTEBUF);
 }
 
-void consumeBufferedData(void *arg) {
+[[noreturn]] void consumeBufferedData(void *arg) {
     auto *instance = static_cast<RecordingManager *>(arg);
     size_t bytes_read;
     bool firstPacket = true;
-    std::vector<uint8_t> lastPacketBuff = std::vector<uint8_t>();
+    auto lastPacketBuff = std::vector<uint8_t>();
     lastPacketBuff.push_back(0);
     while (true) {
-        auto *buffer = (uint8_t *) xRingbufferReceive(instance->getRingBuffer(), &bytes_read,
-                                                      pdMS_TO_TICKS(Settings::getSpeakPauseDuration()));
+        auto *buffer = static_cast<uint8_t *>(xRingbufferReceive(instance->getRingBuffer(), &bytes_read,
+                                                                 pdMS_TO_TICKS(Settings::getSpeakPauseDuration())));
         if (buffer == nullptr) {
             if (!firstPacket) {
                 instance->getSttClient().recognize(lastPacketBuff.data(), lastPacketBuff.size(), firstPacket, true);
@@ -76,7 +78,7 @@ void consumeBufferedData(void *arg) {
     }
 }
 
-RingbufHandle_t RecordingManager::getRingBuffer() {
+RingbufHandle_t RecordingManager::getRingBuffer() const {
     return _ringBuffer;
 }
 

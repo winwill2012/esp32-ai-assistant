@@ -32,7 +32,7 @@ void Settings::begin() {
         ESP.restart();
     }
     JsonDocument doc;
-    DeserializationError error = deserializeJson(doc, file);
+    const DeserializationError error = deserializeJson(doc, file);
     file.close();
     if (error) {
         log_e("deserialize settings.json failed: %s", error.c_str());
@@ -56,40 +56,15 @@ void Settings::begin() {
     doubaoAppId = doc["doubao"]["appId"].as<std::string>();
     doubaoAccessToken = doc["doubao"]["accessToken"].as<std::string>();
     cozeToken = doc["coze"]["token"].as<std::string>();
-    JsonArray voiceListJsonArray = doc["voiceList"].as<JsonArray>();
+    const JsonArray voiceListJsonArray = doc["voiceList"].as<JsonArray>();
     for (JsonObject item: voiceListJsonArray) {
         voiceMap[item["name"].as<std::string>()] = item["value"].as<std::string>();
     }
-    JsonArray personaListJsonArray = doc["coze"]["personaList"].as<JsonArray>();
+    const JsonArray personaListJsonArray = doc["coze"]["personaList"].as<JsonArray>();
     for (JsonObject item: personaListJsonArray) {
         personaMap[item["name"].as<std::string>()] = item["botId"].as<std::string>();
     }
     show();
-    TimerHandle_t scanWifiTimer = xTimerCreate("scanWifi", pdMS_TO_TICKS(1 * 60 * 1000), true, nullptr, [](void *ptr) {
-        log_d("schedule scan wifi");
-        WiFi.scanNetworks(true);
-        int16_t scanResult = WiFi.scanComplete();
-        while (true) {
-            if (scanResult == WIFI_SCAN_FAILED) {
-                log_e("scan wifi failed");
-                break;
-            } else if (scanResult == WIFI_SCAN_RUNNING) {
-                vTaskDelay(pdMS_TO_TICKS(1000));
-                scanResult = WiFi.scanComplete();
-            } else if (scanResult >= 0) {
-                log_d("scan wifi completed, found %d ap", scanResult);
-                scannedWifiList.clear();
-                for (int i = 0; i < scanResult; i++) {
-                    scannedWifiList.emplace_back(WiFi.SSID(i), WiFi.RSSI(i),
-                                                 WiFi.encryptionType(i) != WIFI_AUTH_OPEN);
-                }
-                break;
-            }
-        }
-    });
-    if (scanWifiTimer != nullptr) {
-        xTimerStart(scanWifiTimer, 0);
-    }
 }
 
 void Settings::show() {
@@ -119,7 +94,7 @@ void Settings::show() {
 /**
 *  扫描设备周围WiFi列表
 */
-std::vector<WifiInfo> Settings::getWifiList(bool refresh) {
+std::vector<WifiInfo> Settings::getWifiList(const bool refresh) {
     if (!refresh) {
         return scannedWifiList;
     }
@@ -242,7 +217,7 @@ int Settings::getScreenBrightness() {
 
 void Settings::setScreenBrightness(int brightness) {
     currentScreenBrightness = brightness;
-    analogWrite(8, (int) (currentScreenBrightness * 2.55));
+    analogWrite(8, static_cast<int>(currentScreenBrightness * 2.55));
     preferences.begin(SETTINGS_NAMESPACE);
     preferences.putInt(SETTING_SCREEN_BRIGHTNESS, brightness);
     preferences.end();

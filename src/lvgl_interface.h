@@ -25,7 +25,7 @@ void set_speak_pause_duration(int duration);
 
 void load_system_setting_data();
 
-void load_wifi_list(void *refresh);
+void load_wifi_list(const void *refresh);
 
 bool connect_wifi(const char *ssid, const char *password);
 

@@ -1,8 +1,6 @@
 #ifndef AI_ROBOT_UTILS_H
 #define AI_ROBOT_UTILS_H
 
-#include <GlobalState.h>
-
 #include "Arduino.h"
 #include <vector>
 #include <WiFi.h>

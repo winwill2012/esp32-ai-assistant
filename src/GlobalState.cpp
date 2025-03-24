@@ -19,10 +19,10 @@ String GlobalState::getConversationId() {
     return conversationId;
 }
 
-EventBits_t GlobalState::getEventBits(std::vector<MachineState> states) {
+EventBits_t GlobalState::getEventBits(const std::vector<MachineState> &states) {
     EventBits_t result = 0;
-    for (int i = 0; i < states.size(); i++) {
-        result |= (1 << states[i]);
+    for (const auto &state: states) {
+        result |= (1 << state);
     }
     return result;
 }
@@ -64,6 +64,8 @@ void GlobalState::setState(const MachineState state) {
         case Speaking:
             LvglDisplay::updateState("正在说话...");
             LvglDisplay::updateRecordingButtonImage(&_stop_alpha_40x40);
+            break;
+        default:
             break;
     }
 }
