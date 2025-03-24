@@ -70,7 +70,7 @@ void DoubaoSTT::buildFullClientRequest() {
         payload[i] = static_cast<uint8_t>(payloadStr.charAt(i));
     }
     payload[payloadStr.length()] = '\0';
-    std::vector<uint8_t> payloadSize = int2Array(payloadStr.length());
+    std::vector<uint8_t> payloadSize = uint32ToUint8Array(payloadStr.length());
     _requestBuilder.clear();
     // 先写入报头（四字节）
     _requestBuilder.insert(_requestBuilder.end(), DoubaoTTSDefaultFullClientWsHeader,
@@ -83,7 +83,7 @@ void DoubaoSTT::buildFullClientRequest() {
 
 void DoubaoSTT::buildAudioOnlyRequest(uint8_t *audio, const size_t size, const bool lastPacket) {
     _requestBuilder.clear();
-    std::vector<uint8_t> payloadLength = int2Array(size);
+    std::vector<uint8_t> payloadLength = uint32ToUint8Array(size);
 
     if (lastPacket) {
         // 先写入报头（四字节）
@@ -136,9 +136,9 @@ void DoubaoSTT::parseResponse(const uint8_t *response) {
     switch (messageType) {
         case 0b1001: {
             // 服务端下发包含识别结果的 full server response
-            const uint32_t payloadSize = parseInt32(payload);
+            const uint32_t payloadSize = readInt32(payload);
             payload += 4;
-            std::string recognizeResult = parseString(payload, payloadSize);
+            std::string recognizeResult = readString(payload, payloadSize);
             JsonDocument jsonResult;
             const DeserializationError err = deserializeJson(jsonResult, recognizeResult);
             if (err) {
@@ -175,11 +175,11 @@ void DoubaoSTT::parseResponse(const uint8_t *response) {
         }
         case 0b1111: {
             // 服务端处理错误时下发的消息类型（如无效的消息格式，不支持的序列化方法等）
-            const uint32_t errorCode = parseInt32(payload);
+            const uint32_t errorCode = readInt32(payload);
             payload += 4;
-            const uint32_t messageLength = parseInt32(payload);
+            const uint32_t messageLength = readInt32(payload);
             payload += 4;
-            const std::string errorMessage = parseString(payload, messageLength);
+            const std::string errorMessage = readString(payload, messageLength);
             log_e("speech recognize failed: ");
             log_e("   errorCode =  %u\n", errorCode);
             log_e("errorMessage =  %s\n", errorMessage.c_str());

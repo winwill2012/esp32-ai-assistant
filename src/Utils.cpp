@@ -15,11 +15,11 @@ std::string generateTaskId() {
     return {uuid};
 }
 
-int32_t parseInt32(const uint8_t *bytes) {
+int32_t readInt32(const uint8_t *bytes) {
     return (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
 }
 
-std::string parseString(const uint8_t *bytes, const uint32_t length) {
+std::string readString(const uint8_t *bytes, const uint32_t length) {
     std::string result;
     for (int i = 0; i < length; i++) {
         result += static_cast<char>(bytes[i]);
@@ -38,7 +38,7 @@ std::string getChipId(const char *prefix) {
     return content;
 }
 
-std::vector<uint8_t> int2Array(const uint32_t size) {
+std::vector<uint8_t> uint32ToUint8Array(const uint32_t size) {
     std::vector<uint8_t> result(4);
     result[0] = (size >> 24) & 0xFF;
     result[1] = (size >> 16) & 0xFF;
