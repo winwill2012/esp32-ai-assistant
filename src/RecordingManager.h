@@ -17,7 +17,7 @@ public:
 
     [[noreturn]] void begin();
 
-    inline RingbufHandle_t getRingBuffer() const { return _ringBuffer; };
+    RingbufHandle_t getRingBuffer() const { return _ringBuffer; };
 
 private:
     RingbufHandle_t _ringBuffer;

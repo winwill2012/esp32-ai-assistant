@@ -1,5 +1,7 @@
 #include "Application.h"
 
+#include <TimeUpdater.h>
+
 Application *Application::_instance = nullptr;
 
 Application::Application() {
@@ -10,7 +12,7 @@ Application::Application() {
     _recordingManager = new RecordingManager();
 }
 
-void Application::begin() {
+void Application::begin() const {
     TimeUpdater::begin();
     _audioPlayer->begin();
     _recordingManager->begin();

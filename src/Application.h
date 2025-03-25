@@ -4,10 +4,24 @@
 #include "DoubaoTTS.h"
 #include "DoubaoSTT.h"
 #include "RecordingManager.h"
-#include "TimeUpdater.h"
 #include "AudioPlayer.h"
 
 class Application {
+public:
+    static Application *getInstance();
+
+    void begin() const;
+
+    DoubaoTTS *getTTSInstance() const { return _ttsClient; }
+
+    DoubaoSTT *getSTTInstance() const { return _sttClient; }
+
+    CozeLLMAgent *getLlmAgentInstance() const { return _llmAgent; }
+
+    RecordingManager *recordingManager() const { return _recordingManager; }
+
+    AudioPlayer *getAudioPlayer() const { return _audioPlayer; }
+
 private:
     Application();
 
@@ -22,21 +36,6 @@ private:
     CozeLLMAgent *_llmAgent = nullptr;
     AudioPlayer *_audioPlayer = nullptr;
     RecordingManager *_recordingManager = nullptr;
-
-public:
-    static Application *getInstance();
-
-    void begin();
-
-    inline DoubaoTTS *getTTSInstance() const { return _ttsClient; }
-
-    inline DoubaoSTT *getSTTInstance() const { return _sttClient; }
-
-    inline CozeLLMAgent *getLlmAgentInstance() const { return _llmAgent; }
-
-    inline RecordingManager *recordingManager() const { return _recordingManager; }
-
-    inline AudioPlayer *getAudioPlayer() const { return _audioPlayer; }
 };
 
 

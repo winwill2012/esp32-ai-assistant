@@ -23,7 +23,7 @@ public:
 
     void publishTask(PlayAudioTask task);
 
-    inline QueueHandle_t getTaskQueue() const { return _taskQueue; };
+    QueueHandle_t getTaskQueue() const { return _taskQueue; };
 
     void interrupt(bool value);
 

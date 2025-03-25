@@ -75,8 +75,8 @@ void AudioPlayer::interrupt(bool value) {
         i2s_stop(MAX98357_I2S_NUM);
         i2s_zero_dma_buffer(MAX98357_I2S_NUM);
     } else {
-        i2s_start(MAX98357_I2S_NUM);
         i2s_zero_dma_buffer(MAX98357_I2S_NUM);
+        i2s_start(MAX98357_I2S_NUM);
     }
 }
 
