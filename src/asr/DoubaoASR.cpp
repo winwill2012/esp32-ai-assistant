@@ -1,16 +1,14 @@
-#include "DoubaoSTT.h"
+#include "DoubaoASR.h"
 #include "Utils.h"
 #include "Settings.h"
 #include <Arduino.h>
-#include <CozeLLMAgent.h>
 #include <RecordingManager.h>
-#include <utility>
 #include <vector>
 #include "LvglDisplay.h"
 #include "Application.h"
 #include "ArduinoJson.h"
 
-DoubaoSTT::DoubaoSTT() {
+DoubaoASR::DoubaoASR() {
     _eventGroup = xEventGroupCreate();
     _requestBuilder = std::vector<uint8_t>();
     _firstPacket = true;
@@ -21,7 +19,7 @@ DoubaoSTT::DoubaoSTT() {
     });
 }
 
-void DoubaoSTT::eventCallback(WStype_t type, uint8_t *payload, size_t length) {
+void DoubaoASR::eventCallback(WStype_t type, uint8_t *payload, size_t length) {
     switch (type) {
         case WStype_PING:
         case WStype_ERROR:
@@ -43,7 +41,7 @@ void DoubaoSTT::eventCallback(WStype_t type, uint8_t *payload, size_t length) {
     }
 }
 
-void DoubaoSTT::buildFullClientRequest() {
+void DoubaoASR::buildFullClientRequest() {
     JsonDocument doc;
     doc.clear();
     const JsonObject app = doc["app"].to<JsonObject>();
@@ -81,7 +79,7 @@ void DoubaoSTT::buildFullClientRequest() {
     _requestBuilder.insert(_requestBuilder.end(), payload, payload + payloadStr.length());
 }
 
-void DoubaoSTT::buildAudioOnlyRequest(uint8_t *audio, const size_t size, const bool lastPacket) {
+void DoubaoASR::buildAudioOnlyRequest(uint8_t *audio, const size_t size, const bool lastPacket) {
     _requestBuilder.clear();
     std::vector<uint8_t> payloadLength = uint32ToUint8Array(size);
 
@@ -101,9 +99,9 @@ void DoubaoSTT::buildAudioOnlyRequest(uint8_t *audio, const size_t size, const b
     _requestBuilder.insert(_requestBuilder.end(), audio, audio + size);
 }
 
-void DoubaoSTT::recognize(uint8_t *audio, const size_t size, const bool firstPacket, const bool lastPacket) {
-    log_d("speech recognize request: %d, %d, %d", size, firstPacket, lastPacket);
-    if (firstPacket) {
+void DoubaoASR::recognize(WebSocketASRTask task) {
+    log_d("speech recognize request: %d, %d, %d", task.data.size(), task.firstPacket, task.lastPacket);
+    if (task.firstPacket) {
         xEventGroupClearBits(_eventGroup, STT_TASK_COMPLETED_EVENT);
         while (!isConnected()) {
             loop();
@@ -115,12 +113,12 @@ void DoubaoSTT::recognize(uint8_t *audio, const size_t size, const bool firstPac
         }
         loop();
     }
-    buildAudioOnlyRequest(audio, size, lastPacket);
+    buildAudioOnlyRequest(task.data.data(), task.data.size(), task.lastPacket);
     if (!sendBIN(_requestBuilder.data(), _requestBuilder.size())) {
         log_e("send speech recognize audio only packet failed");
     }
     loop();
-    if (lastPacket) {
+    if (task.lastPacket) {
         while ((xEventGroupWaitBits(_eventGroup, STT_TASK_COMPLETED_EVENT,
                                     false, true, pdMS_TO_TICKS(1)) & STT_TASK_COMPLETED_EVENT) == 0) {
             loop();
@@ -130,7 +128,7 @@ void DoubaoSTT::recognize(uint8_t *audio, const size_t size, const bool firstPac
     }
 }
 
-void DoubaoSTT::parseResponse(const uint8_t *response) {
+void DoubaoASR::parseResponse(const uint8_t *response) {
     const uint8_t messageType = response[1] >> 4;
     const uint8_t *payload = response + 4;
     switch (messageType) {
@@ -166,7 +164,7 @@ void DoubaoSTT::parseResponse(const uint8_t *response) {
                         task.message = static_cast<char *>(ps_malloc(sizeof(char) * text.length()));
                         task.length = text.length();
                         text.toCharArray(task.message, task.length);
-                        Application::getInstance()->getLlmAgentInstance()->publishTask(task);
+                        Application::llm()->publishTask(task);
                         _firstPacket = true;
                     }
                 }

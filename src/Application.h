@@ -1,38 +1,40 @@
 #ifndef ESP32_AI_ASSISTANT_APPLICATION_H
 #define ESP32_AI_ASSISTANT_APPLICATION_H
 
-#include "DoubaoTTS.h"
-#include "DoubaoSTT.h"
+#include "tts/DoubaoTTS.h"
+#include "asr/WebSocketASR.h"
+#include "llm/CozeLLMAgent.h"
 #include "RecordingManager.h"
 #include "AudioPlayer.h"
 
 class Application {
 public:
-    static Application *getInstance();
-
-    void begin() const;
-
-    DoubaoTTS *getTTSInstance() const { return _ttsClient; }
-
-    DoubaoSTT *getSTTInstance() const { return _sttClient; }
-
-    CozeLLMAgent *getLlmAgentInstance() const { return _llmAgent; }
-
-    RecordingManager *recordingManager() const { return _recordingManager; }
-
-    AudioPlayer *getAudioPlayer() const { return _audioPlayer; }
-
-private:
-    Application();
+    static Application &getInstance() {
+        static auto *instance = new Application();
+        return *instance;
+    }
 
     Application(const Application &) = delete;
 
     Application &operator=(const Application &) = delete;
 
-    static Application *_instance;
+    void begin() const;
+
+    static DoubaoTTS *tts() { return getInstance()._ttsClient; }
+
+    static WebSocketASR *asr() { return getInstance()._asrClient; }
+
+    static CozeLLMAgent *llm() { return getInstance()._llmAgent; }
+
+    static RecordingManager *recordingManager() { return getInstance()._recordingManager; }
+
+    static AudioPlayer *audioPlayer() { return getInstance()._audioPlayer; }
+
+private:
+    Application();
 
     DoubaoTTS *_ttsClient = nullptr;
-    DoubaoSTT *_sttClient = nullptr;
+    WebSocketASR *_asrClient = nullptr;
     CozeLLMAgent *_llmAgent = nullptr;
     AudioPlayer *_audioPlayer = nullptr;
     RecordingManager *_recordingManager = nullptr;

@@ -30,7 +30,7 @@ void setup() {
     log_d("network connect successfully");
     GlobalState::setState(Sleep);
 
-    Application::getInstance()->begin();
+    Application::getInstance().begin();
 }
 
 void loop() {

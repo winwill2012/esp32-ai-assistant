@@ -15,11 +15,11 @@ void set_current_persona(const char *persona) {
     Settings::setCurrentPersona(persona);
 }
 
-void set_volume_ratio(float volume) {
+void set_volume_ratio(const double volume) {
     Settings::setCurrentSpeakVolumeRatio(volume);
 }
 
-void set_speak_speed(float speed) {
+void set_speak_speed(const double speed) {
     Settings::setCurrentSpeakSpeedRatio(speed);
 }
 
@@ -61,9 +61,9 @@ void set_screen_brightness(int brightness) {
 void on_microphone_clicked() {
     // 正在说话或者思考，直接进入聆听模式
     if (GlobalState::getState() == Speaking || GlobalState::getState() == Thinking) {
-        Application::getInstance()->getLlmAgentInstance()->interrupt(true);
-        Application::getInstance()->getTTSInstance()->interrupt(true);
-        Application::getInstance()->getAudioPlayer()->interrupt(true);
+        Application::llm()->interrupt(true);
+        Application::tts()->interrupt(true);
+        Application::audioPlayer()->interrupt(true);
         vTaskDelay(pdMS_TO_TICKS(500));
         GlobalState::setState(Listening);
     } else if (GlobalState::getState() == Listening) {

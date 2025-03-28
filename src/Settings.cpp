@@ -8,8 +8,8 @@ Preferences Settings::preferences;
 String Settings::currentVoice;
 String Settings::currentPersona;
 int Settings::currentScreenBrightness;
-float Settings::currentSpeakSpeedRatio;
-float Settings::currentSpeakVolumeRatio;
+double Settings::currentSpeakSpeedRatio;
+double Settings::currentSpeakVolumeRatio;
 double Settings::recordingRmsThreshold;
 int Settings::speakPauseDuration;
 std::map<std::string, std::string> Settings::voiceMap = std::map<std::string, std::string>(); // <声音，声音值>列表
@@ -40,8 +40,8 @@ void Settings::begin() {
     }
 
     preferences.begin(SETTINGS_NAMESPACE, false);
-    currentSpeakVolumeRatio = preferences.getFloat(SETTING_VOLUME_RATIO, doc["system"]["volumeRatio"].as<float>());
-    currentSpeakSpeedRatio = preferences.getFloat(SETTING_SPEED_RATIO, doc["system"]["speakSpeed"].as<float>());
+    currentSpeakVolumeRatio = preferences.getDouble(SETTING_VOLUME_RATIO, doc["system"]["volumeRatio"].as<double>());
+    currentSpeakSpeedRatio = preferences.getDouble(SETTING_SPEED_RATIO, doc["system"]["speakSpeed"].as<double>());
     currentVoice = preferences.getString(SETTING_VOICE_TYPE, doc["system"]["voiceType"].as<String>());
     currentPersona = preferences.getString(SETTING_PERSONA, doc["system"]["persona"].as<String>());
     recordingRmsThreshold = preferences.getDouble(SETTING_RECORDING_RMS_THRESHOLD,
@@ -134,25 +134,25 @@ void Settings::setCurrentPersona(const String &persona) {
     preferences.end();
 }
 
-float Settings::getCurrentSpeakVolumeRatio() {
+double Settings::getCurrentSpeakVolumeRatio() {
     return currentSpeakVolumeRatio;
 }
 
-void Settings::setCurrentSpeakVolumeRatio(float speakVolumeRatio) {
+void Settings::setCurrentSpeakVolumeRatio(const double speakVolumeRatio) {
     currentSpeakVolumeRatio = speakVolumeRatio;
     preferences.begin(SETTINGS_NAMESPACE);
-    preferences.putFloat(SETTING_VOLUME_RATIO, speakVolumeRatio);
+    preferences.putDouble(SETTING_VOLUME_RATIO, speakVolumeRatio);
     preferences.end();
 }
 
-float Settings::getCurrentSpeakSpeedRatio() {
+double Settings::getCurrentSpeakSpeedRatio() {
     return currentSpeakSpeedRatio;
 }
 
-void Settings::setCurrentSpeakSpeedRatio(float speakSpeedRatio) {
+void Settings::setCurrentSpeakSpeedRatio(const double speakSpeedRatio) {
     currentSpeakSpeedRatio = speakSpeedRatio;
     preferences.begin(SETTINGS_NAMESPACE);
-    preferences.putFloat(SETTING_SPEED_RATIO, speakSpeedRatio);
+    preferences.putDouble(SETTING_SPEED_RATIO, speakSpeedRatio);
     preferences.end();
 }
 

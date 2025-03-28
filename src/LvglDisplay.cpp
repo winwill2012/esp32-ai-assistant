@@ -1,6 +1,8 @@
+#include <Arduino.h>
 #include "LvglDisplay.h"
 #include "Settings.h"
 #include <FT6336.h>
+#include <TFT_eSPI.h>
 #include <gui/events_init.h>
 #include <gui/gui_guider.h>
 #include "lvgl_interface.h"

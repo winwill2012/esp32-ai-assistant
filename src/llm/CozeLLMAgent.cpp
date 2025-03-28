@@ -48,9 +48,9 @@ void CozeLLMAgent::chat(const String &input) {
     message["role"] = "user";
     std::string requestBodyStr;
     serializeJson(requestBody, requestBodyStr);
-    int httpResponseCode = http.POST(requestBodyStr.c_str());
-    String lastEvent;
+    const int httpResponseCode = http.POST(requestBodyStr.c_str());
     if (httpResponseCode > 0) {
+        String lastEvent;
         WiFiClient *stream = http.getStreamPtr();
         String line = "";
         while (stream->connected() || stream->available()) {
@@ -65,9 +65,9 @@ void CozeLLMAgent::chat(const String &input) {
                     if (line.compareTo("event:conversation.message.completed") == 0
                         && lastEvent.compareTo("event:conversation.message.delta") == 0) {
                         if (_ttsTextBuffer != "") {
-                            Application::getInstance()->getTTSInstance()->synth(_ttsTextBuffer, true);
+                            Application::tts()->synth(_ttsTextBuffer, true);
                         } else {
-                            Application::getInstance()->getTTSInstance()->disconnect();
+                            Application::tts()->disconnect();
                         }
                         break;
                     }
@@ -102,7 +102,7 @@ void CozeLLMAgent::ProcessStreamOutput(String data) {
         return;
     }
     String content = document["content"];
-    String conversationId = document["conversation_id"];
+    const String conversationId = document["conversation_id"];
     GlobalState::setConversationId(conversationId);
     ProcessContent(content);
 }
@@ -133,8 +133,8 @@ void CozeLLMAgent::ProcessContent(String &content) {
     while (true) {
         const std::pair<int, size_t> delimiterIndex = findMinIndexOfDelimiter(_ttsTextBuffer);
         if (delimiterIndex.first >= 0) {
-            Application::getInstance()->getTTSInstance()->synth(_ttsTextBuffer.substring(0, delimiterIndex.first),
-                                                                false);
+            Application::tts()->synth(_ttsTextBuffer.substring(0, delimiterIndex.first),
+                                      false);
             _ttsTextBuffer = _ttsTextBuffer.substring(delimiterIndex.first + delimiterIndex.second);
         } else {
             break;
@@ -142,13 +142,13 @@ void CozeLLMAgent::ProcessContent(String &content) {
     }
 }
 
-void CozeLLMAgent::publishTask(LLMTask task) {
+void CozeLLMAgent::publishTask(const LLMTask task) const {
     if (xQueueSend(_taskQueue, &task, portMAX_DELAY) == pdFALSE) {
         log_e("send llm task to queue failed");
         free(task.message);
     }
 }
 
-void CozeLLMAgent::interrupt(bool value) {
+void CozeLLMAgent::interrupt(const bool value) {
     _interrupted = value;
 }

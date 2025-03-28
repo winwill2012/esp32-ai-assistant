@@ -1,9 +1,9 @@
-#ifndef DOUBAO_STT_H
-#define DOUBAO_STT_H
+#ifndef DOUBAO_ASR_H
+#define DOUBAO_ASR_H
 
 #include <Arduino.h>
-#include <CozeLLMAgent.h>
 #include <WebSocketsClient.h>
+#include "WebSocketASR.h"
 #include <vector>
 
 #define STT_TASK_COMPLETED_EVENT (1<<1)
@@ -13,9 +13,9 @@ constexpr byte DoubaoTTSDefaultFullClientWsHeader[] = {0x11, 0x10, 0x10, 0x00};
 constexpr byte DoubaoTTSDefaultAudioOnlyWsHeader[] = {0x11, 0x20, 0x10, 0x00};
 constexpr byte DoubaoTTSDefaultLastAudioWsHeader[] = {0x11, 0x22, 0x10, 0x00};
 
-class DoubaoSTT final : public WebSocketsClient {
+class DoubaoASR final : public WebSocketASR {
 public:
-    DoubaoSTT();
+    DoubaoASR();
 
     void eventCallback(WStype_t type, uint8_t *payload, size_t length);
 
@@ -25,7 +25,7 @@ public:
 
     void buildAudioOnlyRequest(uint8_t *audio, size_t size, bool lastPacket);
 
-    void recognize(uint8_t *audio, size_t size, bool firstPacket, bool lastPacket);
+    void recognize(WebSocketASRTask task) override;
 
 private:
     EventGroupHandle_t _eventGroup;

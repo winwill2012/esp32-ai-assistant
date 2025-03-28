@@ -212,7 +212,7 @@ static void speak_pause_duration_event_cb(lv_event_t *e) {
 static void speak_volume_event_cb(lv_event_t *e) {
     if (lv_event_get_code(e) == LV_EVENT_VALUE_CHANGED) {
         const int32_t value = lv_slider_get_value(lv_event_get_target(e));
-        set_volume_ratio((float) (value / 100.0));
+        set_volume_ratio(value / 100.0);
     }
 }
 

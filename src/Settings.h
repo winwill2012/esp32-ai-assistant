@@ -58,13 +58,13 @@ public:
 
     static void setCurrentPersona(const String &persona);
 
-    static float getCurrentSpeakVolumeRatio();
+    static double getCurrentSpeakVolumeRatio();
 
-    static void setCurrentSpeakVolumeRatio(float speakVolumeRatio);
+    static void setCurrentSpeakVolumeRatio(double speakVolumeRatio);
 
-    static float getCurrentSpeakSpeedRatio();
+    static double getCurrentSpeakSpeedRatio();
 
-    static void setCurrentSpeakSpeedRatio(float speakSpeedRatio);
+    static void setCurrentSpeakSpeedRatio(double speakSpeedRatio);
 
     static int getSpeakPauseDuration();
 
@@ -82,8 +82,8 @@ private:
     static String currentVoice; // 当前设置的发音人
     static String currentPersona; // 当前设置的人设
     static int currentScreenBrightness; // 当前屏幕亮度 [30, 100]
-    static float currentSpeakVolumeRatio; // 当前设置的音量
-    static float currentSpeakSpeedRatio; // 当前设置的说话语速
+    static double currentSpeakVolumeRatio; // 当前设置的音量
+    static double currentSpeakSpeedRatio; // 当前设置的说话语速
 
     // 每一次录音的静默时间，单位ms，超过该时间则认为本次录音已完成
     static int speakPauseDuration;

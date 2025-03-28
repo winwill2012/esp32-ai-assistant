@@ -46,14 +46,10 @@ std::vector<uint8_t> uint32ToUint8Array(const uint32_t size) {
     return result;
 }
 
-double calculateSoundRMS(const uint8_t *buffer, const size_t bufferSize) {
-    if (bufferSize % 2 != 0) {
-        return 0.0;
-    }
+double calculateSoundRMS(const int16_t *buffer, const size_t bufferSize) {
     double sumSquares = 0.0;
-    for (size_t i = 0; i < bufferSize; i += 2) {
-        const auto sample = static_cast<int16_t>((buffer[i] << 8) | buffer[i + 1]);
-        sumSquares += (sample * sample);
+    for (size_t i = 0; i < bufferSize; i++) {
+        sumSquares += static_cast<double>(buffer[i]) * buffer[i];
     }
     double rms = sqrt(sumSquares * 2 / bufferSize);
     return rms;
@@ -117,13 +113,13 @@ std::vector<uint8_t> int16ToUint8BigEndian(const std::vector<int16_t> &input) {
 }
 
 // 将 uint8_t 数组转换成 int16_t 数组，采用大端序，返回 std::vector<int16_t>
-std::vector<int16_t> uint8ToInt16BigEndian(const std::vector<uint8_t> &input) {
+std::vector<int16_t> uint8ToInt16BigEndian(const uint8_t *input, const size_t size) {
     std::vector<int16_t> output;
-    if (input.size() % 2 != 0) {
+    if (size % 2 != 0) {
         return output;
     }
-    output.reserve(input.size() / 2);
-    for (size_t i = 0; i < input.size(); i += 2) {
+    output.reserve(size / 2);
+    for (size_t i = 0; i < size; i += 2) {
         auto value = static_cast<int16_t>((input[i] << 8) | input[i + 1]);
         output.push_back(value);
     }

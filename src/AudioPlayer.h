@@ -12,7 +12,7 @@
 
 struct PlayAudioTask {
     size_t length;
-    uint8_t *data;
+    int16_t *data;
 };
 
 class AudioPlayer {
@@ -21,7 +21,9 @@ public:
 
     void begin();
 
-    void publishTask(PlayAudioTask task);
+    static std::vector<int32_t> adjustVolume(const std::vector<int16_t> &input);
+
+    void publishTask(PlayAudioTask task) const;
 
     QueueHandle_t getTaskQueue() const { return _taskQueue; };
 

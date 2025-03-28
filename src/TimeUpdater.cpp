@@ -5,7 +5,7 @@
 
 unsigned long TimeUpdater::_lastMinute = -1;
 WiFiUDP udp;
-NTPClient timeClient = NTPClient(udp, "time1.aliyun.com");
+auto timeClient = NTPClient(udp, "time1.aliyun.com");
 
 void TimeUpdater::begin() {
     timeClient.begin();

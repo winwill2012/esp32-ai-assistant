@@ -5,6 +5,7 @@
 #include <WebSocketsClient.h>
 #include "driver/i2s.h"
 
+
 class DoubaoTTS final : public WebSocketsClient {
 public:
     DoubaoTTS();
@@ -13,7 +14,7 @@ public:
 
     void begin();
 
-    String buildFullClientRequest(const String &text);
+    static String buildFullClientRequest(const String &text);
 
     void parseResponse(const uint8_t *response);
 

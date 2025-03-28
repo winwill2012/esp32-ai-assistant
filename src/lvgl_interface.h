@@ -5,9 +5,9 @@
 
 extern "C" {
 #endif
-#define ENV_QUIET   8000  // 安静
-#define ENV_GENERAL 11000  // 正常
-#define ENV_NOISY   15000  // 嘈杂
+#define ENV_QUIET   20  // 安静
+#define ENV_GENERAL 30  // 正常
+#define ENV_NOISY   50  // 嘈杂
 
 void set_current_voice(const char *voice);
 
@@ -15,9 +15,9 @@ void set_current_persona(const char *persona);
 
 void set_environment_noise(const char *noise);
 
-void set_volume_ratio(float volume);
+void set_volume_ratio(double volume);
 
-void set_speak_speed(float speed);
+void set_speak_speed(double speed);
 
 void set_screen_brightness(int brightness);
 

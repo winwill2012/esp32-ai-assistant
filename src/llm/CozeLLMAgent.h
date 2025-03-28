@@ -1,8 +1,8 @@
 #ifndef COZE_LLMAGENT_H
 #define COZE_LLMAGENT_H
 
+#include "Arduino.h"
 #include "CozeLLMAgent.h"
-#include "DoubaoTTS.h"
 
 struct LLMTask {
     char *message;
@@ -13,7 +13,7 @@ class CozeLLMAgent {
 public:
     CozeLLMAgent();
 
-    void publishTask(LLMTask task);
+    void publishTask(LLMTask task) const;
 
     void chat(const String &input);
 
@@ -27,10 +27,10 @@ public:
 
 private:
     bool _interrupted = false;
-    String _response;
-    String _cmd;
-    String _content;
-    String _ttsTextBuffer;
+    String _response = "";
+    String _cmd = "";
+    String _content = "";
+    String _ttsTextBuffer = "";
     bool _firstPacket;
     QueueHandle_t _taskQueue;
 };
