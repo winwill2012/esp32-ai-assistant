@@ -3,12 +3,12 @@
 
 #include <freertos/ringbuf.h>
 
-#define MICROPHONE_I2S_NUM          I2S_NUM_1
-#define AUDIO_SAMPLE_RATE           16000
-#define AUDIO_RECORDING_BUFFER_SIZE 160    // 10ms音频数据
-#define MICROPHONE_I2S_BCLK         42
-#define MICROPHONE_I2S_LRC          2
-#define MICROPHONE_I2S_DOUT         1
+#define MICROPHONE_I2S_NUM             I2S_NUM_1
+#define AUDIO_SAMPLE_RATE              16000
+#define AUDIO_RECORDING_SAMPLE_NUMBER  160    // 10ms音频样本数
+#define MICROPHONE_I2S_BCLK            42
+#define MICROPHONE_I2S_LRC             2
+#define MICROPHONE_I2S_DOUT            1
 
 class RecordingManager {
 public:

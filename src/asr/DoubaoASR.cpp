@@ -131,6 +131,7 @@ void DoubaoASR::recognize(WebSocketASRTask task) {
 void DoubaoASR::parseResponse(const uint8_t *response) {
     const uint8_t messageType = response[1] >> 4;
     const uint8_t *payload = response + 4;
+    log_d("message type: %d", messageType);
     switch (messageType) {
         case 0b1001: {
             // 服务端下发包含识别结果的 full server response
@@ -148,12 +149,14 @@ void DoubaoASR::parseResponse(const uint8_t *response) {
             const String message = jsonResult["message"];
             const int32_t sequence = jsonResult["sequence"];
             const JsonArray result = jsonResult["result"];
+            log_d("sequence = %d, code = %d, message = %s, result size = %d", sequence, code, message.c_str(), result.size());
             if (sequence < 0) {
                 xEventGroupSetBits(_eventGroup, STT_TASK_COMPLETED_EVENT);
             }
             if (code == 1000 && result.size() > 0) {
                 for (const auto &item: result) {
                     String text = item["text"];
+                    log_d("text = %s", text.c_str());
                     LvglDisplay::updateChatText(User, _firstPacket, text.c_str());
                     if (_firstPacket) {
                         _firstPacket = false;

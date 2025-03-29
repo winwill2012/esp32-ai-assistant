@@ -23,6 +23,8 @@ public:
 
     static std::vector<int32_t> adjustVolume(const std::vector<int16_t> &input);
 
+    static std::vector<int16_t> adjustVolume2(const std::vector<int16_t> &input);
+
     void publishTask(PlayAudioTask task) const;
 
     QueueHandle_t getTaskQueue() const { return _taskQueue; };

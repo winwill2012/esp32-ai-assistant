@@ -46,12 +46,12 @@ std::vector<uint8_t> uint32ToUint8Array(const uint32_t size) {
     return result;
 }
 
-double calculateSoundRMS(const int16_t *buffer, const size_t bufferSize) {
+double calculateSoundRMS(const std::vector<int16_t> &buffer) {
     double sumSquares = 0.0;
-    for (size_t i = 0; i < bufferSize; i++) {
-        sumSquares += static_cast<double>(buffer[i]) * buffer[i];
+    for (auto &x: buffer) {
+        sumSquares += static_cast<double>(x) * x;
     }
-    double rms = sqrt(sumSquares * 2 / bufferSize);
+    double rms = sqrt(sumSquares / buffer.size());
     return rms;
 }
 
@@ -97,31 +97,4 @@ bool connectWifi(const char *ssid, const char *password, const int maxRetries) {
     GlobalState::setState(NetworkConnectFailed);
     log_e("network connect failed!");
     return false;
-}
-
-// 将 int16_t 数组转换成 uint8_t 数组，采用大端序，返回 std::vector<uint8_t>
-std::vector<uint8_t> int16ToUint8BigEndian(const std::vector<int16_t> &input) {
-    std::vector<uint8_t> output;
-    output.reserve(input.size() * 2);
-
-    for (const int16_t value: input) {
-        output.push_back(static_cast<uint8_t>(value >> 8)); // 高字节
-        output.push_back(static_cast<uint8_t>(value & 0xFF)); // 低字节
-    }
-
-    return output;
-}
-
-// 将 uint8_t 数组转换成 int16_t 数组，采用大端序，返回 std::vector<int16_t>
-std::vector<int16_t> uint8ToInt16BigEndian(const uint8_t *input, const size_t size) {
-    std::vector<int16_t> output;
-    if (size % 2 != 0) {
-        return output;
-    }
-    output.reserve(size / 2);
-    for (size_t i = 0; i < size; i += 2) {
-        auto value = static_cast<int16_t>((input[i] << 8) | input[i + 1]);
-        output.push_back(value);
-    }
-    return output;
 }

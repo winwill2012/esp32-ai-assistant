@@ -19,16 +19,17 @@ void playAudio(void *ptr) {
             GlobalState::setState(Speaking);
             // 调节音量后，16位PCM直接转换成32位PCM音频
             std::vector<int32_t> output = AudioPlayer::adjustVolume(
-                std::vector<int16_t>(task.data, task.data + task.length));
+                    std::vector<int16_t>(task.data, task.data + task.length));
             const esp_err_t result = i2s_write(MAX98357_I2S_NUM,
                                                output.data(),
                                                output.size() * sizeof(int32_t),
                                                &bytes_written,
                                                portMAX_DELAY);
+            free(task.data);
             if (result != ESP_OK) {
                 log_e("Play audio failed, errorCode: %d", result);
             }
-            free(task.data);
+
             // 语音已经播放完成，并且队列里面没有数据，则进入监听模式
             if (uxQueueMessagesWaiting(Application::audioPlayer()->getTaskQueue()) == 0) {
                 // 此时可能i2s DMA缓冲区还有未播放的数据，延时1000ms，不然可能麦克风会监听到播放的语音
@@ -42,22 +43,22 @@ void playAudio(void *ptr) {
 
 void AudioPlayer::begin() {
     constexpr i2s_config_t max98357_i2s_config = {
-        .mode = static_cast<i2s_mode_t>(I2S_MODE_MASTER | I2S_MODE_TX),
-        .sample_rate = SAMPLE_RATE,
-        .bits_per_sample = I2S_BITS_PER_SAMPLE_32BIT,
-        .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
-        .communication_format = I2S_COMM_FORMAT_STAND_I2S,
-        .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1, // 中断优先级，如果对实时性要求高，可以调高优先级
-        .dma_buf_count = 16,
-        .dma_buf_len = 1024,
-        .tx_desc_auto_clear = true
+            .mode = static_cast<i2s_mode_t>(I2S_MODE_MASTER | I2S_MODE_TX),
+            .sample_rate = SAMPLE_RATE,
+            .bits_per_sample = I2S_BITS_PER_SAMPLE_32BIT,
+            .channel_format = I2S_CHANNEL_FMT_ONLY_LEFT,
+            .communication_format = I2S_COMM_FORMAT_STAND_I2S,
+            .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1, // 中断优先级，如果对实时性要求高，可以调高优先级
+            .dma_buf_count = 4,
+            .dma_buf_len = 1024,
+            .tx_desc_auto_clear = true
     };
 
     constexpr i2s_pin_config_t max98357_gpio_config = {
-        .bck_io_num = MAX98357_BCLK,
-        .ws_io_num = MAX98357_LRC,
-        .data_out_num = MAX98357_DOUT,
-        .data_in_num = -1
+            .bck_io_num = MAX98357_BCLK,
+            .ws_io_num = MAX98357_LRC,
+            .data_out_num = MAX98357_DOUT,
+            .data_in_num = -1
     };
 
     i2s_driver_install(MAX98357_I2S_NUM, &max98357_i2s_config, 0, nullptr);
@@ -104,4 +105,20 @@ void AudioPlayer::interrupt(bool value) {
         i2s_zero_dma_buffer(MAX98357_I2S_NUM);
         i2s_start(MAX98357_I2S_NUM);
     }
+}
+
+std::vector<int16_t> AudioPlayer::adjustVolume2(const std::vector<int16_t> &input) {
+    const double volumeRatio = Settings::getCurrentSpeakVolumeRatio(); // 当前设置的音量大小，范围[0, 1.0]
+    const double factor = pow(volumeRatio, 2);
+    std::vector<int16_t> output(input.size());
+    for (int i = 0; i < input.size(); i++) {
+        int16_t data = input[i] * factor;
+        if (data > INT16_MAX) {
+            data = INT16_MAX;
+        } else if (data < INT16_MIN) {
+            data = INT16_MIN;
+        }
+        output[i] = data;
+    }
+    return output;
 }
