@@ -15,12 +15,13 @@ extern "C" {
 #endif
 
 #include "gui_guider.h"
+
 void events_init(lv_ui *ui);
 
-void events_init_home_page(lv_ui *ui);
-void events_init_settings_page(lv_ui *ui);
-void events_init_network_setting(lv_ui *ui);
-void events_init_system_setting(lv_ui *ui);
+void events_init_screen_main(lv_ui *ui);
+void events_init_screen_settings(lv_ui *ui);
+void events_init_screen_networking_setting(lv_ui *ui);
+void events_init_screen_system_setting(lv_ui *ui);
 
 #ifdef __cplusplus
 }

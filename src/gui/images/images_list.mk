@@ -1,1 +1,1 @@
-GEN_CSRCS += _WIFI_alpha_26x26.c _robot_alpha_26x26.c _micphone_alpha_40x40.c _retrun_alpha_33x33.c
+GEN_CSRCS += _wifi_RGB565A8_20x20.c _stop_RGB565A8_25x25.c

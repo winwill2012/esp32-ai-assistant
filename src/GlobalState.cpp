@@ -38,7 +38,7 @@ void GlobalState::setState(const MachineState state) {
     switch (state) {
         case Sleep:
             LvglDisplay::updateState("待命中...");
-            LvglDisplay::updateRecordingButtonImage(&_mic_off_alpha_40x40);
+            LvglDisplay::updateRecordingButtonImage(&_mic_off_RGB565A8_25x25);
             break;
         case NetworkConfigurationNotFound:
             LvglDisplay::updateState("等待配网...");
@@ -55,15 +55,15 @@ void GlobalState::setState(const MachineState state) {
             break;
         case Listening:
             LvglDisplay::updateState("正在聆听...");
-            LvglDisplay::updateRecordingButtonImage(&_mic_on_alpha_40x40);
+            LvglDisplay::updateRecordingButtonImage(&_mic_on_RGB565A8_25x25);
             break;
         case Thinking:
             LvglDisplay::updateState("正在思考...");
-            LvglDisplay::updateRecordingButtonImage(&_stop_alpha_40x40);
+            LvglDisplay::updateRecordingButtonImage(&_stop_RGB565A8_25x25);
             break;
         case Speaking:
             LvglDisplay::updateState("正在说话...");
-            LvglDisplay::updateRecordingButtonImage(&_stop_alpha_40x40);
+            LvglDisplay::updateRecordingButtonImage(&_stop_RGB565A8_25x25);
             break;
         default:
             break;

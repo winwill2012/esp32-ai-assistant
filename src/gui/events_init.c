@@ -9,224 +9,325 @@
 
 #include "events_init.h"
 #include <stdio.h>
-#include "lvgl_interface.h"
 #include "lvgl.h"
-#include "Arduino.h"
+#include "lvgl_interface.h"
 
 #if LV_USE_GUIDER_SIMULATOR && LV_USE_FREEMASTER
 #include "freemaster_client.h"
 #endif
 
-static void home_page_imgbtn_recording_event_handler(lv_event_t *e) {
+
+static void screen_main_event_handler (lv_event_t *e)
+{
     lv_event_code_t code = lv_event_get_code(e);
     switch (code) {
-        case LV_EVENT_CLICKED: {
-            on_microphone_clicked();
+    case LV_EVENT_GESTURE:
+    {
+        lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_active());
+        switch(dir) {
+        case LV_DIR_LEFT:
+        {
+            lv_indev_wait_release(lv_indev_active());
+            ui_load_scr_animation(&guider_ui, &guider_ui.screen_settings, guider_ui.screen_settings_del, &guider_ui.screen_main_del, setup_scr_screen_settings, LV_SCR_LOAD_ANIM_NONE, 200, 200, false, false);
             break;
         }
         default:
             break;
+        }
+        break;
+    }
+    default:
+        break;
     }
 }
 
-static void home_page_btn_settings_event_handler(lv_event_t *e) {
+static void screen_main_imgbtn_mic_event_handler (lv_event_t *e)
+{
     lv_event_code_t code = lv_event_get_code(e);
     switch (code) {
-        case LV_EVENT_CLICKED: {
-            ui_load_scr_animation(&guider_ui, &guider_ui.settings_page, guider_ui.settings_page_del,
-                                  &guider_ui.home_page_del, setup_scr_settings_page, LV_SCR_LOAD_ANIM_FADE_ON, 200, 200,
-                                  false, false);
+    case LV_EVENT_CLICKED:
+    {
+        on_microphone_clicked();
+        break;
+    }
+    default:
+        break;
+    }
+}
+
+void events_init_screen_main (lv_ui *ui)
+{
+    lv_obj_add_event_cb(ui->screen_main, screen_main_event_handler, LV_EVENT_ALL, ui);
+    lv_obj_add_event_cb(ui->screen_main_imgbtn_mic, screen_main_imgbtn_mic_event_handler, LV_EVENT_ALL, ui);
+}
+
+static void screen_settings_event_handler (lv_event_t *e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    switch (code) {
+    case LV_EVENT_GESTURE:
+    {
+        lv_dir_t dir = lv_indev_get_gesture_dir(lv_indev_active());
+        switch(dir) {
+        case LV_DIR_RIGHT:
+        {
+            lv_indev_wait_release(lv_indev_active());
+            ui_load_scr_animation(&guider_ui, &guider_ui.screen_main, guider_ui.screen_main_del, &guider_ui.screen_settings_del, setup_scr_screen_main, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 200, false, true);
             break;
         }
         default:
             break;
+        }
+        break;
+    }
+    default:
+        break;
     }
 }
 
-void events_init_home_page(lv_ui *ui) {
-    lv_obj_add_event_cb(ui->home_page_imgbtn_recording, home_page_imgbtn_recording_event_handler, LV_EVENT_ALL, ui);
-    lv_obj_add_event_cb(ui->home_page_btn_settings, home_page_btn_settings_event_handler, LV_EVENT_ALL, ui);
-}
-
-static void settings_page_imgbtn_back_event_handler(lv_event_t *e) {
+static void screen_settings_btn_networking_setting_event_handler (lv_event_t *e)
+{
     lv_event_code_t code = lv_event_get_code(e);
     switch (code) {
-        case LV_EVENT_CLICKED: {
-            ui_load_scr_animation(&guider_ui, &guider_ui.home_page, guider_ui.home_page_del,
-                                  &guider_ui.settings_page_del, setup_scr_home_page, LV_SCR_LOAD_ANIM_FADE_ON, 200, 200,
-                                  true, true);
-            break;
-        }
-        default:
-            break;
+    case LV_EVENT_CLICKED:
+    {
+        ui_load_scr_animation(&guider_ui, &guider_ui.screen_networking_setting, guider_ui.screen_networking_setting_del, &guider_ui.screen_settings_del, setup_scr_screen_networking_setting, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 200, false, false);
+        break;
+    }
+    default:
+        break;
     }
 }
 
-static void settings_page_btn_network_setting_event_handler(lv_event_t *e) {
+static void screen_settings_btn_system_setting_event_handler (lv_event_t *e)
+{
     lv_event_code_t code = lv_event_get_code(e);
     switch (code) {
-        case LV_EVENT_CLICKED: {
-            ui_load_scr_animation(&guider_ui, &guider_ui.network_setting, guider_ui.network_setting_del,
-                                  &guider_ui.settings_page_del, setup_scr_network_setting, LV_SCR_LOAD_ANIM_MOVE_LEFT,
-                                  200, 200, false, false);
-            break;
-        }
-        default:
-            break;
+    case LV_EVENT_CLICKED:
+    {
+        ui_load_scr_animation(&guider_ui, &guider_ui.screen_system_setting, guider_ui.screen_system_setting_del, &guider_ui.screen_settings_del, setup_scr_screen_system_setting, LV_SCR_LOAD_ANIM_MOVE_LEFT, 200, 200, false, false);
+        break;
+    }
+    default:
+        break;
     }
 }
 
-static void settings_page_btn_voice_setting_event_handler(lv_event_t *e) {
+static void screen_settings_btn_reset_setting_event_handler (lv_event_t *e)
+{
     lv_event_code_t code = lv_event_get_code(e);
     switch (code) {
-        case LV_EVENT_CLICKED: {
-            ui_load_scr_animation(&guider_ui, &guider_ui.system_setting, guider_ui.system_setting_del,
-                                  &guider_ui.settings_page_del, setup_scr_system_setting, LV_SCR_LOAD_ANIM_MOVE_LEFT,
-                                  200, 200, false, false);
-            break;
-        }
-        default:
-            break;
+    case LV_EVENT_CLICKED:
+    {
+
+        break;
+    }
+    default:
+        break;
     }
 }
 
-void events_init_settings_page(lv_ui *ui) {
-    lv_obj_add_event_cb(ui->settings_page_imgbtn_back, settings_page_imgbtn_back_event_handler, LV_EVENT_ALL, ui);
-    lv_obj_add_event_cb(ui->settings_page_btn_network_setting, settings_page_btn_network_setting_event_handler,
-                        LV_EVENT_ALL, ui);
-    lv_obj_add_event_cb(ui->settings_page_btn_voice_setting, settings_page_btn_voice_setting_event_handler,
-                        LV_EVENT_ALL, ui);
-}
-
-static void network_setting_imgbtn_back_event_handler(lv_event_t *e) {
+static void screen_settings_btn_1_event_handler (lv_event_t *e)
+{
     lv_event_code_t code = lv_event_get_code(e);
     switch (code) {
-        case LV_EVENT_CLICKED: {
-            ui_load_scr_animation(&guider_ui, &guider_ui.settings_page, guider_ui.settings_page_del,
-                                  &guider_ui.network_setting_del, setup_scr_settings_page, LV_SCR_LOAD_ANIM_MOVE_RIGHT,
-                                  200, 200, true, true);
-            break;
-        }
-        default:
-            break;
+    case LV_EVENT_CLICKED:
+    {
+
+        break;
+    }
+    default:
+        break;
     }
 }
 
-static void load_wifi_list_task(void *arg) {
-    load_wifi_list((bool *) arg);
-    vTaskDelete(NULL);
+void events_init_screen_settings (lv_ui *ui)
+{
+    lv_obj_add_event_cb(ui->screen_settings, screen_settings_event_handler, LV_EVENT_ALL, ui);
+    lv_obj_add_event_cb(ui->screen_settings_btn_networking_setting, screen_settings_btn_networking_setting_event_handler, LV_EVENT_ALL, ui);
+    lv_obj_add_event_cb(ui->screen_settings_btn_system_setting, screen_settings_btn_system_setting_event_handler, LV_EVENT_ALL, ui);
+    lv_obj_add_event_cb(ui->screen_settings_btn_reset_setting, screen_settings_btn_reset_setting_event_handler, LV_EVENT_ALL, ui);
+    lv_obj_add_event_cb(ui->screen_settings_btn_1, screen_settings_btn_1_event_handler, LV_EVENT_ALL, ui);
 }
 
-static void network_setting_animimg_refresh_event_handler(lv_event_t *e) {
+static void screen_networking_setting_btn_refresh_event_handler (lv_event_t *e)
+{
     lv_event_code_t code = lv_event_get_code(e);
     switch (code) {
-        case LV_EVENT_CLICKED: {
-            lv_animimg_start(lv_event_get_target(e));
-            xTaskCreate(load_wifi_list_task, "loadWifiTask", 4096, (void *) true, 1, NULL);
-            break;
-        }
-        default:
-            break;
+    case LV_EVENT_CLICKED:
+    {
+
+        break;
+    }
+    default:
+        break;
     }
 }
 
-void events_init_network_setting(lv_ui *ui) {
-    lv_obj_add_event_cb(ui->network_setting_imgbtn_back, network_setting_imgbtn_back_event_handler, LV_EVENT_ALL, ui);
-    lv_obj_add_event_cb(ui->network_setting_animimg_refresh, network_setting_animimg_refresh_event_handler,
-                        LV_EVENT_ALL, ui);
-}
-
-static void speak_brightness_event_cb(lv_event_t *e) {
+static void screen_networking_setting_btn_back_event_handler (lv_event_t *e)
+{
     lv_event_code_t code = lv_event_get_code(e);
     switch (code) {
-        case LV_EVENT_VALUE_CHANGED: {
-            set_screen_brightness(lv_slider_get_value(lv_event_get_target(e)));
-            break;
-        }
-        default:
-            break;
+    case LV_EVENT_CLICKED:
+    {
+        ui_load_scr_animation(&guider_ui, &guider_ui.screen_settings, guider_ui.screen_settings_del, &guider_ui.screen_networking_setting_del, setup_scr_screen_settings, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 200, true, true);
+        break;
+    }
+    default:
+        break;
     }
 }
 
-static void speaker_setting_imgbtn_back_event_handler(lv_event_t *e) {
+static void screen_networking_setting_btn_cancel_event_handler (lv_event_t *e)
+{
     lv_event_code_t code = lv_event_get_code(e);
     switch (code) {
-        case LV_EVENT_CLICKED: {
-            ui_load_scr_animation(&guider_ui, &guider_ui.settings_page, guider_ui.settings_page_del,
-                                  &guider_ui.system_setting_del, setup_scr_settings_page, LV_SCR_LOAD_ANIM_MOVE_RIGHT,
-                                  200, 200, true, true);
-            break;
-        }
-        default:
-            break;
+    case LV_EVENT_CLICKED:
+    {
+
+        break;
+    }
+    default:
+        break;
     }
 }
 
-static void voice_type_dropdown_event_cb(lv_event_t *e) {
+static void screen_networking_setting_btn_confirm_event_handler (lv_event_t *e)
+{
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t *obj = lv_event_get_target(e);
+    switch (code) {
+    case LV_EVENT_CLICKED:
+    {
 
-    if (code == LV_EVENT_VALUE_CHANGED) {
-        char selected_voice[64];
-        lv_dropdown_get_selected_str(obj, selected_voice, sizeof(selected_voice));
-        set_current_voice(selected_voice);
+        break;
+    }
+    default:
+        break;
     }
 }
 
-static void persona_dropdown_event_cb(lv_event_t *e) {
+void events_init_screen_networking_setting (lv_ui *ui)
+{
+    lv_obj_add_event_cb(ui->screen_networking_setting_btn_refresh, screen_networking_setting_btn_refresh_event_handler, LV_EVENT_ALL, ui);
+    lv_obj_add_event_cb(ui->screen_networking_setting_btn_back, screen_networking_setting_btn_back_event_handler, LV_EVENT_ALL, ui);
+    lv_obj_add_event_cb(ui->screen_networking_setting_btn_cancel, screen_networking_setting_btn_cancel_event_handler, LV_EVENT_ALL, ui);
+    lv_obj_add_event_cb(ui->screen_networking_setting_btn_confirm, screen_networking_setting_btn_confirm_event_handler, LV_EVENT_ALL, ui);
+}
+
+static void screen_system_setting_slider_speak_volume_event_handler (lv_event_t *e)
+{
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t *obj = lv_event_get_target(e);
+    switch (code) {
+    case LV_EVENT_VALUE_CHANGED:
+    {
 
-    if (code == LV_EVENT_VALUE_CHANGED) {
-        char selected_person[64];
-        lv_dropdown_get_selected_str(obj, selected_person, sizeof(selected_person));
-        set_current_persona(selected_person);
+        break;
+    }
+    default:
+        break;
     }
 }
 
-static void environment_noise_dropdown_event_cb(lv_event_t *e) {
+static void screen_system_setting_ddlist_voice_type_event_handler (lv_event_t *e)
+{
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t *obj = lv_event_get_target(e);
+    switch (code) {
+    case LV_EVENT_VALUE_CHANGED:
+    {
+        uint32_t id = lv_dropdown_get_selected(guider_ui.screen_system_setting_ddlist_voice_type);
 
-    if (code == LV_EVENT_VALUE_CHANGED) {
-        char selected_noise[64];
-        lv_dropdown_get_selected_str(obj, selected_noise, sizeof(selected_noise));
-        set_environment_noise(selected_noise);
+        break;
+    }
+    default:
+        break;
     }
 }
 
-static void speak_speed_event_cb(lv_event_t *e) {
-    if (lv_event_get_code(e) == LV_EVENT_VALUE_CHANGED) {
-        int value = lv_spinbox_get_value(lv_event_get_target(e));
-        set_speak_speed((float) value / 10);
+static void screen_system_setting_ddlist_persona_event_handler (lv_event_t *e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    switch (code) {
+    case LV_EVENT_VALUE_CHANGED:
+    {
+        uint32_t id = lv_dropdown_get_selected(guider_ui.screen_system_setting_ddlist_persona);
+
+        break;
+    }
+    default:
+        break;
     }
 }
 
-static void speak_pause_duration_event_cb(lv_event_t *e) {
-    if (lv_event_get_code(e) == LV_EVENT_VALUE_CHANGED) {
-        int value = lv_spinbox_get_value(lv_event_get_target(e));
-        set_speak_pause_duration(value * 100);
+static void screen_system_setting_ddlist_environment_noise_event_handler (lv_event_t *e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    switch (code) {
+    case LV_EVENT_VALUE_CHANGED:
+    {
+        uint32_t id = lv_dropdown_get_selected(guider_ui.screen_system_setting_ddlist_environment_noise);
+
+        break;
+    }
+    default:
+        break;
     }
 }
 
-static void speak_volume_event_cb(lv_event_t *e) {
-    if (lv_event_get_code(e) == LV_EVENT_VALUE_CHANGED) {
-        const int32_t value = lv_slider_get_value(lv_event_get_target(e));
-        set_volume_ratio(value / 100.0);
+static void screen_system_setting_slider_screen_brightness_event_handler (lv_event_t *e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    switch (code) {
+    case LV_EVENT_VALUE_CHANGED:
+    {
+
+        break;
+    }
+    default:
+        break;
     }
 }
 
-void events_init_system_setting(lv_ui *ui) {
-    lv_obj_add_event_cb(ui->system_setting_imgbtn_back, speaker_setting_imgbtn_back_event_handler, LV_EVENT_ALL, ui);
-    lv_obj_add_event_cb(ui->system_setting_slider_brightness, speak_brightness_event_cb, LV_EVENT_ALL, ui);
-    lv_obj_add_event_cb(ui->system_setting_voice_type, voice_type_dropdown_event_cb, LV_EVENT_ALL, ui);
-    lv_obj_add_event_cb(ui->system_setting_persona, persona_dropdown_event_cb, LV_EVENT_ALL, ui);
-    lv_obj_add_event_cb(ui->system_setting_environment_noise, environment_noise_dropdown_event_cb, LV_EVENT_ALL, ui);
-    lv_obj_add_event_cb(ui->system_setting_speed, speak_speed_event_cb, LV_EVENT_ALL, ui);
-    lv_obj_add_event_cb(ui->system_setting_recording_pause, speak_pause_duration_event_cb, LV_EVENT_ALL, ui);
-    lv_obj_add_event_cb(ui->system_setting_slider_volume, speak_volume_event_cb, LV_EVENT_ALL, ui);
+static void screen_system_setting_btn_back_event_handler (lv_event_t *e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    switch (code) {
+    case LV_EVENT_CLICKED:
+    {
+        ui_load_scr_animation(&guider_ui, &guider_ui.screen_settings, guider_ui.screen_settings_del, &guider_ui.screen_system_setting_del, setup_scr_screen_settings, LV_SCR_LOAD_ANIM_MOVE_RIGHT, 200, 200, true, true);
+        break;
+    }
+    default:
+        break;
+    }
+}
+
+static void screen_system_setting_slider_speak_speed_event_handler (lv_event_t *e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    switch (code) {
+    case LV_EVENT_VALUE_CHANGED:
+    {
+
+        break;
+    }
+    default:
+        break;
+    }
+}
+
+void events_init_screen_system_setting (lv_ui *ui)
+{
+    lv_obj_add_event_cb(ui->screen_system_setting_slider_speak_volume, screen_system_setting_slider_speak_volume_event_handler, LV_EVENT_ALL, ui);
+    lv_obj_add_event_cb(ui->screen_system_setting_ddlist_voice_type, screen_system_setting_ddlist_voice_type_event_handler, LV_EVENT_ALL, ui);
+    lv_obj_add_event_cb(ui->screen_system_setting_ddlist_persona, screen_system_setting_ddlist_persona_event_handler, LV_EVENT_ALL, ui);
+    lv_obj_add_event_cb(ui->screen_system_setting_ddlist_environment_noise, screen_system_setting_ddlist_environment_noise_event_handler, LV_EVENT_ALL, ui);
+    lv_obj_add_event_cb(ui->screen_system_setting_slider_screen_brightness, screen_system_setting_slider_screen_brightness_event_handler, LV_EVENT_ALL, ui);
+    lv_obj_add_event_cb(ui->screen_system_setting_btn_back, screen_system_setting_btn_back_event_handler, LV_EVENT_ALL, ui);
+    lv_obj_add_event_cb(ui->screen_system_setting_slider_speak_speed, screen_system_setting_slider_speak_speed_event_handler, LV_EVENT_ALL, ui);
 }
 
 
-void events_init(lv_ui *ui) {
+void events_init(lv_ui *ui)
+{
+
 }

@@ -17,25 +17,14 @@ extern "C" {
 #include "gui_guider.h"
 
 __attribute__((unused)) void kb_event_cb(lv_event_t *e);
-
 __attribute__((unused)) void ta_event_cb(lv_event_t *e);
-
 #if LV_USE_ANALOGCLOCK != 0
 void clock_count(int *hour, int *min, int *sec);
+void digital_clock_count(int * hour, int * minute, int * seconds, char * meridiem);
 #endif
 
-extern lv_obj_t *speaker_setting_speed;
-extern const lv_img_dsc_t *network_setting_animimg_refresh_imgs[3];
 
-void lv_system_setting_speed_increment_event_cb(lv_event_t *event);
 
-void lv_system_setting_speed_decrement_event_cb(lv_event_t *event);
-
-extern lv_obj_t *system_setting_recording_pause;
-
-void lv_system_setting_recording_pause_increment_event_cb(lv_event_t *event);
-
-void lv_system_setting_recording_pause_decrement_event_cb(lv_event_t *event);
 
 #ifdef __cplusplus
 }
