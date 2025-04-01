@@ -5,7 +5,7 @@
     "voiceType": "湾湾小何",
     "persona": "幽默风趣",
     "speakPauseDuration": 1000,
-    "recordingRmsThreshold": 8000.00
+    "recordingRmsThreshold": 30.00
   },
   "doubao": {
     "appId": "8988564775",

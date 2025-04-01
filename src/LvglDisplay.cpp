@@ -77,11 +77,12 @@ void LvglDisplay::loadSystemSettingData() {
     } else {
         lv_dropdown_set_selected(guider_ui.screen_system_setting_ddlist_environment_noise, 2, LV_ANIM_OFF);
     }
-    lv_spinbox_set_value(guider_ui.screen_system_setting_slider_speak_speed,
-                         static_cast<int32_t>(Settings::getCurrentSpeakSpeedRatio() * 10));
+    lv_slider_set_value(guider_ui.screen_system_setting_slider_speak_speed,
+                        static_cast<int32_t>(Settings::getCurrentSpeakSpeedRatio() * 10), LV_ANIM_OFF);
     lv_slider_set_value(guider_ui.screen_system_setting_slider_speak_volume,
                         static_cast<int32_t>(Settings::getCurrentSpeakVolumeRatio() * 100), LV_ANIM_OFF);
-    lv_slider_set_value(guider_ui.screen_system_setting_slider_screen_brightness, Settings::getScreenBrightness(), LV_ANIM_ON);
+    lv_slider_set_value(guider_ui.screen_system_setting_slider_screen_brightness, Settings::getScreenBrightness(),
+                        LV_ANIM_ON);
 }
 
 static uint32_t my_tick(void) {
@@ -196,7 +197,8 @@ static void click_wifi_item_event_callback(lv_event_t *e) {
 
 // 渲染wifi列表，添加每一条wifi信息
 void add_wifi_item(const WifiInfo &wifi) {
-    lv_obj_t *wifi_item = lv_list_add_btn(guider_ui.screen_networking_setting_list_wlan, LV_SYMBOL_WIFI, wifi._ssid.c_str());
+    lv_obj_t *wifi_item = lv_list_add_btn(guider_ui.screen_networking_setting_list_wlan, LV_SYMBOL_WIFI,
+                                          wifi._ssid.c_str());
     lv_obj_set_style_text_font(wifi_item, &lv_customer_font_Siyuan_Regular_14, 0);
     if (wifi._ssid.compareTo(Settings::getWifiInfo().first.c_str()) == 0) {
         lv_obj_set_style_text_color(wifi_item, lv_color_make(0, 128, 0), 0);
