@@ -20,6 +20,8 @@ public:
 
     void begin() const;
 
+    static void showMemoryInfo() ;
+
     static DoubaoTTS *tts() { return getInstance()._ttsClient; }
 
     static WebSocketASR *asr() { return getInstance()._asrClient; }

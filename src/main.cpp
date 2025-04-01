@@ -12,6 +12,14 @@
 
 void setup() {
     Serial.begin(115200);
+    log_d("Free ram: %d", heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
+    log_d("Free psram: %d", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
+    void *pVoid1 = malloc(64 * 1024);
+    log_d("ram address = %x", pVoid1);
+    void *pVoid = ps_malloc(64 * 1024);
+    log_d("psram address = %x", pVoid);
+    log_d("Free ram: %d", heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
+    log_d("Free psram: %d", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
     Settings::begin();
     LvglDisplay::begin();
     analogWrite(8, static_cast<int>(Settings::getScreenBrightness() * 2.55)); // 设置屏幕亮度

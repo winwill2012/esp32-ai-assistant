@@ -48,8 +48,8 @@ typedef struct
 	lv_obj_t *screen_networking_setting_label_networking_setting_title;
 	lv_obj_t *screen_networking_setting_list_wlan;
 	lv_obj_t *screen_networking_setting_label_tips;
-	lv_obj_t *screen_networking_setting_btn_refresh;
-	lv_obj_t *screen_networking_setting_btn_refresh_label;
+    lv_obj_t *screen_networking_setting_img_refresh;
+    lv_anim_t screen_networking_setting_anim;
 	lv_obj_t *screen_networking_setting_btn_back;
 	lv_obj_t *screen_networking_setting_btn_back_label;
 	lv_obj_t *screen_networking_setting_cont_mask;
@@ -114,6 +114,7 @@ LV_IMAGE_DECLARE(_no_wifi_RGB565A8_20x20);
 LV_IMAGE_DECLARE(_stop_RGB565A8_25x25);
 LV_IMAGE_DECLARE(_mic_on_RGB565A8_25x25);
 LV_IMAGE_DECLARE(_mic_off_RGB565A8_25x25);
+LV_IMAGE_DECLARE(_refresh_RGB565A8_20x20);
 
 LV_FONT_DECLARE(lv_font_montserratMedium_16)
 LV_FONT_DECLARE(lv_font_montserratMedium_12)

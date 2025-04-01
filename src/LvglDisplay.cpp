@@ -63,10 +63,14 @@ void LvglDisplay::loadSystemSettingData() {
     lv_dropdown_set_options(guider_ui.screen_system_setting_ddlist_voice_type, voiceList.c_str());
     lv_dropdown_set_symbol(guider_ui.screen_system_setting_ddlist_voice_type, LV_SYMBOL_DOWN);
     lv_dropdown_set_selected(guider_ui.screen_system_setting_ddlist_voice_type, selectedVoiceIndex, LV_ANIM_OFF);
+    lv_obj_t *voice_list = lv_dropdown_get_list(guider_ui.screen_system_setting_ddlist_voice_type);
+    lv_obj_set_style_text_font(voice_list, &lv_customer_font_Siyuan_Regular_14, 0);
 
     lv_dropdown_set_options(guider_ui.screen_system_setting_ddlist_persona, personaList.c_str());
     lv_dropdown_set_symbol(guider_ui.screen_system_setting_ddlist_persona, LV_SYMBOL_DOWN);
     lv_dropdown_set_selected(guider_ui.screen_system_setting_ddlist_persona, selectedPersonaIndex, LV_ANIM_OFF);
+    lv_obj_t *persona_list = lv_dropdown_get_list(guider_ui.screen_system_setting_ddlist_persona);
+    lv_obj_set_style_text_font(persona_list, &lv_customer_font_Siyuan_Regular_14, 0);
 
     lv_dropdown_set_options(guider_ui.screen_system_setting_ddlist_environment_noise, "安静\n一般\n嘈杂");
     lv_dropdown_set_symbol(guider_ui.screen_system_setting_ddlist_environment_noise, LV_SYMBOL_DOWN);
@@ -77,6 +81,9 @@ void LvglDisplay::loadSystemSettingData() {
     } else {
         lv_dropdown_set_selected(guider_ui.screen_system_setting_ddlist_environment_noise, 2, LV_ANIM_OFF);
     }
+    lv_obj_t *environment_noise_list = lv_dropdown_get_list(guider_ui.screen_system_setting_ddlist_environment_noise);
+    lv_obj_set_style_text_font(environment_noise_list, &lv_customer_font_Siyuan_Regular_14, 0);
+
     lv_slider_set_value(guider_ui.screen_system_setting_slider_speak_speed,
                         static_cast<int32_t>(Settings::getCurrentSpeakSpeedRatio() * 10), LV_ANIM_OFF);
     lv_slider_set_value(guider_ui.screen_system_setting_slider_speak_volume,
@@ -88,6 +95,7 @@ void LvglDisplay::loadSystemSettingData() {
 static uint32_t my_tick(void) {
     return millis();
 }
+
 
 void LvglDisplay::begin() {
     lv_init();
@@ -113,7 +121,7 @@ void LvglDisplay::begin() {
             }
             vTaskDelay(5);
         }
-    }, "lvgl-updater", 16 * 1024, nullptr, 1, nullptr);
+    }, "lvgl-updater", 8 * 1024, nullptr, 1, nullptr);
 }
 
 // 更新首页聊天列表
@@ -208,7 +216,6 @@ void add_wifi_item(const WifiInfo &wifi) {
         lv_obj_add_event_cb(wifi_item, click_wifi_item_event_callback, LV_EVENT_CLICKED, ssid_copy);
     }
 }
-
 void LvglDisplay::loadWifiList(const bool forceRefresh) {
     const std::vector<WifiInfo> &list = Settings::getWifiList(forceRefresh);
     for (const auto &wifi: list) {
@@ -217,10 +224,9 @@ void LvglDisplay::loadWifiList(const bool forceRefresh) {
 //            // 所以本段逻辑不在lv_timer_handler中执行，需要加锁
 //            if (xSemaphoreTakeRecursive(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
 //                add_wifi_item(wifi);
-//                // wifi列表加载完毕，停止播放动画
-//                lv_anim_del(guider_ui.network_setting_animimg_refresh, nullptr);
 //                xSemaphoreGiveRecursive(lvglUpdateLock);
 //            }
+            lv_anim_start(&guider_ui.screen_networking_setting_anim);
         } else {
             add_wifi_item(wifi);
         }

@@ -144,29 +144,6 @@ void setup_scr_screen_networking_setting(lv_ui *ui)
     lv_obj_set_style_pad_left(ui->screen_networking_setting_label_tips, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_shadow_width(ui->screen_networking_setting_label_tips, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
 
-    //Write codes screen_networking_setting_btn_refresh
-    ui->screen_networking_setting_btn_refresh = lv_button_create(ui->screen_networking_setting);
-    lv_obj_set_pos(ui->screen_networking_setting_btn_refresh, 163, 68);
-    lv_obj_set_size(ui->screen_networking_setting_btn_refresh, 20, 20);
-    ui->screen_networking_setting_btn_refresh_label = lv_label_create(ui->screen_networking_setting_btn_refresh);
-    lv_label_set_text(ui->screen_networking_setting_btn_refresh_label, "" LV_SYMBOL_REFRESH "");
-    lv_label_set_long_mode(ui->screen_networking_setting_btn_refresh_label, LV_LABEL_LONG_WRAP);
-    lv_obj_align(ui->screen_networking_setting_btn_refresh_label, LV_ALIGN_CENTER, 0, 0);
-    lv_obj_set_style_pad_all(ui->screen_networking_setting_btn_refresh, 0, LV_STATE_DEFAULT);
-    lv_obj_set_width(ui->screen_networking_setting_btn_refresh_label, LV_PCT(100));
-
-    //Write style for screen_networking_setting_btn_refresh, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
-    lv_obj_set_style_bg_opa(ui->screen_networking_setting_btn_refresh, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_networking_setting_btn_refresh, lv_color_hex(0xffffff), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_grad_dir(ui->screen_networking_setting_btn_refresh, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_border_width(ui->screen_networking_setting_btn_refresh, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_radius(ui->screen_networking_setting_btn_refresh, 5, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_width(ui->screen_networking_setting_btn_refresh, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(ui->screen_networking_setting_btn_refresh, lv_color_hex(0x000000), LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui->screen_networking_setting_btn_refresh, &lv_customer_font_Siyuan_yuanti_14, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(ui->screen_networking_setting_btn_refresh, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_text_align(ui->screen_networking_setting_btn_refresh, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN|LV_STATE_DEFAULT);
-
     //Write codes screen_networking_setting_btn_back
     ui->screen_networking_setting_btn_back = lv_button_create(ui->screen_networking_setting);
     lv_obj_set_pos(ui->screen_networking_setting_btn_back, 8, 30);
@@ -190,9 +167,10 @@ void setup_scr_screen_networking_setting(lv_ui *ui)
 
     //Write codes screen_networking_setting_cont_mask
     ui->screen_networking_setting_cont_mask = lv_obj_create(ui->screen_networking_setting);
-    lv_obj_set_pos(ui->screen_networking_setting_cont_mask, 0, 0);
+    lv_obj_set_pos(ui->screen_networking_setting_cont_mask, 0, -2);
     lv_obj_set_size(ui->screen_networking_setting_cont_mask, 240, 320);
     lv_obj_set_scrollbar_mode(ui->screen_networking_setting_cont_mask, LV_SCROLLBAR_MODE_OFF);
+    lv_obj_add_flag(ui->screen_networking_setting_cont_mask, LV_OBJ_FLAG_HIDDEN);
     lv_obj_add_flag(ui->screen_networking_setting_cont_mask, LV_OBJ_FLAG_HIDDEN);
 
     //Write style for screen_networking_setting_cont_mask, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
@@ -213,6 +191,7 @@ void setup_scr_screen_networking_setting(lv_ui *ui)
     lv_obj_set_pos(ui->screen_networking_setting_cont_wifi_password_dialog, 5, 60);
     lv_obj_set_size(ui->screen_networking_setting_cont_wifi_password_dialog, 230, 102);
     lv_obj_set_scrollbar_mode(ui->screen_networking_setting_cont_wifi_password_dialog, LV_SCROLLBAR_MODE_OFF);
+    lv_obj_add_flag(ui->screen_networking_setting_cont_wifi_password_dialog, LV_OBJ_FLAG_HIDDEN);
     lv_obj_add_flag(ui->screen_networking_setting_cont_wifi_password_dialog, LV_OBJ_FLAG_HIDDEN);
 
     //Write style for screen_networking_setting_cont_wifi_password_dialog, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
@@ -339,8 +318,27 @@ void setup_scr_screen_networking_setting(lv_ui *ui)
     lv_obj_set_style_bg_grad_dir(ui->screen_networking_setting_ta_wifi_password, LV_GRAD_DIR_NONE, LV_PART_SCROLLBAR|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->screen_networking_setting_ta_wifi_password, 0, LV_PART_SCROLLBAR|LV_STATE_DEFAULT);
 
-    //The custom code of screen_networking_setting.
+    //Write codes screen_networking_setting_img_refresh
+    ui->screen_networking_setting_img_refresh = lv_image_create(ui->screen_networking_setting);
+    lv_obj_set_pos(ui->screen_networking_setting_img_refresh, 144, 68);
+    lv_obj_set_size(ui->screen_networking_setting_img_refresh, 20, 20);
+    lv_obj_add_flag(ui->screen_networking_setting_img_refresh, LV_OBJ_FLAG_CLICKABLE);
+    lv_image_set_src(ui->screen_networking_setting_img_refresh, &_refresh_RGB565A8_20x20);
+    lv_image_set_pivot(ui->screen_networking_setting_img_refresh, 10,10);
+    lv_image_set_rotation(ui->screen_networking_setting_img_refresh, 0);
 
+    //Write style for screen_networking_setting_img_refresh, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
+    lv_obj_set_style_image_recolor_opa(ui->screen_networking_setting_img_refresh, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_image_opa(ui->screen_networking_setting_img_refresh, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
+
+    //The custom code of screen_networking_setting.
+    lv_anim_init(&ui->screen_networking_setting_anim);
+    lv_anim_set_var(&ui->screen_networking_setting_anim, guider_ui.screen_networking_setting_img_refresh);
+    lv_anim_set_exec_cb(&ui->screen_networking_setting_anim, (lv_anim_exec_xcb_t)lv_img_set_angle);
+    lv_anim_set_values(&ui->screen_networking_setting_anim, 3600-1, 0);
+    lv_anim_set_time(&ui->screen_networking_setting_anim, 1000);
+    lv_anim_set_repeat_count(&ui->screen_networking_setting_anim, LV_ANIM_REPEAT_INFINITE);
+    lv_anim_set_delay(&ui->screen_networking_setting_anim, 0);
 
     //Update current screen layout.
     lv_obj_update_layout(ui->screen_networking_setting);
