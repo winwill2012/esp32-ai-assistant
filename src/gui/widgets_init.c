@@ -34,7 +34,7 @@ __attribute__((unused)) void ta_event_cb (lv_event_t *e) {
             lv_obj_remove_flag(kb, LV_OBJ_FLAG_HIDDEN);
         }
     }
-    else if(code == LV_EVENT_READY) {
+    else if(code == LV_EVENT_DEFOCUSED || code == LV_EVENT_READY) {
         lv_obj_add_flag(kb, LV_OBJ_FLAG_HIDDEN);
         lv_obj_remove_state(ta, LV_STATE_FOCUSED);
         lv_indev_reset(NULL, ta);

@@ -174,7 +174,24 @@ static void screen_networking_setting_btn_cancel_event_handler(lv_event_t *e) {
     lv_event_code_t code = lv_event_get_code(e);
     switch (code) {
         case LV_EVENT_CLICKED: {
+            lv_obj_add_flag(guider_ui.screen_networking_setting_cont_wifi_password_dialog, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_add_flag(guider_ui.screen_networking_setting_cont_mask, LV_OBJ_FLAG_HIDDEN);
+            guider_ui.screen_networking_settings_clicked_wifi_ssid = NULL;
+            break;
+        }
+        default:
+            break;
+    }
+}
 
+static void screen_networking_setting_cont_mask_event_handler(lv_event_t *e) {
+    lv_event_code_t code = lv_event_get_code(e);
+    switch (code) {
+        case LV_EVENT_CLICKED: {
+            lv_obj_add_flag(guider_ui.screen_networking_setting_cont_wifi_password_dialog, LV_OBJ_FLAG_HIDDEN);
+            lv_obj_add_flag(guider_ui.screen_networking_setting_cont_mask, LV_OBJ_FLAG_HIDDEN);
+
+            guider_ui.screen_networking_settings_clicked_wifi_ssid = NULL;
             break;
         }
         default:
@@ -186,7 +203,9 @@ static void screen_networking_setting_btn_confirm_event_handler(lv_event_t *e) {
     lv_event_code_t code = lv_event_get_code(e);
     switch (code) {
         case LV_EVENT_CLICKED: {
-
+            const char *pwd = lv_textarea_get_text(guider_ui.screen_networking_setting_ta_wifi_password);
+            lv_obj_add_flag(guider_ui.screen_networking_setting_cont_wifi_password_dialog, LV_OBJ_FLAG_HIDDEN);
+            connect_wifi(guider_ui.screen_networking_settings_clicked_wifi_ssid, pwd);
             break;
         }
         default:
@@ -202,6 +221,8 @@ void events_init_screen_networking_setting(lv_ui *ui) {
     lv_obj_add_event_cb(ui->screen_networking_setting_btn_cancel, screen_networking_setting_btn_cancel_event_handler,
                         LV_EVENT_ALL, ui);
     lv_obj_add_event_cb(ui->screen_networking_setting_btn_confirm, screen_networking_setting_btn_confirm_event_handler,
+                        LV_EVENT_ALL, ui);
+    lv_obj_add_event_cb(ui->screen_networking_setting_cont_mask, screen_networking_setting_cont_mask_event_handler,
                         LV_EVENT_ALL, ui);
 }
 

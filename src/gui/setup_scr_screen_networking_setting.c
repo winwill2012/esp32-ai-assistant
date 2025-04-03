@@ -285,7 +285,7 @@ void setup_scr_screen_networking_setting(lv_ui *ui)
     lv_textarea_set_text(ui->screen_networking_setting_ta_wifi_password, "");
     lv_textarea_set_placeholder_text(ui->screen_networking_setting_ta_wifi_password, "");
     lv_textarea_set_password_bullet(ui->screen_networking_setting_ta_wifi_password, "*");
-    lv_textarea_set_password_mode(ui->screen_networking_setting_ta_wifi_password, true);
+    lv_textarea_set_password_mode(ui->screen_networking_setting_ta_wifi_password, false);
     lv_textarea_set_one_line(ui->screen_networking_setting_ta_wifi_password, true);
     lv_textarea_set_accepted_chars(ui->screen_networking_setting_ta_wifi_password, "");
     lv_textarea_set_max_length(ui->screen_networking_setting_ta_wifi_password, 32);

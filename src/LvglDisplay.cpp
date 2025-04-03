@@ -62,24 +62,24 @@ void LvglDisplay::loadSystemSettingData() {
     personaList.pop_back();
     lv_dropdown_set_options(guider_ui.screen_system_setting_ddlist_voice_type, voiceList.c_str());
     lv_dropdown_set_symbol(guider_ui.screen_system_setting_ddlist_voice_type, LV_SYMBOL_DOWN);
-    lv_dropdown_set_selected(guider_ui.screen_system_setting_ddlist_voice_type, selectedVoiceIndex, LV_ANIM_OFF);
+    lv_dropdown_set_selected(guider_ui.screen_system_setting_ddlist_voice_type, selectedVoiceIndex);
     lv_obj_t *voice_list = lv_dropdown_get_list(guider_ui.screen_system_setting_ddlist_voice_type);
     lv_obj_set_style_text_font(voice_list, &lv_customer_font_Siyuan_Regular_14, 0);
 
     lv_dropdown_set_options(guider_ui.screen_system_setting_ddlist_persona, personaList.c_str());
     lv_dropdown_set_symbol(guider_ui.screen_system_setting_ddlist_persona, LV_SYMBOL_DOWN);
-    lv_dropdown_set_selected(guider_ui.screen_system_setting_ddlist_persona, selectedPersonaIndex, LV_ANIM_OFF);
+    lv_dropdown_set_selected(guider_ui.screen_system_setting_ddlist_persona, selectedPersonaIndex);
     lv_obj_t *persona_list = lv_dropdown_get_list(guider_ui.screen_system_setting_ddlist_persona);
     lv_obj_set_style_text_font(persona_list, &lv_customer_font_Siyuan_Regular_14, 0);
 
     lv_dropdown_set_options(guider_ui.screen_system_setting_ddlist_environment_noise, "安静\n一般\n嘈杂");
     lv_dropdown_set_symbol(guider_ui.screen_system_setting_ddlist_environment_noise, LV_SYMBOL_DOWN);
     if (Settings::getRecordingRmsThreshold() == ENV_QUIET) {
-        lv_dropdown_set_selected(guider_ui.screen_system_setting_ddlist_environment_noise, 0, LV_ANIM_OFF);
+        lv_dropdown_set_selected(guider_ui.screen_system_setting_ddlist_environment_noise, 0);
     } else if (Settings::getRecordingRmsThreshold() == ENV_GENERAL) {
-        lv_dropdown_set_selected(guider_ui.screen_system_setting_ddlist_environment_noise, 1, LV_ANIM_OFF);
+        lv_dropdown_set_selected(guider_ui.screen_system_setting_ddlist_environment_noise, 1);
     } else {
-        lv_dropdown_set_selected(guider_ui.screen_system_setting_ddlist_environment_noise, 2, LV_ANIM_OFF);
+        lv_dropdown_set_selected(guider_ui.screen_system_setting_ddlist_environment_noise, 2);
     }
     lv_obj_t *environment_noise_list = lv_dropdown_get_list(guider_ui.screen_system_setting_ddlist_environment_noise);
     lv_obj_set_style_text_font(environment_noise_list, &lv_customer_font_Siyuan_Regular_14, 0);
@@ -104,7 +104,7 @@ void LvglDisplay::begin() {
 
     lv_display_t *disp;
     disp = lv_tft_espi_create(TFT_HOR_RES, TFT_VER_RES, draw_buf, sizeof(draw_buf));
-    lv_display_set_rotation(disp, TFT_ROTATION);
+    lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_0);
 
     lv_indev_t *indev = lv_indev_create();
     lv_indev_set_type(indev, LV_INDEV_TYPE_POINTER); /*Touchpad should have POINTER type*/
@@ -193,14 +193,13 @@ void LvglDisplay::updateRecordingButtonImage(const void *img) {
 
 // 点击了列表中的某一个wifi后，弹出对话框，输入wifi密码
 static void click_wifi_item_event_callback(lv_event_t *e) {
-//    void *user_data = lv_event_get_user_data(e);
-//    if (user_data != nullptr) {
-//        guider_ui.clicked_wifi_ssid = (char *) user_data;
-//        lv_label_set_text(guider_ui.network_setting_connect_wifi_window_title, (char *) user_data);
-//        lv_textarea_set_text(guider_ui.network_setting_wifi_password_textarea, "");
-//        lv_obj_clear_flag(guider_ui.network_setting_overlay, LV_OBJ_FLAG_HIDDEN);
-//        lv_obj_clear_flag(guider_ui.network_setting_connect_wifi_window, LV_OBJ_FLAG_HIDDEN);
-//    }
+    void *user_data = lv_event_get_user_data(e);
+    if (user_data != nullptr) {
+        guider_ui.screen_networking_settings_clicked_wifi_ssid = (char *) user_data;
+        lv_textarea_set_text(guider_ui.screen_networking_setting_ta_wifi_password, "");
+        lv_obj_clear_flag(guider_ui.screen_networking_setting_cont_wifi_password_dialog, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_clear_flag(guider_ui.screen_networking_setting_cont_mask, LV_OBJ_FLAG_HIDDEN);
+    }
 }
 
 // 渲染wifi列表，添加每一条wifi信息
@@ -216,21 +215,23 @@ void add_wifi_item(const WifiInfo &wifi) {
         lv_obj_add_event_cb(wifi_item, click_wifi_item_event_callback, LV_EVENT_CLICKED, ssid_copy);
     }
 }
+
 void LvglDisplay::loadWifiList(const bool forceRefresh) {
+    lv_anim_start(&guider_ui.screen_networking_setting_anim);
     const std::vector<WifiInfo> &list = Settings::getWifiList(forceRefresh);
     for (const auto &wifi: list) {
         if (forceRefresh) {
-//            // 强制刷新的时候，是点击了UI上的刷新按钮，那里会创建一个新的task来加载wifi，
-//            // 所以本段逻辑不在lv_timer_handler中执行，需要加锁
-//            if (xSemaphoreTakeRecursive(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
-//                add_wifi_item(wifi);
-//                xSemaphoreGiveRecursive(lvglUpdateLock);
-//            }
-            lv_anim_start(&guider_ui.screen_networking_setting_anim);
+            // 强制刷新的时候，是点击了UI上的刷新按钮，那里会创建一个新的task来加载wifi，
+            // 所以本段逻辑不在lv_timer_handler中执行，需要加锁
+            if (xSemaphoreTakeRecursive(lvglUpdateLock, portMAX_DELAY) == pdTRUE) {
+                add_wifi_item(wifi);
+                xSemaphoreGiveRecursive(lvglUpdateLock);
+            }
         } else {
             add_wifi_item(wifi);
         }
     }
+    lv_anim_delete(&guider_ui.screen_networking_setting_anim, nullptr);
 }
 
 void LvglDisplay::updateRecordingState(bool active) {
