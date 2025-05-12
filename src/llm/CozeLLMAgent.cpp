@@ -119,7 +119,6 @@ void CozeLLMAgent::ProcessContent(String &content) {
     if (_interrupted) {
         return;
     }
-    content.trim();
     if (content.isEmpty()) {
         return;
     }
