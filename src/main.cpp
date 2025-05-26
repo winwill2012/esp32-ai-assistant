@@ -14,14 +14,13 @@ void setup() {
     Serial.begin(115200);
     Settings::begin();
     LvglDisplay::begin();
-    analogWrite(8, static_cast<int>(Settings::getScreenBrightness() * 2.55)); // 设置屏幕亮度
 
     const auto wifiInfo = Settings::getWifiInfo();
     if (wifiInfo.first.empty() || wifiInfo.second.empty()) {
         log_e("no wifi configuration found");
         GlobalState::setState(NetworkConfigurationNotFound);
     } else {
-        connectSavedWifi(wifiInfo.first.c_str(), wifiInfo.second.c_str(), 20);
+        connectSavedWifi(wifiInfo.first.c_str(), wifiInfo.second.c_str(), 10);
     }
     log_d("waiting for network connected...");
     // 等待网络连接成功

@@ -88,6 +88,7 @@ void connectSavedWifi(const char* ssid, const char* password, int maxRetries)
     {
         retryCount++;
         vTaskDelay(pdMS_TO_TICKS(1000));
+        GlobalState::setState(NetworkConnecting);
     }
     if (WiFiClass::status() == WL_CONNECTED)
     {
@@ -95,6 +96,7 @@ void connectSavedWifi(const char* ssid, const char* password, int maxRetries)
     }
     else
     {
+        WiFi.disconnect(false, true);
         GlobalState::setState(NetworkConnectFailed);
     }
 }
@@ -104,12 +106,7 @@ bool reconnectWifi(lv_timer_t* timer, const char* ssid, const char* password, co
     if (isConnectingWifi)
     {
         connectRetries++;
-        String stateMessage = "正在连网";
-        for (int i = 0; i <= connectRetries % 3; i++)
-        {
-            stateMessage += ".";
-        }
-        LvglDisplay::updateState(stateMessage.c_str());
+        GlobalState::setState(NetworkConnecting);
         if (WiFi.isConnected())
         {
             GlobalState::setState(NetworkConnected);

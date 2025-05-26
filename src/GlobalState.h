@@ -31,12 +31,11 @@ public:
 
     static void setState(MachineState state);
 
-    static void removeState(MachineState state);
-
 private:
     static String conversationId;
     static MachineState machineState;
     static EventGroupHandle_t eventGroup;
+    static String connectingWiFiMessage;
 };
 
 

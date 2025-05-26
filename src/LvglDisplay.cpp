@@ -101,6 +101,7 @@ static uint32_t my_tick(void)
 
 void LvglDisplay::begin()
 {
+    analogWrite(8, static_cast<int>(Settings::getScreenBrightness() * 2.55)); // 设置屏幕亮度
     lv_init();
     lv_tick_set_cb(my_tick);
     ts.begin();
