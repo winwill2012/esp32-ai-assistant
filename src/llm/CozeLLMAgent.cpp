@@ -27,7 +27,7 @@ CozeLLMAgent::CozeLLMAgent() {
 
 void CozeLLMAgent::chat(const String &input) {
     if (input == "") return;
-    log_d("Ready to send query to coze agent: %s", input.c_str());
+    Serial.println(input);
     GlobalState::setState(Thinking);
     reset();
     HTTPClient http;
@@ -42,7 +42,7 @@ void CozeLLMAgent::chat(const String &input) {
     requestBody["bot_id"] = personaMap[Settings::getCurrentPersona().c_str()];
     requestBody["user_id"] = getChipId(nullptr);
     const JsonArray additionalMessages = requestBody["additional_messages"].to<JsonArray>();
-    JsonObject message = additionalMessages.add<JsonObject>();
+    const JsonObject message = additionalMessages.add<JsonObject>();
     message["content_type"] = "text";
     message["content"] = input;
     message["role"] = "user";
@@ -88,7 +88,7 @@ void CozeLLMAgent::ProcessStreamOutput(String data) {
     if (_interrupted) {
         return;
     }
-    log_v("Process coze agent response fragment: %s", data.c_str());
+    // log_v("Process coze agent response fragment: %s", data.c_str());
     // 只处理data开头，并且是助手回答的数据类型
     if (!data.startsWith("data:") || data.indexOf(R"("role":"assistant","type":"answer")") < 0) {
         return;
@@ -115,7 +115,7 @@ void CozeLLMAgent::reset() {
     _firstPacket = true;
 }
 
-void CozeLLMAgent::ProcessContent(String &content) {
+void CozeLLMAgent::ProcessContent(const String &content) {
     if (_interrupted) {
         return;
     }

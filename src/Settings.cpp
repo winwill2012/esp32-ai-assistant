@@ -11,7 +11,6 @@ int Settings::currentScreenBrightness;
 double Settings::currentSpeakSpeedRatio;
 double Settings::currentSpeakVolumeRatio;
 double Settings::recordingRmsThreshold;
-int Settings::speakPauseDuration;
 std::map<std::string, std::string> Settings::voiceMap = std::map<std::string, std::string>(); // <声音，声音值>列表
 std::map<std::string, std::string> Settings::personaMap = std::map<std::string, std::string>(); // <人设，botId>列表
 std::string Settings::doubaoAppId;
@@ -46,8 +45,6 @@ void Settings::begin() {
     currentPersona = preferences.getString(SETTING_PERSONA, doc["system"]["persona"].as<String>());
     recordingRmsThreshold = preferences.getDouble(SETTING_RECORDING_RMS_THRESHOLD,
                                                   doc["system"]["recordingRmsThreshold"].as<double>());
-    speakPauseDuration = preferences.getInt(SETTING_SPEAK_PAUSE_DURATION,
-                                            doc["system"]["speakPauseDuration"].as<int>());
     wifiSsid = preferences.getString(SETTING_WIFI_SSID, "").c_str();
     wifiPassword = preferences.getString(SETTING_WIFI_PASSWORD, "").c_str();
     currentScreenBrightness = preferences.getInt(SETTING_SCREEN_BRIGHTNESS, 80);
@@ -74,7 +71,6 @@ void Settings::show() {
     log_i("           currentVoice: %s", currentVoice.c_str());
     log_i("         currentPersona: %s", currentPersona.c_str());
     log_i("  recordingRmsThreshold: %f", recordingRmsThreshold);
-    log_i("     speakPauseDuration: %d ms", speakPauseDuration);
     log_i("            doubaoAppId: %s", doubaoAppId.c_str());
     log_i("      doubaoAccessToken: %s", doubaoAccessToken.c_str());
     log_i("              cozeToken: %s", cozeToken.c_str());
@@ -94,12 +90,9 @@ void Settings::show() {
 /**
 *  扫描设备周围WiFi列表
 */
-std::vector<WifiInfo> Settings::getWifiList(const bool refresh) {
-    if (!refresh) {
-        return scannedWifiList;
-    }
+std::vector<WifiInfo> Settings::getWifiList() {
     log_d("start scan wifi...");
-    const int16_t number = WiFi.scanNetworks();
+    const int16_t number = WiFi.scanNetworks(true);
     if (number == 0) {
         return {};
     }
@@ -153,17 +146,6 @@ void Settings::setCurrentSpeakSpeedRatio(const double speakSpeedRatio) {
     currentSpeakSpeedRatio = speakSpeedRatio;
     preferences.begin(SETTINGS_NAMESPACE);
     preferences.putDouble(SETTING_SPEED_RATIO, speakSpeedRatio);
-    preferences.end();
-}
-
-int Settings::getSpeakPauseDuration() {
-    return speakPauseDuration;
-}
-
-void Settings::setSpeakPauseDuration(int pauseDuration) {
-    speakPauseDuration = pauseDuration;
-    preferences.begin(SETTINGS_NAMESPACE);
-    preferences.putInt(SETTING_SPEAK_PAUSE_DURATION, pauseDuration);
     preferences.end();
 }
 

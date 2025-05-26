@@ -3,7 +3,6 @@
 #include "Application.h"
 #include "LvglDisplay.h"
 #include "Utils.h"
-#include "driver/i2s.h"
 #include "AudioPlayer.h"
 #include "GlobalState.h"
 
@@ -27,49 +26,49 @@ void load_system_setting_data() {
     LvglDisplay::loadSystemSettingData();
 }
 
-void set_environment_noise(const char *noise) {
-    if (strcmp(noise, "安静") == 0) {
-        Settings::setRecordingRmsThreshold(ENV_QUIET);
-    } else if (strcmp(noise, "一般") == 0) {
-        Settings::setRecordingRmsThreshold(ENV_GENERAL);
-    } else if (strcmp(noise, "嘈杂") == 0) {
-        Settings::setRecordingRmsThreshold(ENV_NOISY);
-    }
+void load_wifi_list(lv_timer_t* timer) {
+    LvglDisplay::loadWifiList(timer);
 }
 
-void set_speak_pause_duration(int duration) {
-    Settings::setSpeakPauseDuration(duration);
-}
-
-void load_wifi_list(const void *refresh) {
-    LvglDisplay::loadWifiList(refresh);
-}
-
-bool connect_wifi(const char *ssid, const char *password) {
+void connect_wifi(lv_timer_t* timer, const char *ssid, const char *password) {
     log_d("连接网络: %s, %s", ssid, password);
-    if (connectWifi(ssid, password, 20)) {
+    if (reconnectWifi(timer, ssid, password, 20)) {
         Settings::setWifiInfo(ssid, password);
-        return true;
     }
-    return false;
 }
 
 void set_screen_brightness(int brightness) {
     Settings::setScreenBrightness(brightness);
 }
 
-void on_microphone_clicked() {
+void on_btn_speak_clicked() {
     // 正在说话或者思考，直接进入聆听模式
     if (GlobalState::getState() == Speaking || GlobalState::getState() == Thinking) {
         Application::llm()->interrupt(true);
         Application::tts()->interrupt(true);
         Application::audioPlayer()->interrupt(true);
         vTaskDelay(pdMS_TO_TICKS(500));
-        GlobalState::setState(Listening);
-    } else if (GlobalState::getState() == Listening) {
-        // 正在聆听，自己进入待机模式
         GlobalState::setState(Sleep);
-    } else if (GlobalState::getState() == Sleep) {
+    }
+}
+
+void on_btn_speak_pressed()
+{
+    Serial.println("说话按键按下");
+    if (GlobalState::getState() == Sleep)
+    {
+        // 正在待机，进入聆听状态
         GlobalState::setState(Listening);
+        LvglDisplay::playSpeakAnim();
+    }
+}
+
+void on_btn_speak_released()
+{
+    Serial.println("说话按键释放");
+    if (GlobalState::getState() == Listening)
+    {
+        GlobalState::setState(Recognizing);
+        LvglDisplay::stopSpeakAnim();
     }
 }

@@ -1,24 +1,25 @@
 #ifndef AI_ROBOT_UTILS_H
 #define AI_ROBOT_UTILS_H
 
-#include "Arduino.h"
 #include <vector>
 #include <WiFi.h>
 
+#include "misc/lv_types.h"
+
 std::string generateTaskId();
 
-std::string getChipId(const char *prefix);
+std::string getChipId(const char* prefix);
 
-int32_t readInt32(const uint8_t *bytes);
+int32_t readInt32(const uint8_t* bytes);
 
-std::string readString(const uint8_t *bytes, uint32_t length);
+std::string readString(const uint8_t* bytes, uint32_t length);
 
 std::vector<uint8_t> uint32ToUint8Array(uint32_t size);
 
-double calculateSoundRMS(const std::vector<int16_t> &buffer);
+std::pair<int, size_t> findMinIndexOfDelimiter(const String& input);
 
-std::pair<int, size_t> findMinIndexOfDelimiter(const String &input);
+void connectSavedWifi(const char* ssid, const char* password, int maxRetries);
 
-bool connectWifi(const char *ssid, const char *password, int maxRetries);
+bool reconnectWifi(lv_timer_t* timer, const char* ssid, const char* password, int maxRetries);
 
 #endif

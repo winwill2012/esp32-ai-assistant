@@ -11,6 +11,7 @@ enum MachineState {
     NetworkConnected,
     NetworkConnectFailed,
     Listening,
+    Recognizing,
     Thinking,
     Speaking,
     ForceStop
@@ -29,6 +30,8 @@ public:
     static MachineState getState();
 
     static void setState(MachineState state);
+
+    static void removeState(MachineState state);
 
 private:
     static String conversationId;

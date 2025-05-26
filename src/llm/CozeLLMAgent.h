@@ -19,7 +19,7 @@ public:
 
     void ProcessStreamOutput(String data);
 
-    void ProcessContent(String &content);
+    void ProcessContent(const String &content);
 
     void reset();
 

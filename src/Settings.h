@@ -34,7 +34,7 @@ public:
 
     static void show();
 
-    static std::vector<WifiInfo> getWifiList(bool refresh);
+    static std::vector<WifiInfo> getWifiList();
 
     static String getCurrentVoice();
 
@@ -66,10 +66,6 @@ public:
 
     static void setCurrentSpeakSpeedRatio(double speakSpeedRatio);
 
-    static int getSpeakPauseDuration();
-
-    static void setSpeakPauseDuration(int pauseDuration);
-
     static double getRecordingRmsThreshold();
 
     static void setRecordingRmsThreshold(double rmsThreshold);
@@ -85,8 +81,6 @@ private:
     static double currentSpeakVolumeRatio; // 当前设置的音量
     static double currentSpeakSpeedRatio; // 当前设置的说话语速
 
-    // 每一次录音的静默时间，单位ms，超过该时间则认为本次录音已完成
-    static int speakPauseDuration;
     static double recordingRmsThreshold; // 录音RMS阈值
     static std::map<std::string, std::string> voiceMap; // <声音，声音值>
     static std::map<std::string, std::string> personaMap; // <人设，botId>

@@ -7,6 +7,7 @@
 #include "LvglDisplay.h"
 #include "Application.h"
 #include "ArduinoJson.h"
+#include "GlobalState.h"
 
 DoubaoASR::DoubaoASR() {
     _eventGroup = xEventGroupCreate();
@@ -100,6 +101,7 @@ void DoubaoASR::buildAudioOnlyRequest(uint8_t *audio, const size_t size, const b
 }
 
 void DoubaoASR::recognize(WebSocketASRTask task) {
+    Serial.println("开始语音识别...");
     log_d("speech recognize request: %d, %d, %d", task.data.size(), task.firstPacket, task.lastPacket);
     if (task.firstPacket) {
         xEventGroupClearBits(_eventGroup, STT_TASK_COMPLETED_EVENT);
@@ -171,6 +173,9 @@ void DoubaoASR::parseResponse(const uint8_t *response) {
                         _firstPacket = true;
                     }
                 }
+            } else if (GlobalState::getState() != Listening)
+            {
+                GlobalState::setState(Sleep);
             }
             break;
         }

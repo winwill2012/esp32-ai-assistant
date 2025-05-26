@@ -21,7 +21,7 @@ void setup() {
         log_e("no wifi configuration found");
         GlobalState::setState(NetworkConfigurationNotFound);
     } else {
-        connectWifi(wifiInfo.first.c_str(), wifiInfo.second.c_str(), 20);
+        connectSavedWifi(wifiInfo.first.c_str(), wifiInfo.second.c_str(), 20);
     }
     log_d("waiting for network connected...");
     // 等待网络连接成功

@@ -331,15 +331,6 @@ void setup_scr_screen_networking_setting(lv_ui *ui)
     lv_obj_set_style_image_recolor_opa(ui->screen_networking_setting_img_refresh, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_image_opa(ui->screen_networking_setting_img_refresh, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
 
-    //The custom code of screen_networking_setting.
-    lv_anim_init(&ui->screen_networking_setting_anim);
-    lv_anim_set_var(&ui->screen_networking_setting_anim, guider_ui.screen_networking_setting_img_refresh);
-    lv_anim_set_exec_cb(&ui->screen_networking_setting_anim, (lv_anim_exec_xcb_t)lv_img_set_angle);
-    lv_anim_set_values(&ui->screen_networking_setting_anim, 3600-1, 0);
-    lv_anim_set_time(&ui->screen_networking_setting_anim, 1000);
-    lv_anim_set_repeat_count(&ui->screen_networking_setting_anim, LV_ANIM_REPEAT_INFINITE);
-    lv_anim_set_delay(&ui->screen_networking_setting_anim, 0);
-
     //Update current screen layout.
     lv_obj_update_layout(ui->screen_networking_setting);
 

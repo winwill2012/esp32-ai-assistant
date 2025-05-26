@@ -1,7 +1,6 @@
 #ifndef ASR_H
 #define ASR_H
 #include <vector>
-#include <cstdint>
 #include <WebSocketsClient.h>
 
 struct WebSocketASRTask;

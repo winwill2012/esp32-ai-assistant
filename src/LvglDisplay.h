@@ -22,18 +22,20 @@ public:
 
     static void updateWifiState(bool success);
 
-    static void updateRecordingButtonImage(const void *img);
-
     static void loadSystemSettingData();
 
-    static void loadWifiList(bool forceRefresh);
+    static void loadWifiList(lv_timer_t* timer);
 
-    static void updateRecordingState(bool active);
+    static void playSpeakAnim();
+
+    static void stopSpeakAnim();
 
 private:
     static lv_obj_t *last_message;
     static int current_message_number;
     static SemaphoreHandle_t lvglUpdateLock;
+    static bool scanningWifi;
+    static int refreshImageAngle; // wifi刷新按钮的旋转角度，用来做动画用的
 };
 
 

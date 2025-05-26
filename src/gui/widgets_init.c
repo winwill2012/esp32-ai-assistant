@@ -92,3 +92,27 @@ void digital_clock_count(int * hour, int * minute, int * seconds, char * meridie
 }
 
 
+const lv_image_dsc_t * screen_main_animimg_1_imgs[20] = {
+    &screen_main_animimg_1noise_check_0,
+    &screen_main_animimg_1noise_check_1,
+    &screen_main_animimg_1noise_check_10,
+    &screen_main_animimg_1noise_check_11,
+    &screen_main_animimg_1noise_check_12,
+    &screen_main_animimg_1noise_check_13,
+    &screen_main_animimg_1noise_check_14,
+    &screen_main_animimg_1noise_check_15,
+    &screen_main_animimg_1noise_check_16,
+    &screen_main_animimg_1noise_check_17,
+    &screen_main_animimg_1noise_check_18,
+    &screen_main_animimg_1noise_check_19,
+    &screen_main_animimg_1noise_check_2,
+    &screen_main_animimg_1noise_check_3,
+    &screen_main_animimg_1noise_check_4,
+    &screen_main_animimg_1noise_check_5,
+    &screen_main_animimg_1noise_check_6,
+    &screen_main_animimg_1noise_check_7,
+    &screen_main_animimg_1noise_check_8,
+    &screen_main_animimg_1noise_check_9,
+};
+
+

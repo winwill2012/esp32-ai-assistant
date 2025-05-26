@@ -34,7 +34,7 @@ void playAudio(void *ptr) {
             if (uxQueueMessagesWaiting(Application::audioPlayer()->getTaskQueue()) == 0) {
                 // 此时可能i2s DMA缓冲区还有未播放的数据，延时1000ms，不然可能麦克风会监听到播放的语音
                 vTaskDelay(pdMS_TO_TICKS(1000));
-                GlobalState::setState(Listening);
+                GlobalState::setState(Sleep);
             }
         }
         vTaskDelay(1);
