@@ -3,33 +3,61 @@
 
 #include "Arduino.h"
 #include "CozeLLMAgent.h"
+#define DELIMITER "|"
 
-struct LLMTask {
-    char *message;
+struct LLMTask
+{
+    char* message;
     size_t length;
 };
 
-class CozeLLMAgent {
+// LLM状态列表
+enum LLMState
+{
+    Begin,
+    CommandCompleted,
+    ResponseCompleted,
+    ParamsCompleted
+};
+
+// LLM流式输出事件
+enum LLMEvent
+{
+    Normal,
+    Delimiter
+};
+
+class CozeLLMAgent
+{
 public:
     CozeLLMAgent();
 
     void publishTask(LLMTask task) const;
 
-    void chat(const String &input);
+    void chat(const String& input);
 
-    void ProcessStreamOutput(String data);
+    void processStreamOutput(String data);
 
-    void ProcessContent(const String &content);
+    void processContent(String& content);
+
+    void processPart(const String& input);
 
     void reset();
 
     void interrupt(bool value);
 
+    // 状态机状态转移函数
+    void transition(LLMState state, LLMEvent event);
+
 private:
     bool _interrupted = false;
+    LLMState _currentState = Begin;
+    // 回复内容
     String _response = "";
-    String _cmd = "";
-    String _content = "";
+    // 命令类型
+    String _command = "";
+    // 附加参数
+    String _params = "";
     String _ttsTextBuffer = "";
     bool _firstPacket;
     QueueHandle_t _taskQueue;

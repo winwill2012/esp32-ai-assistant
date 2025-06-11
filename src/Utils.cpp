@@ -139,3 +139,18 @@ bool reconnectWifi(lv_timer_t* timer, const char* ssid, const char* password, co
     WiFi.begin(ssid, password);
     return false;
 }
+
+uint32_t hexColorToUInt(String hex)
+{
+    if (hex.length() != 7 || hex[0] != '#')
+    {
+        return 0xffffff;
+    }
+    hex.replace("#", "");
+    return std::stoul(hex.c_str(), nullptr, 16);
+}
+
+int str2int(const String& input)
+{
+    return std::stoi(input.c_str(), nullptr, 10);
+}

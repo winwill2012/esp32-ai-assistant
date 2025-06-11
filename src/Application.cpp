@@ -3,9 +3,13 @@
 #include <TimeUpdater.h>
 #include <asr/DoubaoASR.h>
 
+#include "IOT.h"
+
 DECLARE_ASR(DoubaoASR)
 
-Application::Application() {
+Application::Application()
+{
+    IOT::begin();
     _ttsClient = new DoubaoTTS();
     _llmAgent = new CozeLLMAgent();
     _asrClient = createASR();
@@ -13,20 +17,23 @@ Application::Application() {
     _recordingManager = new RecordingManager();
 }
 
-void Application::begin() const {
+void Application::begin() const
+{
     TimeUpdater::begin();
     _audioPlayer->begin();
     // showMemoryInfo();
     _recordingManager->begin();
 }
 
-void Application::showMemoryInfo() {
-    xTaskCreate([](void *ptr) {
-        while (true) {
+void Application::showMemoryInfo()
+{
+    xTaskCreate([](void* ptr)
+    {
+        while (true)
+        {
             log_d("Free ram: %d", heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
             log_d("Free psram: %d", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
             vTaskDelay(pdMS_TO_TICKS(1000));
         }
     }, "showMemoryInfo", 2048, nullptr, 1, nullptr);
-
 }

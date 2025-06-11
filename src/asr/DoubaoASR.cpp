@@ -47,7 +47,7 @@ void DoubaoASR::buildFullClientRequest() {
     doc.clear();
     const JsonObject app = doc["app"].to<JsonObject>();
     app["appid"] = Settings::getDoubaoAppId();
-    app["cluster"] = "volcengine_input_common";
+    app["cluster"] = "volcengine_streaming_common";
     app["token"] = Settings::getDoubaoAccessToken();
     const JsonObject user = doc["user"].to<JsonObject>();
     user["uid"] = getChipId(nullptr);

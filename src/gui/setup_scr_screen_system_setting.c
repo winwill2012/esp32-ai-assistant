@@ -78,7 +78,7 @@ void setup_scr_screen_system_setting(lv_ui *ui)
     ui->screen_system_setting_slider_speak_volume = lv_slider_create(ui->screen_system_setting);
     lv_obj_set_pos(ui->screen_system_setting_slider_speak_volume, 73, 115);
     lv_obj_set_size(ui->screen_system_setting_slider_speak_volume, 160, 5);
-    lv_slider_set_range(ui->screen_system_setting_slider_speak_volume, 0, 100);
+    lv_slider_set_range(ui->screen_system_setting_slider_speak_volume, 30, 100);
     lv_slider_set_mode(ui->screen_system_setting_slider_speak_volume, LV_SLIDER_MODE_NORMAL);
     lv_slider_set_value(ui->screen_system_setting_slider_speak_volume, 50, LV_ANIM_OFF);
 

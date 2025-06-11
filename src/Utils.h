@@ -22,4 +22,7 @@ void connectSavedWifi(const char* ssid, const char* password, int maxRetries);
 
 bool reconnectWifi(lv_timer_t* timer, const char* ssid, const char* password, int maxRetries);
 
+uint32_t hexColorToUInt(String hex);
+
+int str2int(const String& input);
 #endif
