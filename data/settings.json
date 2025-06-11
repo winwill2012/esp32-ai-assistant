@@ -6,19 +6,19 @@
     "persona": "暴躁易怒"
   },
   "doubao": {
-    "appId": "8988564775",
-    "accessToken": "dsWgV1rCvxiinw_H2clmJuAI-O1D8P94"
+    "appId": "4630330133",
+    "accessToken": "4YOzBPBOFizGvhWbqZroVA3fTXQbeWOW"
   },
   "coze": {
-    "token": "pat_KOlEI8e7COZgCvGuYaLrNlcrRsbB8xpwmliKZW8YTPT0Uqsr9ZvAddO4xjR75PlM",
+    "token": "pat_VTfRoHS1Q8HeNHXS6WUo8xykp8JiAJdrcbxcn4GaNXFL6Gn6i60k0FaaT6wyjAt7",
     "personaList": [
       {
         "name": "幽默风趣",
-        "botId": "7479628247178313747"
+        "botId": "7514588542430511141"
       },
       {
         "name": "暴躁易怒",
-        "botId": "7468218438402818082"
+        "botId": "7514593872404627493"
       }
     ]
   },
