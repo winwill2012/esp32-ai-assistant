@@ -5,24 +5,30 @@
 #include <lvgl.h>
 #include <semphr.h>
 
-enum MessageRole {
+enum MessageRole
+{
     Robot,
     User
 };
 
-class LvglDisplay {
+class LvglDisplay
+{
 public:
     static void begin();
 
-    static void updateChatText(MessageRole messageRole, bool newLine, const std::string &text);
+    static void updateChatText(MessageRole messageRole, bool newLine, const std::string& text);
 
-    static void updateState(const std::string &state);
+    static void updateState(const std::string& state);
 
-    static void updateTime(const std::string &time);
+    static void updateTime(const std::string& time);
 
     static void updateWifiState(bool success);
 
     static void loadSystemSettingData();
+
+    static void disableBtn(const String& title, uint32_t color);
+
+    static void enableBtn(const String& title, uint32_t color);
 
     static void loadWifiList(lv_timer_t* timer);
 
@@ -31,7 +37,7 @@ public:
     static void stopSpeakAnim();
 
 private:
-    static lv_obj_t *last_message;
+    static lv_obj_t* last_message;
     static int current_message_number;
     static SemaphoreHandle_t lvglUpdateLock;
     static bool scanningWifi;

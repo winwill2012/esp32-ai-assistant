@@ -63,7 +63,7 @@ void AudioPlayer::begin() {
 
     i2s_driver_install(MAX98357_I2S_NUM, &max98357_i2s_config, 0, nullptr);
     i2s_set_pin(MAX98357_I2S_NUM, &max98357_gpio_config);
-    i2s_zero_dma_buffer(MAX98357_I2S_NUM);
+    // i2s_zero_dma_buffer(MAX98357_I2S_NUM);
     xTaskCreate(playAudio, "playAudio", 4096, nullptr, 1, nullptr);
 }
 
@@ -95,14 +95,14 @@ void AudioPlayer::publishTask(const PlayAudioTask task) const {
     }
 }
 
-void AudioPlayer::interrupt(bool value) {
+void AudioPlayer::interrupt(const bool value) {
     _interrupted = value;
     if (_interrupted) {
         xQueueReset(_taskQueue);
         i2s_stop(MAX98357_I2S_NUM);
-        i2s_zero_dma_buffer(MAX98357_I2S_NUM);
+        // i2s_zero_dma_buffer(MAX98357_I2S_NUM);
     } else {
-        i2s_zero_dma_buffer(MAX98357_I2S_NUM);
+        // i2s_zero_dma_buffer(MAX98357_I2S_NUM);
         i2s_start(MAX98357_I2S_NUM);
     }
 }

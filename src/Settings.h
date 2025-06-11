@@ -11,8 +11,6 @@
 #define SETTING_SPEED_RATIO                 "speedRatio"
 #define SETTING_VOICE_TYPE                  "voiceType"
 #define SETTING_PERSONA                     "persona"
-#define SETTING_SPEAK_PAUSE_DURATION        "pauseDur"
-#define SETTING_RECORDING_RMS_THRESHOLD     "rmsThreshold"
 #define SETTING_WIFI_SSID                   "wifiSsid"
 #define SETTING_WIFI_PASSWORD               "wifiPassword"
 #define SETTING_SCREEN_BRIGHTNESS           "brightness"
@@ -31,6 +29,8 @@ struct WifiInfo {
 class Settings {
 public:
     static void begin();
+
+    static void reset();
 
     static void show();
 
@@ -66,10 +66,6 @@ public:
 
     static void setCurrentSpeakSpeedRatio(double speakSpeedRatio);
 
-    static double getRecordingRmsThreshold();
-
-    static void setRecordingRmsThreshold(double rmsThreshold);
-
     static void setWifiInfo(const std::string &ssid, const std::string &password);
 
     static std::pair<std::string, std::string> getWifiInfo();
@@ -81,7 +77,6 @@ private:
     static double currentSpeakVolumeRatio; // 当前设置的音量
     static double currentSpeakSpeedRatio; // 当前设置的说话语速
 
-    static double recordingRmsThreshold; // 录音RMS阈值
     static std::map<std::string, std::string> voiceMap; // <声音，声音值>
     static std::map<std::string, std::string> personaMap; // <人设，botId>
     static std::string doubaoAppId;

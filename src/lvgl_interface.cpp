@@ -5,6 +5,7 @@
 #include "Utils.h"
 #include "AudioPlayer.h"
 #include "GlobalState.h"
+#include "gui/gui_guider.h"
 
 void set_current_voice(const char *voice) {
     Settings::setCurrentVoice(voice);
@@ -34,6 +35,7 @@ void connect_wifi(lv_timer_t* timer, const char *ssid, const char *password) {
     log_d("连接网络: %s, %s", ssid, password);
     if (reconnectWifi(timer, ssid, password, 20)) {
         Settings::setWifiInfo(ssid, password);
+        lv_screen_load(guider_ui.screen_main);
     }
 }
 
@@ -54,8 +56,7 @@ void on_btn_speak_clicked() {
 
 void on_btn_speak_pressed()
 {
-    Serial.println("说话按键按下");
-    if (GlobalState::getState() == Sleep)
+    if (GlobalState::getState() == Sleep || GlobalState::getState() == NetworkConnected)
     {
         // 正在待机，进入聆听状态
         GlobalState::setState(Listening);
@@ -65,10 +66,14 @@ void on_btn_speak_pressed()
 
 void on_btn_speak_released()
 {
-    Serial.println("说话按键释放");
     if (GlobalState::getState() == Listening)
     {
         GlobalState::setState(Recognizing);
         LvglDisplay::stopSpeakAnim();
     }
+}
+
+void reset_settings()
+{
+    Settings::reset();
 }

@@ -16,7 +16,7 @@ Application::Application() {
 void Application::begin() const {
     TimeUpdater::begin();
     _audioPlayer->begin();
-    showMemoryInfo();
+    // showMemoryInfo();
     _recordingManager->begin();
 }
 

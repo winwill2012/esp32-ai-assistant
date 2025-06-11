@@ -3,6 +3,7 @@
 
 #include "LvglDisplay.h"
 #include "utils.h"
+#include "gui/gui_guider.h"
 #include "misc/lv_timer_private.h"
 auto charset = "0123456789abcdef";
 
@@ -111,6 +112,7 @@ bool reconnectWifi(lv_timer_t* timer, const char* ssid, const char* password, co
         {
             GlobalState::setState(NetworkConnected);
             lv_timer_delete(timer); // 连接成功，删除联网定时器
+            lv_screen_load(guider_ui.screen_main);
             isConnectingWifi = false;
             connectRetries = 0;
             return true;

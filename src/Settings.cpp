@@ -3,6 +3,7 @@
 #include <WiFi.h>
 #include <map>
 #include "ArduinoJson.h"
+#include "GlobalState.h"
 
 Preferences Settings::preferences;
 String Settings::currentVoice;
@@ -10,7 +11,6 @@ String Settings::currentPersona;
 int Settings::currentScreenBrightness;
 double Settings::currentSpeakSpeedRatio;
 double Settings::currentSpeakVolumeRatio;
-double Settings::recordingRmsThreshold;
 std::map<std::string, std::string> Settings::voiceMap = std::map<std::string, std::string>(); // <声音，声音值>列表
 std::map<std::string, std::string> Settings::personaMap = std::map<std::string, std::string>(); // <人设，botId>列表
 std::string Settings::doubaoAppId;
@@ -43,8 +43,6 @@ void Settings::begin() {
     currentSpeakSpeedRatio = preferences.getDouble(SETTING_SPEED_RATIO, doc["system"]["speakSpeed"].as<double>());
     currentVoice = preferences.getString(SETTING_VOICE_TYPE, doc["system"]["voiceType"].as<String>());
     currentPersona = preferences.getString(SETTING_PERSONA, doc["system"]["persona"].as<String>());
-    recordingRmsThreshold = preferences.getDouble(SETTING_RECORDING_RMS_THRESHOLD,
-                                                  doc["system"]["recordingRmsThreshold"].as<double>());
     wifiSsid = preferences.getString(SETTING_WIFI_SSID, "").c_str();
     wifiPassword = preferences.getString(SETTING_WIFI_PASSWORD, "").c_str();
     currentScreenBrightness = preferences.getInt(SETTING_SCREEN_BRIGHTNESS, 80);
@@ -64,13 +62,26 @@ void Settings::begin() {
     show();
 }
 
+void Settings::reset()
+{
+    preferences.begin(SETTINGS_NAMESPACE, false);
+    preferences.remove(SETTING_VOLUME_RATIO);
+    preferences.remove(SETTING_SPEED_RATIO);
+    preferences.remove(SETTING_VOICE_TYPE);
+    preferences.remove(SETTING_PERSONA);
+    preferences.remove(SETTING_WIFI_SSID);
+    preferences.remove(SETTING_WIFI_PASSWORD);
+    preferences.remove(SETTING_SCREEN_BRIGHTNESS);
+    preferences.end();
+    ESP.restart();
+}
+
 void Settings::show() {
     log_i("------------------------settings info begin---------------------------------");
     log_i("currentSpeakVolumeRatio: %f", currentSpeakVolumeRatio);
     log_i(" currentSpeakSpeedRatio: %f", currentSpeakSpeedRatio);
     log_i("           currentVoice: %s", currentVoice.c_str());
     log_i("         currentPersona: %s", currentPersona.c_str());
-    log_i("  recordingRmsThreshold: %f", recordingRmsThreshold);
     log_i("            doubaoAppId: %s", doubaoAppId.c_str());
     log_i("      doubaoAccessToken: %s", doubaoAccessToken.c_str());
     log_i("              cozeToken: %s", cozeToken.c_str());
@@ -146,17 +157,6 @@ void Settings::setCurrentSpeakSpeedRatio(const double speakSpeedRatio) {
     currentSpeakSpeedRatio = speakSpeedRatio;
     preferences.begin(SETTINGS_NAMESPACE);
     preferences.putDouble(SETTING_SPEED_RATIO, speakSpeedRatio);
-    preferences.end();
-}
-
-double Settings::getRecordingRmsThreshold() {
-    return recordingRmsThreshold;
-}
-
-void Settings::setRecordingRmsThreshold(double rmsThreshold) {
-    recordingRmsThreshold = rmsThreshold;
-    preferences.begin(SETTINGS_NAMESPACE);
-    preferences.putDouble(SETTING_RECORDING_RMS_THRESHOLD, rmsThreshold);
     preferences.end();
 }
 

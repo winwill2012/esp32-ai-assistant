@@ -377,7 +377,7 @@ void setup_scr_screen_system_setting(lv_ui *ui)
     ui->screen_system_setting_slider_speak_speed = lv_slider_create(ui->screen_system_setting);
     lv_obj_set_pos(ui->screen_system_setting_slider_speak_speed, 73, 165);
     lv_obj_set_size(ui->screen_system_setting_slider_speak_speed, 160, 5);
-    lv_slider_set_range(ui->screen_system_setting_slider_speak_speed, 0, 100);
+    lv_slider_set_range(ui->screen_system_setting_slider_speak_speed, 8, 20);
     lv_slider_set_mode(ui->screen_system_setting_slider_speak_speed, LV_SLIDER_MODE_NORMAL);
     lv_slider_set_value(ui->screen_system_setting_slider_speak_speed, 50, LV_ANIM_OFF);
 

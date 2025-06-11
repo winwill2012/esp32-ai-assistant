@@ -144,6 +144,7 @@ static void screen_settings_btn_reset_setting_event_handler(lv_event_t* e)
     {
     case LV_EVENT_CLICKED:
         {
+            reset_settings();
             break;
         }
     default:
@@ -256,7 +257,7 @@ static void connect_wifi_timer_cb(lv_timer_t* timer)
 
 static void screen_networking_setting_btn_confirm_event_handler(lv_event_t* e)
 {
-    lv_event_code_t code = lv_event_get_code(e);
+    const lv_event_code_t code = lv_event_get_code(e);
     switch (code)
     {
     case LV_EVENT_CLICKED:

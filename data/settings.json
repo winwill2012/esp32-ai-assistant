@@ -1,11 +1,9 @@
 {
   "system": {
-    "volumeRatio": 0.8,
+    "volumeRatio": 1.0,
     "speakSpeed": 1.0,
-    "voiceType": "湾湾小何",
-    "persona": "幽默风趣",
-    "speakPauseDuration": 1000,
-    "recordingRmsThreshold": 30.00
+    "voiceType": "湾湾小何(女)",
+    "persona": "暴躁易怒"
   },
   "doubao": {
     "appId": "8988564775",
