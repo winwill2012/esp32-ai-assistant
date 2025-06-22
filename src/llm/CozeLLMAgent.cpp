@@ -33,7 +33,7 @@ CozeLLMAgent::CozeLLMAgent()
 void CozeLLMAgent::chat(const String& input)
 {
     if (input == "") return;
-    Serial.println(input);
+    ESP_LOGI("LLM", "发送消息到Coze智能体：%s", input.c_str());
     GlobalState::setState(Thinking);
     reset();
     HTTPClient http;
@@ -142,6 +142,7 @@ void CozeLLMAgent::reset()
     _command = "";
     _params = "";
     _firstPacket = true;
+    _interrupted = false;
 }
 
 // 处理增量消息

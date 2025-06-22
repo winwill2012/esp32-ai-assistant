@@ -116,6 +116,8 @@ void setup_scr_screen_system_setting(lv_ui* ui);
 LV_IMAGE_DECLARE(_wifi_RGB565A8_20x20);
 LV_IMAGE_DECLARE(_no_wifi_RGB565A8_20x20);
 LV_IMAGE_DECLARE(_refresh_RGB565A8_20x20);
+LV_IMAGE_DECLARE(_girl_RGB565A8_240x320);
+
 LV_IMAGE_DECLARE(screen_main_animimg_1noise_check_0);
 LV_IMAGE_DECLARE(screen_main_animimg_1noise_check_1);
 LV_IMAGE_DECLARE(screen_main_animimg_1noise_check_10);
