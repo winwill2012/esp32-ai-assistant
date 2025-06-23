@@ -62,12 +62,6 @@ void CozeLLMAgent::chat(const String& input)
         String line = "";
         while (stream->connected() || stream->available())
         {
-            if (_interrupted)
-            {
-                http.end();
-                return;
-            }
-            vTaskDelay(1);
             if (stream->available())
             {
                 line = stream->readStringUntil('\n');
@@ -77,12 +71,13 @@ void CozeLLMAgent::chat(const String& input)
                     if (line.compareTo("event:conversation.message.completed") == 0
                         && lastEvent.compareTo("event:conversation.message.delta") == 0)
                     {
-                        log_i("====================大模型调用结束==================");
-                        log_i("命令: %s", _command.c_str());
-                        log_i("参数: %s", _params.c_str());
-                        log_i("回复: %s", _response.c_str());
+                        ESP_LOGI("LLM", "====================大模型调用结束==================");
+                        ESP_LOGI("LLM", "命令: %s", _command.c_str());
+                        ESP_LOGI("LLM", "参数: %s", _params.c_str());
+                        ESP_LOGI("LLM", "回复: %s", _response.c_str());
                         if (_ttsTextBuffer != "")
                         {
+                            ESP_LOGI("LLM", "最后一条消息，继续语音合成: %s", _ttsTextBuffer.c_str());
                             Application::tts()->synth(_ttsTextBuffer, true);
                         }
                         else
@@ -91,6 +86,7 @@ void CozeLLMAgent::chat(const String& input)
                         }
                         break;
                     }
+                    // 返回true表示强制终止
                     processStreamOutput(line);
                     if (line.startsWith("event:"))
                     {
@@ -98,22 +94,19 @@ void CozeLLMAgent::chat(const String& input)
                     }
                 }
             }
+            vTaskDelay(pdMS_TO_TICKS(1));
         }
     }
     else
     {
-        log_e("Send query to coze agent error: %s", httpResponseCode);
+        ESP_LOGE("LLM", "请求智能体接口失败: %s", httpResponseCode);
     }
     http.end();
 }
 
 void CozeLLMAgent::processStreamOutput(String data)
 {
-    if (_interrupted)
-    {
-        return;
-    }
-    // log_i("Process coze agent response fragment: %s", data.c_str());
+    // ESP_LOGD("llm", "收到扣子返回: %s", data.c_str());
     // 只处理data开头，并且是助手回答的数据类型
     if (!data.startsWith("data:") || data.indexOf(R"("role":"assistant","type":"answer")") < 0)
     {
@@ -125,13 +118,13 @@ void CozeLLMAgent::processStreamOutput(String data)
     const DeserializationError error = deserializeJson(document, data);
     if (error != DeserializationError::Ok)
     {
-        log_e("Deserialization coze agent response error: %s", data.c_str());
+        ESP_LOGE("LLM", "解析智能体请求结果失败: %s", data.c_str());
         return;
     }
     String content = document["content"];
     const String conversationId = document["conversation_id"];
     GlobalState::setConversationId(conversationId);
-    processContent(content);
+    return processContent(content);
 }
 
 void CozeLLMAgent::reset()
@@ -142,16 +135,11 @@ void CozeLLMAgent::reset()
     _command = "";
     _params = "";
     _firstPacket = true;
-    _interrupted = false;
 }
 
 // 处理增量消息
 void CozeLLMAgent::processContent(String& content)
 {
-    if (_interrupted)
-    {
-        return;
-    }
     if (content.isEmpty())
     {
         return;
@@ -175,10 +163,6 @@ void CozeLLMAgent::processContent(String& content)
         content = content.substring(index + 1);
         processContent(content); // 然后递归处理右边部分
     }
-    if (_firstPacket)
-    {
-        _firstPacket = false;
-    }
     // 回复的内容里面包含一些可以断句的标点符号时，直接发送给TTS进行语音合成，降低响应延迟
     while (true)
     {
@@ -193,6 +177,7 @@ void CozeLLMAgent::processContent(String& content)
         {
             break;
         }
+        vTaskDelay(pdMS_TO_TICKS(1));
     }
 }
 
@@ -210,6 +195,10 @@ void CozeLLMAgent::processPart(const String& input)
         _response += input;
         _ttsTextBuffer += input;
         LvglDisplay::updateChatText(Robot, _firstPacket, _response.c_str());
+        if (_firstPacket)
+        {
+            _firstPacket = false;
+        }
         break;
     default:
         break;
@@ -220,14 +209,9 @@ void CozeLLMAgent::publishTask(const LLMTask task) const
 {
     if (xQueueSend(_taskQueue, &task, portMAX_DELAY) == pdFALSE)
     {
-        log_e("send llm task to queue failed");
+        ESP_LOGE("LLM", "发送智能体结果到语音合成队列失败: %s", task.message);
         free(task.message);
     }
-}
-
-void CozeLLMAgent::interrupt(const bool value)
-{
-    _interrupted = value;
 }
 
 void CozeLLMAgent::transition(const LLMState state, const LLMEvent event)

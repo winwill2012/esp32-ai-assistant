@@ -175,7 +175,7 @@ void setup_scr_screen_main(lv_ui *ui)
      //Write codes screen_main_btn_speak
     ui->screen_main_btn_speak = lv_button_create(ui->screen_main);
     lv_obj_set_pos(ui->screen_main_btn_speak, 10, 290);
-    lv_obj_set_size(ui->screen_main_btn_speak, 220, 22);
+    lv_obj_set_size(ui->screen_main_btn_speak, 220, 28);
     ui->screen_main_btn_speak_label = lv_label_create(ui->screen_main_btn_speak);
     lv_label_set_text(ui->screen_main_btn_speak_label, "按住说话");
     lv_label_set_long_mode(ui->screen_main_btn_speak_label, LV_LABEL_LONG_WRAP);
@@ -185,7 +185,7 @@ void setup_scr_screen_main(lv_ui *ui)
 
     //Write style for screen_main_btn_speak, Part: LV_PART_MAIN, State: LV_STATE_DEFAULT.
     lv_obj_set_style_bg_opa(ui->screen_main_btn_speak, 255, LV_PART_MAIN|LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui->screen_main_btn_speak, lv_color_hex(0x2F92DA), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(ui->screen_main_btn_speak, lv_color_hex(0x55b79d), LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_bg_grad_dir(ui->screen_main_btn_speak, LV_GRAD_DIR_NONE, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_border_width(ui->screen_main_btn_speak, 0, LV_PART_MAIN|LV_STATE_DEFAULT);
     lv_obj_set_style_radius(ui->screen_main_btn_speak, 5, LV_PART_MAIN|LV_STATE_DEFAULT);

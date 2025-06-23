@@ -20,20 +20,24 @@ std::string Settings::wifiSsid;
 std::string Settings::wifiPassword;
 std::vector<WifiInfo> Settings::scannedWifiList = std::vector<WifiInfo>();
 
-void Settings::begin() {
-    if (!SPIFFS.begin(true)) {
+void Settings::begin()
+{
+    if (!SPIFFS.begin(true))
+    {
         log_e("an Error has occurred while mounting SPIFFS");
         ESP.restart();
     }
     File file = SPIFFS.open("/settings.json", "r");
-    if (!file) {
+    if (!file)
+    {
         log_e("failed to open settings.json file for reading");
         ESP.restart();
     }
     JsonDocument doc;
     const DeserializationError error = deserializeJson(doc, file);
     file.close();
-    if (error) {
+    if (error)
+    {
         log_e("deserialize settings.json failed: %s", error.c_str());
         ESP.restart();
     }
@@ -52,11 +56,13 @@ void Settings::begin() {
     doubaoAccessToken = doc["doubao"]["accessToken"].as<std::string>();
     cozeToken = doc["coze"]["token"].as<std::string>();
     const JsonArray voiceListJsonArray = doc["voiceList"].as<JsonArray>();
-    for (JsonObject item: voiceListJsonArray) {
+    for (JsonObject item : voiceListJsonArray)
+    {
         voiceMap[item["name"].as<std::string>()] = item["value"].as<std::string>();
     }
     const JsonArray personaListJsonArray = doc["coze"]["personaList"].as<JsonArray>();
-    for (JsonObject item: personaListJsonArray) {
+    for (JsonObject item : personaListJsonArray)
+    {
         personaMap[item["name"].as<std::string>()] = item["botId"].as<std::string>();
     }
     show();
@@ -76,91 +82,96 @@ void Settings::reset()
     ESP.restart();
 }
 
-void Settings::show() {
-    log_i("------------------------settings info begin---------------------------------");
-    log_i("currentSpeakVolumeRatio: %f", currentSpeakVolumeRatio);
-    log_i(" currentSpeakSpeedRatio: %f", currentSpeakSpeedRatio);
-    log_i("           currentVoice: %s", currentVoice.c_str());
-    log_i("         currentPersona: %s", currentPersona.c_str());
-    log_i("            doubaoAppId: %s", doubaoAppId.c_str());
-    log_i("      doubaoAccessToken: %s", doubaoAccessToken.c_str());
-    log_i("              cozeToken: %s", cozeToken.c_str());
-    log_i("               wifiSsid: %s", wifiSsid.c_str());
-    log_i("           wifiPassword: %s", wifiPassword.c_str());
-    log_i("         all voice list: ");
-    for (const auto &pair: voiceMap) {
-        log_i("%s [%s]", pair.first.c_str(), pair.second.c_str());
-    }
-    log_i("       all persona list: ");
-    for (const auto &pair: personaMap) {
-        log_i("%s [%s]", pair.first.c_str(), pair.second.c_str());
-    }
-    log_i("------------------------settings info end---------------------------------");
+void Settings::show()
+{
+    ESP_LOGI("Settings", "------------------------当前系统配置---------------------------------");
+    ESP_LOGI("Settings", "  当前音量: %f", currentSpeakVolumeRatio);
+    ESP_LOGI("Settings", "  当前语速: %f", currentSpeakSpeedRatio);
+    ESP_LOGI("Settings", "  当前音色: %s", currentVoice.c_str());
+    ESP_LOGI("Settings", "  当前性格: %s", currentPersona.c_str());
+    ESP_LOGI("Settings", "豆包AppId: %s", doubaoAppId.c_str());
+    ESP_LOGI("Settings", "豆包Token: %s", doubaoAccessToken.c_str());
+    ESP_LOGI("Settings", "扣子Token: %s", cozeToken.c_str());
+    ESP_LOGI("Settings", "WiFi Sid: %s", wifiSsid.c_str());
+    ESP_LOGI("Settings", " WiFi密码: %s", wifiPassword.c_str());
+    ESP_LOGI("Settings", "-------------------------------------------------------------------");
 }
 
 /**
 *  扫描设备周围WiFi列表
 */
-std::vector<WifiInfo> Settings::getWifiList() {
-    log_d("start scan wifi...");
+std::vector<WifiInfo> Settings::getWifiList()
+{
+    ESP_LOGD("Settings", "开始扫描周边WiFi列表...");
     const int16_t number = WiFi.scanNetworks(true);
-    if (number == 0) {
+    if (number == 0)
+    {
         return {};
     }
-    log_d("scan wifi completed, found %d ap", number);
+    ESP_LOGD("Settings", "周边WiFi扫描结束, 一共 %d 个AP", number);
     scannedWifiList.clear();
-    for (int i = 0; i < number; i++) {
+    for (int i = 0; i < number; i++)
+    {
         scannedWifiList.emplace_back(WiFi.SSID(i), WiFi.RSSI(i), WiFi.encryptionType(i) != WIFI_AUTH_OPEN);
     }
     return scannedWifiList;
 }
 
-String Settings::getCurrentVoice() {
+String Settings::getCurrentVoice()
+{
     return currentVoice;
 }
 
 
-void Settings::setCurrentVoice(const String &voice) {
+void Settings::setCurrentVoice(const String& voice)
+{
     currentVoice = voice;
     preferences.begin(SETTINGS_NAMESPACE);
     preferences.putString(SETTING_VOICE_TYPE, voice);
     preferences.end();
 }
 
-String Settings::getCurrentPersona() {
+String Settings::getCurrentPersona()
+{
     return currentPersona;
 }
 
-void Settings::setCurrentPersona(const String &persona) {
+void Settings::setCurrentPersona(const String& persona)
+{
     currentPersona = persona;
     preferences.begin(SETTINGS_NAMESPACE);
     preferences.putString(SETTING_PERSONA, persona);
     preferences.end();
 }
 
-double Settings::getCurrentSpeakVolumeRatio() {
+double Settings::getCurrentSpeakVolumeRatio()
+{
     return currentSpeakVolumeRatio;
 }
 
-void Settings::setCurrentSpeakVolumeRatio(const double speakVolumeRatio) {
+void Settings::setCurrentSpeakVolumeRatio(const double speakVolumeRatio)
+{
     currentSpeakVolumeRatio = speakVolumeRatio;
     preferences.begin(SETTINGS_NAMESPACE);
     preferences.putDouble(SETTING_VOLUME_RATIO, speakVolumeRatio);
     preferences.end();
 }
 
-double Settings::getCurrentSpeakSpeedRatio() {
+double Settings::getCurrentSpeakSpeedRatio()
+{
     return currentSpeakSpeedRatio;
 }
 
-void Settings::setCurrentSpeakSpeedRatio(const double speakSpeedRatio) {
+void Settings::setCurrentSpeakSpeedRatio(const double speakSpeedRatio)
+{
     currentSpeakSpeedRatio = speakSpeedRatio;
     preferences.begin(SETTINGS_NAMESPACE);
     preferences.putDouble(SETTING_SPEED_RATIO, speakSpeedRatio);
     preferences.end();
 }
 
-void Settings::setWifiInfo(const std::string &ssid, const std::string &password) {
+void Settings::setWifiInfo(const std::string& ssid, const std::string& password)
+{
     wifiSsid = ssid;
     wifiPassword = password;
     preferences.begin(SETTINGS_NAMESPACE);
@@ -169,35 +180,43 @@ void Settings::setWifiInfo(const std::string &ssid, const std::string &password)
     preferences.end();
 }
 
-std::pair<std::string, std::string> Settings::getWifiInfo() {
+std::pair<std::string, std::string> Settings::getWifiInfo()
+{
     return std::make_pair(wifiSsid, wifiPassword);
 }
 
-std::map<std::string, std::string> Settings::getVoiceMap() {
+std::map<std::string, std::string> Settings::getVoiceMap()
+{
     return voiceMap;
 }
 
-std::map<std::string, std::string> Settings::getPersonaMap() {
+std::map<std::string, std::string> Settings::getPersonaMap()
+{
     return personaMap;
 }
 
-std::string Settings::getDoubaoAppId() {
+std::string Settings::getDoubaoAppId()
+{
     return doubaoAppId;
 }
 
-std::string Settings::getDoubaoAccessToken() {
+std::string Settings::getDoubaoAccessToken()
+{
     return doubaoAccessToken;
 }
 
-std::string Settings::getCozeToken() {
+std::string Settings::getCozeToken()
+{
     return cozeToken;
 }
 
-int Settings::getScreenBrightness() {
+int Settings::getScreenBrightness()
+{
     return currentScreenBrightness;
 }
 
-void Settings::setScreenBrightness(int brightness) {
+void Settings::setScreenBrightness(int brightness)
+{
     currentScreenBrightness = brightness;
     analogWrite(8, static_cast<int>(currentScreenBrightness * 2.55));
     preferences.begin(SETTINGS_NAMESPACE);

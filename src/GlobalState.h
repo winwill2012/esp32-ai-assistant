@@ -4,7 +4,8 @@
 #include <Arduino.h>
 #include <vector>
 
-enum MachineState {
+enum MachineState
+{
     Sleep,
     NetworkConfigurationNotFound,
     NetworkConnecting,
@@ -13,11 +14,11 @@ enum MachineState {
     Listening,
     Recognizing,
     Thinking,
-    Speaking,
-    ForceStop
+    Speaking
 };
 
-class GlobalState {
+class GlobalState
+{
 public:
     static void setConversationId(String conversationId);
 
@@ -25,7 +26,7 @@ public:
 
     static String getConversationId();
 
-    static EventBits_t getEventBits(const std::vector<MachineState> &states);
+    static EventBits_t getEventBits(const std::vector<MachineState>& states);
 
     static MachineState getState();
 

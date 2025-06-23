@@ -12,7 +12,7 @@ void IOT::begin()
 
 void IOT::handle(const String& command, const String& parameter)
 {
-    log_i("执行智能控制: %s, %s", command.c_str(), parameter.c_str());
+    ESP_LOGI("IOT", "执行智能控制: %s, %s", command.c_str(), parameter.c_str());
     if (command == "switch")
     {
         if (parameter.indexOf("on") >= 0)

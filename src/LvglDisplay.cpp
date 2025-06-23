@@ -98,7 +98,8 @@ void LvglDisplay::disableBtn(const String& title, const uint32_t color)
     if (xSemaphoreTakeRecursive(lvglUpdateLock, portMAX_DELAY) == pdTRUE)
     {
         lv_obj_remove_flag(guider_ui.screen_main_btn_speak, LV_OBJ_FLAG_CLICKABLE);
-        lv_obj_set_style_bg_color(guider_ui.screen_main_btn_speak, lv_color_hex(color), LV_PART_MAIN|LV_STATE_DEFAULT);
+        lv_obj_set_style_bg_color(guider_ui.screen_main_btn_speak, lv_color_hex(color),
+                                  LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_label_set_text(guider_ui.screen_main_btn_speak_label, title.c_str());
         xSemaphoreGiveRecursive(lvglUpdateLock);
     }
@@ -109,7 +110,8 @@ void LvglDisplay::enableBtn(const String& title, const uint32_t color)
     if (xSemaphoreTakeRecursive(lvglUpdateLock, portMAX_DELAY) == pdTRUE)
     {
         lv_obj_add_flag(guider_ui.screen_main_btn_speak, LV_OBJ_FLAG_CLICKABLE);
-        lv_obj_set_style_bg_color(guider_ui.screen_main_btn_speak, lv_color_hex(color), LV_PART_MAIN|LV_STATE_DEFAULT);
+        lv_obj_set_style_bg_color(guider_ui.screen_main_btn_speak, lv_color_hex(color),
+                                  LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_label_set_text(guider_ui.screen_main_btn_speak_label, title.c_str());
         xSemaphoreGiveRecursive(lvglUpdateLock);
     }
@@ -269,13 +271,15 @@ void LvglDisplay::loadWifiList(lv_timer_t* timer)
         if (scanResult >= 0)
         {
             refreshImageAngle = 3600;
-            for (int i = 0; i < scanResult; i++) {
+            for (int i = 0; i < scanResult; i++)
+            {
                 add_wifi_item(WifiInfo(WiFi.SSID(i), WiFi.RSSI(i), WiFi.encryptionType(i) != WIFI_AUTH_OPEN));
             }
             lv_timer_delete(timer);
             scanningWifi = false;
         }
-    }  else
+    }
+    else
     {
         scanningWifi = true;
         WiFi.scanNetworks(true);

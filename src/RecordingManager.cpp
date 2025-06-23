@@ -53,7 +53,6 @@ RecordingManager::RecordingManager()
         }
         else
         {
-            Serial.println("buffer有数据...");
             Application::asr()->recognize(WebSocketASRTask(
                 std::vector<uint8_t>(buffer, buffer + pxItemSize),
                 firstPacket, false));
@@ -83,10 +82,6 @@ RecordingManager::RecordingManager()
         if (err == ESP_OK)
         {
             buffer.resize(bytesRead / sizeof(int16_t));
-            // 再次说话时，终止状态清除
-            Application::audioPlayer()->interrupt(false);
-            Application::tts()->interrupt(false);
-            Application::llm()->interrupt(false);
             // 16位PCM数据，转换成大端序字节流
             //                std::vector<uint8_t> uint8Buffer = int16ToUint8BigEndian(buffer);
             xRingbufferSend(_ringBuffer, buffer.data(), buffer.size() * sizeof(int16_t), portMAX_DELAY);

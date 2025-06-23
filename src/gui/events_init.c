@@ -49,11 +49,6 @@ static void screen_main_imgbtn_mic_event_handler(lv_event_t* e)
     lv_event_code_t code = lv_event_get_code(e);
     switch (code)
     {
-    case LV_EVENT_CLICKED:
-        {
-            on_btn_speak_clicked();
-            break;
-        }
     case LV_EVENT_PRESSED:
         {
             on_btn_speak_pressed();

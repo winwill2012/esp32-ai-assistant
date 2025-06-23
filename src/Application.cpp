@@ -31,8 +31,8 @@ void Application::showMemoryInfo()
     {
         while (true)
         {
-            log_d("Free ram: %d", heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
-            log_d("Free psram: %d", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
+            ESP_LOGD("Application", "Free ram: %d", heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
+            ESP_LOGD("Application", "Free psram: %d", heap_caps_get_free_size(MALLOC_CAP_SPIRAM));
             vTaskDelay(pdMS_TO_TICKS(1000));
         }
     }, "showMemoryInfo", 2048, nullptr, 1, nullptr);

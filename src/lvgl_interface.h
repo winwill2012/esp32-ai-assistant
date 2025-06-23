@@ -26,8 +26,6 @@ void load_wifi_list(lv_timer_t* timer);
 
 void connect_wifi(lv_timer_t* timer, const char* ssid, const char* password);
 
-void on_btn_speak_clicked();
-
 void on_btn_speak_pressed();
 
 void on_btn_speak_released();

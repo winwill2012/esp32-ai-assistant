@@ -44,13 +44,10 @@ public:
 
     void reset();
 
-    void interrupt(bool value);
-
     // 状态机状态转移函数
     void transition(LLMState state, LLMEvent event);
 
 private:
-    bool _interrupted = false;
     LLMState _currentState = Begin;
     // 回复内容
     String _response = "";
