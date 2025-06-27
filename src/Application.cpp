@@ -9,6 +9,7 @@ DECLARE_ASR(DoubaoASR)
 
 Application::Application()
 {
+    ps_malloc()
     IOT::begin();
     _ttsClient = new DoubaoTTS();
     _llmAgent = new CozeLLMAgent();

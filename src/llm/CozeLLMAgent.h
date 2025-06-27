@@ -14,10 +14,10 @@ struct LLMTask
 // LLM状态列表
 enum LLMState
 {
-    Begin,
+    Init,
     CommandCompleted,
+    ParamsCompleted,
     ResponseCompleted,
-    ParamsCompleted
 };
 
 // LLM流式输出事件
@@ -45,10 +45,10 @@ public:
     void reset();
 
     // 状态机状态转移函数
-    void transition(LLMState state, LLMEvent event);
+    void stateTransfer(LLMState state, LLMEvent event);
 
 private:
-    LLMState _currentState = Begin;
+    LLMState _state = Init;
     // 回复内容
     String _response = "";
     // 命令类型

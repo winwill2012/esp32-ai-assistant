@@ -129,7 +129,6 @@ void LvglDisplay::begin()
     lv_init();
     lv_tick_set_cb(my_tick);
     ts.begin();
-    lv_mem_init();
     lv_display_t* disp;
     disp = lv_tft_espi_create(TFT_HOR_RES, TFT_VER_RES, draw_buf, sizeof(draw_buf));
     lv_display_set_rotation(disp, LV_DISPLAY_ROTATION_0);

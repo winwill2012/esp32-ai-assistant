@@ -62,36 +62,38 @@ void CozeLLMAgent::chat(const String& input)
         String line = "";
         while (stream->connected() || stream->available())
         {
-            if (stream->available())
+            // 等待数据流有新的数据可读
+            while (!stream->available())
             {
-                line = stream->readStringUntil('\n');
-                if (!line.isEmpty())
+                vTaskDelay(pdMS_TO_TICKS(10));
+            }
+            line = stream->readStringUntil('\n');
+            if (!line.isEmpty())
+            {
+                // 表示大模型回复已经完全结束
+                if (line.compareTo("event:conversation.message.completed") == 0
+                    && lastEvent.compareTo("event:conversation.message.delta") == 0)
                 {
-                    // 表示大模型回复已经完全结束
-                    if (line.compareTo("event:conversation.message.completed") == 0
-                        && lastEvent.compareTo("event:conversation.message.delta") == 0)
+                    ESP_LOGI("LLM", "====================大模型调用结束==================");
+                    ESP_LOGI("LLM", "命令: %s", _command.c_str());
+                    ESP_LOGI("LLM", "参数: %s", _params.c_str());
+                    ESP_LOGI("LLM", "回复: %s", _response.c_str());
+                    if (_ttsTextBuffer != "")
                     {
-                        ESP_LOGI("LLM", "====================大模型调用结束==================");
-                        ESP_LOGI("LLM", "命令: %s", _command.c_str());
-                        ESP_LOGI("LLM", "参数: %s", _params.c_str());
-                        ESP_LOGI("LLM", "回复: %s", _response.c_str());
-                        if (_ttsTextBuffer != "")
-                        {
-                            ESP_LOGI("LLM", "最后一条消息，继续语音合成: %s", _ttsTextBuffer.c_str());
-                            Application::tts()->synth(_ttsTextBuffer, true);
-                        }
-                        else
-                        {
-                            Application::tts()->disconnect();
-                        }
-                        break;
+                        ESP_LOGI("LLM", "最后一条消息，继续语音合成: %s", _ttsTextBuffer.c_str());
+                        Application::tts()->synth(_ttsTextBuffer, true);
                     }
-                    // 返回true表示强制终止
-                    processStreamOutput(line);
-                    if (line.startsWith("event:"))
+                    else
                     {
-                        lastEvent = line;
+                        Application::tts()->disconnect();
                     }
+                    break;
+                }
+                // 返回true表示强制终止
+                processStreamOutput(line);
+                if (line.startsWith("event:"))
+                {
+                    lastEvent = line;
                 }
             }
             vTaskDelay(pdMS_TO_TICKS(1));
@@ -129,7 +131,7 @@ void CozeLLMAgent::processStreamOutput(String data)
 
 void CozeLLMAgent::reset()
 {
-    _currentState = Begin;
+    _state = Init;
     _response = "";
     _ttsTextBuffer = "";
     _command = "";
@@ -159,7 +161,7 @@ void CozeLLMAgent::processContent(String& content)
             processPart(leftPart);
         }
         // 再执行状态转移
-        transition(_currentState, Delimiter);
+        stateTransfer(_state, Delimiter);
         content = content.substring(index + 1);
         processContent(content); // 然后递归处理右边部分
     }
@@ -183,9 +185,9 @@ void CozeLLMAgent::processContent(String& content)
 
 void CozeLLMAgent::processPart(const String& input)
 {
-    switch (_currentState)
+    switch (_state)
     {
-    case Begin:
+    case Init:
         _command += input;
         break;
     case CommandCompleted:
@@ -214,18 +216,18 @@ void CozeLLMAgent::publishTask(const LLMTask task) const
     }
 }
 
-void CozeLLMAgent::transition(const LLMState state, const LLMEvent event)
+void CozeLLMAgent::stateTransfer(const LLMState state, const LLMEvent event)
 {
     switch (state)
     {
-    case Begin:
+    case Init:
         switch (event)
         {
         case Normal:
-            _currentState = Begin;
+            _state = Init;
             break;
         case Delimiter:
-            _currentState = CommandCompleted;
+            _state = CommandCompleted;
             break;
         }
         break;
@@ -233,10 +235,10 @@ void CozeLLMAgent::transition(const LLMState state, const LLMEvent event)
         switch (event)
         {
         case Normal:
-            _currentState = CommandCompleted;
+            _state = CommandCompleted;
             break;
         case Delimiter:
-            _currentState = ParamsCompleted;
+            _state = ParamsCompleted;
             IOT::handle(_command, _params);
             break;
         }
@@ -245,10 +247,10 @@ void CozeLLMAgent::transition(const LLMState state, const LLMEvent event)
         switch (event)
         {
         case Normal:
-            _currentState = ParamsCompleted;
+            _state = ParamsCompleted;
             break;
         case Delimiter:
-            _currentState = ResponseCompleted;
+            _state = ResponseCompleted;
             break;
         }
         break;
