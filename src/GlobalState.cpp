@@ -42,7 +42,6 @@ MachineState GlobalState::getState()
 
 void GlobalState::setState(const MachineState state)
 {
-    ESP_LOGD("GlobalState", "设置设备状态到: %d", state);
     xEventGroupClearBits(eventGroup, xEventGroupGetBits(eventGroup));
     xEventGroupSetBits(eventGroup, 1 << state);
     machineState = state;
