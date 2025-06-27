@@ -5,24 +5,25 @@
 #include <WebSocketsClient.h>
 #include "driver/i2s.h"
 
-class DoubaoTTS final : public WebSocketsClient
-{
+class DoubaoTTS final : public WebSocketsClient {
 public:
     DoubaoTTS();
 
-    void eventCallback(WStype_t type, uint8_t* payload, size_t length);
+    void eventCallback(WStype_t type, uint8_t *payload, size_t length);
 
     void begin();
 
-    static String buildFullClientRequest(const String& text);
+    void connect();
 
-    void parseResponse(const uint8_t* response);
+    static String buildFullClientRequest(const String &text);
 
-    void synth(const String& text, bool disconnectAfter);
+    void parseResponse(const uint8_t *response);
+
+    void synth(const String &text, bool disconnectAfter);
 
 private:
     unsigned long _taskStartTime = 0;
-    size_t _audioSize = 0;
+    volatile bool _isConnecting = false;
     SemaphoreHandle_t _taskFinished;
 };
 

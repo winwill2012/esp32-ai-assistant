@@ -10,18 +10,14 @@
 #include "Application.h"
 #include "IOT.h"
 
-CozeLLMAgent::CozeLLMAgent()
-{
+CozeLLMAgent::CozeLLMAgent() {
     _firstPacket = true;
     _taskQueue = xQueueCreate(5, sizeof(LLMTask));
-    xTaskCreate([](void* ptr)
-    {
-        auto* instance = static_cast<CozeLLMAgent*>(ptr);
+    xTaskCreate([](void *ptr) {
+        auto *instance = static_cast<CozeLLMAgent *>(ptr);
         LLMTask task{};
-        while (true)
-        {
-            if (xQueueReceive(instance->_taskQueue, &task, pdMS_TO_TICKS(1)) == pdTRUE)
-            {
+        while (true) {
+            if (xQueueReceive(instance->_taskQueue, &task, pdMS_TO_TICKS(1)) == pdTRUE) {
                 instance->chat(String(task.message, task.length));
                 free(task.message);
             }
@@ -30,8 +26,7 @@ CozeLLMAgent::CozeLLMAgent()
     }, "llmTaskLoop", 1024 * 8, this, 1, nullptr);
 }
 
-void CozeLLMAgent::chat(const String& input)
-{
+void CozeLLMAgent::chat(const String &input) {
     if (input == "") return;
     ESP_LOGI("LLM", "发送消息到Coze智能体：%s", input.c_str());
     GlobalState::setState(Thinking);
@@ -55,71 +50,59 @@ void CozeLLMAgent::chat(const String& input)
     std::string requestBodyStr;
     serializeJson(requestBody, requestBodyStr);
     const int httpResponseCode = http.POST(requestBodyStr.c_str());
-    if (httpResponseCode > 0)
-    {
+    if (httpResponseCode > 0) {
+        // 开始调用智能体接口就创建TTS连接，提高语音合成相应速度
+        Application::tts()->connect();
         String lastEvent;
-        WiFiClient* stream = http.getStreamPtr();
+        WiFiClient *stream = http.getStreamPtr();
         String line = "";
-        while (stream->connected() || stream->available())
-        {
+        while (stream->connected() || stream->available()) {
             // 等待数据流有新的数据可读
-            while (!stream->available())
-            {
+            while (!stream->available()) {
                 vTaskDelay(pdMS_TO_TICKS(10));
             }
             line = stream->readStringUntil('\n');
-            if (!line.isEmpty())
-            {
+            if (!line.isEmpty()) {
                 // 表示大模型回复已经完全结束
                 if (line.compareTo("event:conversation.message.completed") == 0
-                    && lastEvent.compareTo("event:conversation.message.delta") == 0)
-                {
+                    && lastEvent.compareTo("event:conversation.message.delta") == 0) {
                     ESP_LOGI("LLM", "====================大模型调用结束==================");
                     ESP_LOGI("LLM", "命令: %s", _command.c_str());
                     ESP_LOGI("LLM", "参数: %s", _params.c_str());
                     ESP_LOGI("LLM", "回复: %s", _response.c_str());
-                    if (_ttsTextBuffer != "")
-                    {
+                    if (_ttsTextBuffer != "") {
                         ESP_LOGI("LLM", "最后一条消息，继续语音合成: %s", _ttsTextBuffer.c_str());
                         Application::tts()->synth(_ttsTextBuffer, true);
-                    }
-                    else
-                    {
+                    } else {
                         Application::tts()->disconnect();
                     }
                     break;
                 }
                 // 返回true表示强制终止
                 processStreamOutput(line);
-                if (line.startsWith("event:"))
-                {
+                if (line.startsWith("event:")) {
                     lastEvent = line;
                 }
             }
             vTaskDelay(pdMS_TO_TICKS(1));
         }
-    }
-    else
-    {
+    } else {
         ESP_LOGE("LLM", "请求智能体接口失败: %s", httpResponseCode);
     }
     http.end();
 }
 
-void CozeLLMAgent::processStreamOutput(String data)
-{
+void CozeLLMAgent::processStreamOutput(String data) {
     // ESP_LOGD("llm", "收到扣子返回: %s", data.c_str());
     // 只处理data开头，并且是助手回答的数据类型
-    if (!data.startsWith("data:") || data.indexOf(R"("role":"assistant","type":"answer")") < 0)
-    {
+    if (!data.startsWith("data:") || data.indexOf(R"("role":"assistant","type":"answer")") < 0) {
         return;
     }
     data.replace("data:", "");
     JsonDocument document;
     document.clear();
     const DeserializationError error = deserializeJson(document, data);
-    if (error != DeserializationError::Ok)
-    {
+    if (error != DeserializationError::Ok) {
         ESP_LOGE("LLM", "解析智能体请求结果失败: %s", data.c_str());
         return;
     }
@@ -129,8 +112,7 @@ void CozeLLMAgent::processStreamOutput(String data)
     return processContent(content);
 }
 
-void CozeLLMAgent::reset()
-{
+void CozeLLMAgent::reset() {
     _state = Init;
     _response = "";
     _ttsTextBuffer = "";
@@ -140,24 +122,19 @@ void CozeLLMAgent::reset()
 }
 
 // 处理增量消息
-void CozeLLMAgent::processContent(String& content)
-{
-    if (content.isEmpty())
-    {
+void CozeLLMAgent::processContent(String &content) {
+    if (content.isEmpty()) {
         return;
     }
     const int index = content.indexOf(DELIMITER);
     // 如果不包含分隔符，状态不会发生变化
-    if (index < 0)
-    {
+    if (index < 0) {
         processPart(content);
         content = "";
-    }
-    else // 如果包含分隔符
+    } else // 如果包含分隔符
     {
         const String leftPart = content.substring(0, index);
-        if (!leftPart.isEmpty())
-        {
+        if (!leftPart.isEmpty()) {
             processPart(leftPart);
         }
         // 再执行状态转移
@@ -166,95 +143,81 @@ void CozeLLMAgent::processContent(String& content)
         processContent(content); // 然后递归处理右边部分
     }
     // 回复的内容里面包含一些可以断句的标点符号时，直接发送给TTS进行语音合成，降低响应延迟
-    while (true)
-    {
+    while (true) {
         const std::pair<int, size_t> delimiterIndex = findMinIndexOfDelimiter(_ttsTextBuffer);
-        if (delimiterIndex.first >= 0)
-        {
+        if (delimiterIndex.first >= 0) {
             Application::tts()->synth(_ttsTextBuffer.substring(0, delimiterIndex.first),
                                       false);
             _ttsTextBuffer = _ttsTextBuffer.substring(delimiterIndex.first + delimiterIndex.second);
-        }
-        else
-        {
+        } else {
             break;
         }
         vTaskDelay(pdMS_TO_TICKS(1));
     }
 }
 
-void CozeLLMAgent::processPart(const String& input)
-{
-    switch (_state)
-    {
-    case Init:
-        _command += input;
-        break;
-    case CommandCompleted:
-        _params += input;
-        break;
-    case ParamsCompleted:
-        _response += input;
-        _ttsTextBuffer += input;
-        LvglDisplay::updateChatText(Robot, _firstPacket, _response.c_str());
-        if (_firstPacket)
-        {
-            _firstPacket = false;
-        }
-        break;
-    default:
-        break;
+void CozeLLMAgent::processPart(const String &input) {
+    switch (_state) {
+        case Init:
+            _command += input;
+            break;
+        case CommandCompleted:
+            _params += input;
+            break;
+        case ParamsCompleted:
+            _response += input;
+            _ttsTextBuffer += input;
+            LvglDisplay::updateChatText(Robot, _firstPacket, _response.c_str());
+            if (_firstPacket) {
+                _firstPacket = false;
+            }
+            break;
+        default:
+            break;
     }
 }
 
-void CozeLLMAgent::publishTask(const LLMTask task) const
-{
-    if (xQueueSend(_taskQueue, &task, portMAX_DELAY) == pdFALSE)
-    {
+void CozeLLMAgent::publishTask(const LLMTask task) const {
+    if (xQueueSend(_taskQueue, &task, portMAX_DELAY) == pdFALSE) {
         ESP_LOGE("LLM", "发送智能体结果到语音合成队列失败: %s", task.message);
         free(task.message);
     }
 }
 
-void CozeLLMAgent::stateTransfer(const LLMState state, const LLMEvent event)
-{
-    switch (state)
-    {
-    case Init:
-        switch (event)
-        {
-        case Normal:
-            _state = Init;
+void CozeLLMAgent::stateTransfer(const LLMState state, const LLMEvent event) {
+    switch (state) {
+        case Init:
+            switch (event) {
+                case Normal:
+                    _state = Init;
+                    break;
+                case Delimiter:
+                    _state = CommandCompleted;
+                    break;
+            }
             break;
-        case Delimiter:
-            _state = CommandCompleted;
+        case CommandCompleted:
+            switch (event) {
+                case Normal:
+                    _state = CommandCompleted;
+                    break;
+                case Delimiter:
+                    _state = ParamsCompleted;
+                    IOT::handle(_command, _params);
+                    break;
+            }
             break;
-        }
-        break;
-    case CommandCompleted:
-        switch (event)
-        {
-        case Normal:
-            _state = CommandCompleted;
+        case ParamsCompleted:
+            switch (event) {
+                case Normal:
+                    _state = ParamsCompleted;
+                    break;
+                case Delimiter:
+                    _state = ResponseCompleted;
+                    break;
+            }
             break;
-        case Delimiter:
-            _state = ParamsCompleted;
-            IOT::handle(_command, _params);
+        default:
             break;
-        }
-        break;
-    case ParamsCompleted:
-        switch (event)
-        {
-        case Normal:
-            _state = ParamsCompleted;
-            break;
-        case Delimiter:
-            _state = ResponseCompleted;
-            break;
-        }
-        break;
-    default:
-        break;
     }
 }
