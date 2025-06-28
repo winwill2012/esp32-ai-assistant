@@ -24,6 +24,10 @@ public:
     static void changeScreenBrightness(int brightness);
     // 调整音量
     static void changeVolume(int volume);
+    // 调整音色
+    static void changeVoice(const String& voice);
+    // 调整说话语速
+    static void changeSpeakSpeed(double speed);
 
 private:
     static CRGB leds[1];

@@ -7,6 +7,7 @@
 
 Application::Application() {
     IOT::begin();
+    IOT::turnOffRgb();
     _ttsClient = new DoubaoTTS();
     _llmAgent = new CozeLLMAgent();
     _asrClient = new DoubaoASR();

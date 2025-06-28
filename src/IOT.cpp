@@ -30,7 +30,7 @@ void IOT::handle(const String& command, const String& parameter)
     }
     else if (command == "brightness")
     {
-        changeVolume(str2int(parameter));
+        changeRgbBrightness(str2int(parameter));
     }
     else if (command == "background")
     {
@@ -39,6 +39,14 @@ void IOT::handle(const String& command, const String& parameter)
     else if (command == "volume")
     {
         changeVolume(str2int(parameter));
+    }
+    else if (command == "voice")
+    {
+        changeVoice(parameter);
+    }
+    else if (command == "speed")
+    {
+        changeSpeakSpeed(str2double(parameter));
     }
 }
 
@@ -75,4 +83,14 @@ void IOT::changeScreenBrightness(const int brightness)
 void IOT::changeVolume(const int volume)
 {
     Settings::setCurrentSpeakVolumeRatio(volume * 1.0 / 100);
+}
+
+void IOT::changeVoice(const String& voice)
+{
+    Settings::setCurrentVoice(voice);
+}
+
+void IOT::changeSpeakSpeed(const double speed)
+{
+    Settings::setCurrentSpeakSpeedRatio(speed);
 }

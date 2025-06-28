@@ -25,4 +25,6 @@ bool reconnectWifi(lv_timer_t* timer, const char* ssid, const char* password, in
 uint32_t hexColorToUInt(String hex);
 
 int str2int(const String& input);
+
+double str2double(const String& input);
 #endif

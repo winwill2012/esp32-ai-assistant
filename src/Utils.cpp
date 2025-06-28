@@ -154,3 +154,8 @@ int str2int(const String& input)
 {
     return std::stoi(input.c_str(), nullptr, 10);
 }
+
+double str2double(const String& input)
+{
+    return std::stod(input.c_str(), nullptr);
+}
