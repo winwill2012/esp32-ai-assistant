@@ -1,6 +1,6 @@
 {
   "system": {
-    "volumeRatio": 1.0,
+    "volumeRatio": 0.9,
     "speakSpeed": 1.0,
     "voiceType": "湾湾小何",
     "persona": "幽默芯语"
@@ -10,15 +10,15 @@
     "accessToken": "dsWgV1rCvxiinw_H2clmJuAI-O1D8P94"
   },
   "coze": {
-    "token": "pat_CFUFu9h551f7P3i3NMJZ4JUS2XQRUngcjsepVHK3aMR3hvAIlsaWy66L9phva0Pj",
+    "token": "pat_da2B0XXi1sHY7rm6h03BbI86yxPlLnmUuRAwBjBCESI9XNahHCiapzSGtaJFLTJC",
     "personaList": [
       {
         "name": "幽默芯语",
-        "botId": "7479628247178313747"
+        "botId": "7520829395142361122"
       },
       {
         "name": "暴躁芯语",
-        "botId": "7468218438402818082"
+        "botId": "7520838194271633450"
       }
     ]
   },
